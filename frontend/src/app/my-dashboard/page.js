@@ -12,6 +12,7 @@ import {
   Settings,
   ChevronRight
 } from 'lucide-react';
+import ShinyButton from '@/components/ui/ShinyButton';
 
 export default function EmployeeDashboard() {
   const d = employeeDashboardData;
@@ -26,6 +27,11 @@ export default function EmployeeDashboard() {
 
   return (
     <div className="page-in">
+      {/* ── HEADER ACTIONS ── */}
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 20 }}>
+        <ShinyButton onClick={() => window.location.href='/my-leaves'}>Apply for Leave</ShinyButton>
+      </div>
+
       {/* Hero Banner with Dark Navy Glass Theme */}
       <div style={{
         background: 'linear-gradient(135deg, #0B1E3D 0%, #1A3A6B 55%, #2563EB 100%)',

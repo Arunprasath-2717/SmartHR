@@ -22,6 +22,7 @@ import {
   XCircle,
   FileSpreadsheet
 } from 'lucide-react';
+import ShinyButton from '@/components/ui/ShinyButton';
 
 /* ─── MINI SPARKLINE used in hero cards ─── */
 function Sparkline({ data, color = '#6EE7B7', height = 60 }) {
@@ -174,6 +175,11 @@ export default function HRDashboard() {
 
   return (
     <div style={{ animation:'page-in 350ms ease-out both' }}>
+      {/* ── HEADER ACTIONS ── */}
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 20 }}>
+        <ShinyButton onClick={() => window.location.href='/payroll'}>Generate Payroll Process</ShinyButton>
+      </div>
+
       {/* ── HERO STAT CARDS ── */}
       <div style={{
         background:'linear-gradient(135deg, #0B1E3D 0%, #1A3A6B 55%, #2563EB 100%)',
