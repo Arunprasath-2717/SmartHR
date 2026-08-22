@@ -198,6 +198,18 @@ export default function TopBar() {
                   <User size={15} /> My Profile
                 </button>
 
+                <button
+                  className="dropdown-item"
+                  onClick={() => {
+                    setUserMenuOpen(false);
+                    switchRole(role === 'hr' ? 'employee' : 'hr');
+                    toast({ message: `Switched to ${role === 'hr' ? 'Employee' : 'HR Officer / Employer'} View`, type: 'info' });
+                  }}
+                  style={{ width: '100%', borderRadius: 8, color: '#3B82F6', fontWeight: 600 }}
+                >
+                  <Shield size={15} color="#3B82F6" /> Switch to {role === 'hr' ? 'Employee' : 'Employer / HR'}
+                </button>
+
                 <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', margin: '4px 0' }} />
 
                 <button

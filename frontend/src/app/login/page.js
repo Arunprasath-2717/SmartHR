@@ -53,7 +53,7 @@ export default function LoginPage() {
 
     setLoading(true);
     try {
-      await login(targetEmail, targetPassword);
+      await login(targetEmail, targetPassword, selectedRole);
     } catch (err) {
       setError(err.message || 'Invalid email or password.');
       setLoading(false);

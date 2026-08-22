@@ -52,24 +52,30 @@ export function AuthProvider({ children }) {
     }
   }, [user]);
 
-  const login = async (email, password) => {
+  const login = async (email, password, explicitRole) => {
     if (!email || !password) {
       throw new Error('Please fill in both email and password.');
     }
-    // Determine role based on email or default to employee
-    const isHr = email.toLowerCase().includes('hr') || email.toLowerCase().includes('carla') || email.toLowerCase().includes('admin');
+    // Determine role based on explicit role selection or fallback to email heuristics
+    let roleKey = explicitRole;
+    if (!roleKey) {
+      const isHr = email.toLowerCase().includes('hr') || email.toLowerCase().includes('carla') || email.toLowerCase().includes('admin') || email.toLowerCase().includes('bob');
+      roleKey = isHr ? 'hr' : 'employee';
+    }
+
+    const isHr = roleKey === 'hr';
     const newUser = {
       user_id: isHr ? 10 : 12,
       employee_id: isHr ? 101 : 102,
       name: isHr ? 'Carla Sanford' : 'John Doe',
       email: email,
-      role: isHr ? 'hr' : 'employee',
-      roles: [isHr ? 'hr' : 'employee'],
+      role: roleKey,
+      roles: [roleKey],
       title: isHr ? 'HR Officer' : 'Software Engineer',
       dept: isHr ? 'Human Resources' : 'Engineering',
       initials: isHr ? 'CS' : 'JD',
-      work_phone: '+91 98765 43210',
-      address: '123 Tech Park Blvd, Silicon Valley',
+      work_phone: isHr ? '+91 98765 43210' : '+91 98765 12345',
+      address: isHr ? '123 Tech Park Blvd, Silicon Valley' : '456 Innovation Way, Tech City',
       salary_base: isHr ? 85000 : 75000,
       documents: [
         { name: 'Employment_Contract.pdf', size: '2.4 MB', date: '2024-01-15' },
@@ -79,8 +85,33 @@ export function AuthProvider({ children }) {
 
     setUser(newUser);
     setAuthenticated(true);
-    router.push(newUser.role === 'hr' ? '/dashboard' : '/my-dashboard');
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('dayflow_user', JSON.stringify(newUser));
+    }
+    router.push(isHr ? '/dashboard' : '/my-dashboard');
     return newUser;
+  };
+
+  const switchRole = (newRole) => {
+    const targetRole = newRole || (user?.role === 'hr' ? 'employee' : 'hr');
+    const isHr = targetRole === 'hr';
+    const updatedUser = {
+      ...(user || DEFAULT_USER),
+      role: targetRole,
+      roles: [targetRole],
+      name: isHr ? 'Carla Sanford' : 'John Doe',
+      initials: isHr ? 'CS' : 'JD',
+      title: isHr ? 'HR Officer' : 'Software Engineer',
+      dept: isHr ? 'Human Resources' : 'Engineering',
+      email: isHr ? 'carla@dayflow.io' : 'john@dayflow.io'
+    };
+
+    setUser(updatedUser);
+    setAuthenticated(true);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('dayflow_user', JSON.stringify(updatedUser));
+    }
+    router.push(isHr ? '/dashboard' : '/my-dashboard');
   };
 
   const signup = async ({ employeeId, email, password, role }) => {
@@ -91,15 +122,17 @@ export function AuthProvider({ children }) {
       throw new Error('Password must be at least 6 characters.');
     }
 
+    const roleKey = role || 'employee';
+    const isHr = roleKey === 'hr';
     const newUser = {
       user_id: Math.floor(Math.random() * 1000) + 20,
       employee_id: parseInt(employeeId) || 105,
       name: email.split('@')[0].replace('.', ' ').toUpperCase(),
       email: email,
-      role: role || 'employee',
-      roles: [role || 'employee'],
-      title: role === 'hr' ? 'HR Specialist' : 'Team Member',
-      dept: role === 'hr' ? 'Human Resources' : 'Operations',
+      role: roleKey,
+      roles: [roleKey],
+      title: isHr ? 'HR Specialist' : 'Team Member',
+      dept: isHr ? 'Human Resources' : 'Operations',
       initials: email.slice(0, 2).toUpperCase(),
       work_phone: '+91 98765 00000',
       address: '456 Innovation Way',
@@ -111,7 +144,10 @@ export function AuthProvider({ children }) {
 
     setUser(newUser);
     setAuthenticated(true);
-    router.push(newUser.role === 'hr' ? '/dashboard' : '/my-dashboard');
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('dayflow_user', JSON.stringify(newUser));
+    }
+    router.push(isHr ? '/dashboard' : '/my-dashboard');
     return newUser;
   };
 
@@ -136,6 +172,7 @@ export function AuthProvider({ children }) {
       login,
       signup,
       logout,
+      switchRole,
       updateProfile
     }}>
       {children}
