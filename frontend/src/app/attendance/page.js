@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { attendanceRecords, attendanceSummary } from '@/lib/mockData';
 import { useCounter } from '@/hooks/useCounter';
 import { getStatusClass } from '@/lib/utils';
@@ -8,6 +8,36 @@ import { Download, Search, CheckCircle2, XCircle, Clock } from 'lucide-react';
 
 export default function AttendancePage() {
   const [autoRefresh, setAutoRefresh] = useState(true);
+  const [records, setRecords] = useState(attendanceRecords);
+
+  useEffect(() => {
+    async function loadAttendance() {
+      try {
+        const token = typeof window !== 'undefined' ? localStorage.getItem('dayflow_token') : null;
+        const res = await fetch('/api/v1/attendance', {
+          headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+        });
+        if (res.ok) {
+          const json = await res.json();
+          if (json.data && Array.isArray(json.data) && json.data.length > 0) {
+            const mapped = json.data.map(item => ({
+              id: `#ATT-00${item.id}`,
+              name: item.employee_name || 'Alice Employee',
+              dept: 'Engineering',
+              checkin: item.check_in ? item.check_in.split('T')[1]?.slice(0, 5) || '09:00' : '09:00',
+              checkout: item.check_out ? item.check_out.split('T')[1]?.slice(0, 5) || '18:00' : '—',
+              hours: item.worked_hours || 8.0,
+              status: item.status === 'present' ? 'Present' : (item.status || 'Present'),
+              date: item.check_in ? item.check_in.split('T')[0] : '2026-08-22'
+            }));
+            setRecords(mapped);
+          }
+        }
+      } catch (e) {}
+    }
+    loadAttendance();
+  }, []);
+
   const present  = useCounter(attendanceSummary.present, 1200, 0, true);
   const absent   = useCounter(attendanceSummary.absent, 1200, 0, true);
   const avgHours = useCounter(attendanceSummary.avg_hours, 1200, 1, true);

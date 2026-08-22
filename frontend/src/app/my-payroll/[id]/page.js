@@ -2,6 +2,7 @@
 import { payslipDetail } from '@/lib/mockData';
 import { useCounter } from '@/hooks/useCounter';
 import { useToast } from '@/components/ui/Toast';
+import Link from 'next/link';
 import { Download, Share2, CreditCard, ChevronRight } from 'lucide-react';
 
 export default function PayslipDetailPage({ params }) {
@@ -19,7 +20,7 @@ export default function PayslipDetailPage({ params }) {
     <div className="page-wrapper page-in">
       {/* Breadcrumb */}
       <div className="breadcrumb">
-        <a href="/my-payroll">Payroll</a>
+        <Link href="/my-payroll">Payroll</Link>
         <span className="breadcrumb-sep"><ChevronRight size={14} /></span>
         <span>{d.period}</span>
       </div>

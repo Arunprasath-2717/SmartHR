@@ -1,12 +1,5 @@
-import { NextResponse } from 'next/server';
+import { proxyToBackend } from '@/lib/api';
 
-export async function GET() {
-  return NextResponse.json({
-    data: {
-      authenticated: true,
-      user_id: 10,
-      employee_id: 101,
-      role: "hr"
-    }
-  });
+export async function GET(request) {
+  return proxyToBackend(request, '/api/v1/session');
 }

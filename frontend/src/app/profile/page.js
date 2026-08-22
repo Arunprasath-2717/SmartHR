@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/components/ui/Toast';
 import { User, Briefcase, DollarSign, FileText, Lock, Pencil, Check, Download, Shield } from 'lucide-react';
@@ -11,29 +11,86 @@ export default function ProfilePage() {
   const [editing, setEditing] = useState(false);
 
   const [form, setForm] = useState({
-    name: user?.name || 'Carla Sanford',
-    work_email: user?.email || 'carla@dayflow.io',
-    work_phone: user?.work_phone || '+91 98765 43210',
+    name: user?.name || 'Alice Employee',
+    work_email: user?.email || 'alice@company.com',
+    work_phone: user?.work_phone || '+1-555-0100',
     address: user?.address || '123 Tech Park Blvd, Silicon Valley',
-    job_title: user?.title || 'HR Officer',
-    dept: user?.dept || 'Human Resources',
+    job_title: user?.title || 'Software Engineer',
+    dept: user?.dept || 'Engineering',
     salary_base: user?.salary_base || 85000,
   });
 
+  // Fetch real profile from backend on mount
+  useEffect(() => {
+    async function loadProfile() {
+      try {
+        const token = typeof window !== 'undefined' ? localStorage.getItem('dayflow_token') : null;
+        const res = await fetch('/api/v1/profile', {
+          headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+        });
+        if (res.ok) {
+          const json = await res.json();
+          const p = json.data || {};
+          setForm(prev => ({
+            ...prev,
+            name: p.name || prev.name,
+            work_email: p.work_email || prev.work_email,
+            work_phone: p.work_phone || p.phone || prev.work_phone,
+            address: p.address || prev.address,
+            job_title: p.job_title || prev.job_title,
+            dept: p.department_name || prev.dept,
+          }));
+        }
+      } catch (e) {}
+    }
+    loadProfile();
+  }, []);
+
   const isHr = role === 'hr';
 
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
-    updateProfile({
-      name: form.name,
-      work_phone: form.work_phone,
-      address: form.address,
-      title: form.job_title,
-      dept: form.dept,
-      salary_base: form.salary_base,
-    });
-    setEditing(false);
-    toast({ message: 'Profile updated successfully!', type: 'success' });
+    try {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('dayflow_token') : null;
+      const res = await fetch('/api/v1/profile', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify({
+          phone: form.work_phone,
+          address: form.address
+        })
+      });
+
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({}));
+        throw new Error(errJson.detail || 'Failed to update profile');
+      }
+
+      updateProfile({
+        name: form.name,
+        work_phone: form.work_phone,
+        address: form.address,
+        title: form.job_title,
+        dept: form.dept,
+        salary_base: form.salary_base,
+      });
+      setEditing(false);
+      toast({ message: 'Profile updated successfully on backend!', type: 'success' });
+    } catch (err) {
+      updateProfile({
+        name: form.name,
+        work_phone: form.work_phone,
+        address: form.address,
+        title: form.job_title,
+        dept: form.dept,
+        salary_base: form.salary_base,
+      });
+      setEditing(false);
+      toast({ message: 'Profile updated locally!', type: 'success' });
+    }
   };
 
   return (

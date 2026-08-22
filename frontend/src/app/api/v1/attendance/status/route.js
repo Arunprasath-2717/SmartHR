@@ -1,11 +1,5 @@
-import { NextResponse } from 'next/server';
+import { proxyToBackend } from '@/lib/api';
 
-let currentAttendance = {
-  checked_in: false,
-  attendance_id: null,
-  check_in: null
-};
-
-export async function GET() {
-  return NextResponse.json({ data: currentAttendance });
+export async function GET(request) {
+  return proxyToBackend(request, '/api/v1/attendance/status');
 }

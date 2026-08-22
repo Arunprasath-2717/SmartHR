@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import Link from 'next/link';
 import { useCounter } from '@/hooks/useCounter';
 import { useInView } from '@/hooks/useInView';
 import { LineChart } from '@/components/charts/Charts';
@@ -261,9 +262,9 @@ export default function HRDashboard() {
           <div style={{ padding:'20px 24px 16px', borderBottom:'1px solid rgba(59,130,246,0.07)', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
             <span style={{ fontSize:15, fontWeight:700, color:'#0F172A' }}>Team Assignments</span>
             <div style={{ display:'flex', gap:8, alignItems:'center' }}>
-              <a href="/employees" style={{ fontSize:12, color:'#3B82F6', fontWeight:600, display:'flex', alignItems:'center', gap:4 }}>
+              <Link href="/employees" style={{ fontSize:12, color:'#3B82F6', fontWeight:600, display:'flex', alignItems:'center', gap:4 }}>
                 View All <ArrowRight size={13} />
-              </a>
+              </Link>
               <MoreHorizontal size={18} style={{ color:'#94A3B8', cursor:'pointer' }} />
             </div>
           </div>

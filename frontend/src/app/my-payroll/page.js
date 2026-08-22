@@ -1,17 +1,45 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { myPayslips, payslipDetail } from '@/lib/mockData';
 import { useCounter } from '@/hooks/useCounter';
 import { getStatusClass } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
 
 export default function MyPayrollPage() {
-  const d = payslipDetail;
+  const [payslipData, setPayslipData] = useState(payslipDetail);
+  const router = useRouter();
+
+  useEffect(() => {
+    async function loadPayroll() {
+      try {
+        const token = typeof window !== 'undefined' ? localStorage.getItem('dayflow_token') : null;
+        const res = await fetch('/api/v1/payroll/me', {
+          headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+        });
+        if (res.ok) {
+          const json = await res.json();
+          const p = json.data;
+          if (p && p.basic_salary) {
+            setPayslipData({
+              ...payslipDetail,
+              basic: p.basic_salary,
+              allowances: p.allowances,
+              total_deductions: p.deductions,
+              gross: p.basic_salary + p.allowances,
+              net: p.net_salary
+            });
+          }
+        }
+      } catch (e) {}
+    }
+    loadPayroll();
+  }, []);
+
+  const d = payslipData;
   const netSalary = useCounter(d.net, 1200, 0, true);
   const gross = useCounter(d.gross, 1200, 0, true);
   const deductions = useCounter(d.total_deductions, 1200, 0, true);
-  const router = useRouter();
-  const maxVal = d.gross;
+  const maxVal = d.gross || 85000;
 
   return (
     <div className="page-wrapper page-in">

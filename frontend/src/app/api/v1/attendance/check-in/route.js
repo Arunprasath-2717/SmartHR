@@ -1,12 +1,5 @@
-import { NextResponse } from 'next/server';
+import { proxyToBackend } from '@/lib/api';
 
-export async function POST() {
-  const checkInTime = new Date().toISOString();
-  return NextResponse.json({
-    data: {
-      attendance_id: 5001,
-      check_in: checkInTime,
-      status: "checked_in"
-    }
-  }, { status: 201 });
+export async function POST(request) {
+  return proxyToBackend(request, '/api/v1/attendance/check-in');
 }

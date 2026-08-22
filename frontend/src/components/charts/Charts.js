@@ -75,17 +75,6 @@ export function LineChart({ data = [], width = 400, height = 120, color = '#6C63
   const pathRef = useRef(null);
   const areaRef = useRef(null);
 
-  if (!data.length) return null;
-  const max  = Math.max(...data.map(d => typeof d === 'object' ? d.value : d), 1);
-  const vals = data.map(d => typeof d === 'object' ? d.value : d);
-  const pts  = vals.map((v, i) => ({
-    x: (i / (vals.length - 1)) * width,
-    y: height - (v / max) * height * 0.9 - 8,
-  }));
-
-  const linePath = pts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
-  const areaPath = `${linePath} L ${pts[pts.length-1].x} ${height} L 0 ${height} Z`;
-
   useEffect(() => {
     if (!inView || !pathRef.current) return;
     const len = pathRef.current.getTotalLength();
@@ -98,6 +87,17 @@ export function LineChart({ data = [], width = 400, height = 120, color = '#6C63
       areaRef.current.style.opacity = '0.12';
     }
   }, [inView]);
+
+  if (!data.length) return null;
+  const max  = Math.max(...data.map(d => typeof d === 'object' ? d.value : d), 1);
+  const vals = data.map(d => typeof d === 'object' ? d.value : d);
+  const pts  = vals.map((v, i) => ({
+    x: (i / (vals.length - 1)) * width,
+    y: height - (v / max) * height * 0.9 - 8,
+  }));
+
+  const linePath = pts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
+  const areaPath = `${linePath} L ${pts[pts.length-1].x} ${height} L 0 ${height} Z`;
 
   return (
     <div ref={ref}>

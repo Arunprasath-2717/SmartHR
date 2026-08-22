@@ -2,6 +2,7 @@
 import { employeeDetail } from '@/lib/mockData';
 import { useCounter } from '@/hooks/useCounter';
 import { LineChart } from '@/components/charts/Charts';
+import Link from 'next/link';
 import { Pencil, Download, MoreHorizontal, ChevronRight, TrendingUp } from 'lucide-react';
 
 export default function EmployeeDetailPage({ params }) {
@@ -13,7 +14,7 @@ export default function EmployeeDetailPage({ params }) {
     <div className="page-wrapper page-in">
       {/* Breadcrumb */}
       <div className="breadcrumb">
-        <a href="/employees">Employees</a>
+        <Link href="/employees">Employees</Link>
         <span className="breadcrumb-sep"><ChevronRight size={14} /></span>
         <span>{d.name}</span>
       </div>

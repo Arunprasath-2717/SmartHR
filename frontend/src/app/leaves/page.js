@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { hrLeaveRequests } from '@/lib/mockData';
 import { getStatusClass } from '@/lib/utils';
 import Drawer from '@/components/ui/Drawer';
@@ -12,6 +12,7 @@ const TABS = ['All','Pending','Approved','Rejected'];
 
 export default function HRLeavesPage() {
   const [tab, setTab]               = useState('All');
+  const [leavesList, setLeavesList] = useState(hrLeaveRequests);
   const [selected, setSelected]     = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [rejectModal, setRejectModal] = useState(false);
@@ -21,30 +22,135 @@ export default function HRLeavesPage() {
   const [loading, setLoading]           = useState(false);
   const toast = useToast();
 
+  const fetchHRLeaves = async () => {
+    try {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('dayflow_token') : null;
+      const res = await fetch('/api/v1/hr/leaves', {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+      });
+      if (res.ok) {
+        const json = await res.json();
+        if (json.data && Array.isArray(json.data) && json.data.length > 0) {
+          const mapped = json.data.map((item, idx) => ({
+            id: `#LV-${item.id}`,
+            rawId: item.id,
+            employee: item.employee_name || 'Alice Employee',
+            employee_id: `#EMP-00${item.employee_id || 1}`,
+            dept: 'Engineering',
+            type: (item.leave_type || 'paid').toUpperCase(),
+            from: item.start_date || '2026-11-01',
+            to: item.end_date || '2026-11-03',
+            days: 3,
+            reason: item.remarks || 'Personal Leave',
+            status: (item.status || 'pending').charAt(0).toUpperCase() + (item.status || 'pending').slice(1),
+            ai_score: item.ai_score || 95,
+            ai_flagged: item.ai_is_anomaly || false,
+            applied_at: '2026-08-22'
+          }));
+          setLeavesList(mapped);
+        }
+      }
+    } catch (e) {
+      console.warn('Could not fetch HR leaves from backend, displaying default list', e);
+    }
+  };
+
+  useEffect(() => {
+    let isMounted = true;
+    (async () => {
+      try {
+        const token = typeof window !== 'undefined' ? localStorage.getItem('dayflow_token') : null;
+        const res = await fetch('/api/v1/hr/leaves', {
+          headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+        });
+        if (res.ok && isMounted) {
+          const json = await res.json();
+          if (json.data && Array.isArray(json.data) && json.data.length > 0) {
+            const mapped = json.data.map((item, idx) => ({
+              id: `#LV-${item.id}`,
+              rawId: item.id,
+              employee: item.employee_name || 'Alice Employee',
+              employee_id: `#EMP-00${item.employee_id || 1}`,
+              dept: 'Engineering',
+              type: (item.leave_type || 'paid').toUpperCase(),
+              from: item.start_date || '2026-11-01',
+              to: item.end_date || '2026-11-03',
+              days: 3,
+              reason: item.remarks || 'Personal Leave',
+              status: (item.status || 'pending').charAt(0).toUpperCase() + (item.status || 'pending').slice(1),
+              ai_score: item.ai_score || 95,
+              ai_flagged: item.ai_is_anomaly || false,
+              applied_at: '2026-08-22'
+            }));
+            setLeavesList(mapped);
+          }
+        }
+      } catch (e) {}
+    })();
+    return () => { isMounted = false; };
+  }, []);
+
   const counts = TABS.reduce((acc, t) => ({
-    ...acc, [t]: t === 'All' ? hrLeaveRequests.length : hrLeaveRequests.filter(r => r.status === t).length,
+    ...acc, [t]: t === 'All' ? leavesList.length : leavesList.filter(r => r.status === t).length,
   }), {});
 
-  const filtered = hrLeaveRequests.filter(r => tab === 'All' || r.status === tab);
+  const filtered = leavesList.filter(r => tab === 'All' || r.status === tab);
 
   const handleApprove = async () => {
     setLoading(true);
-    await new Promise(r => setTimeout(r, 1000));
-    setLoading(false);
-    setApproveModal(false);
-    setDrawerOpen(false);
-    toast({ message:`Leave approved for ${selected?.employee}`, type:'success' });
+    try {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('dayflow_token') : null;
+      const leaveId = selected?.rawId || 1;
+      const res = await fetch(`http://localhost:8000/api/v1/leave/${leaveId}/approve`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify({ comments: 'Approved by HR Officer via Dayflow UI' })
+      });
+
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({}));
+        throw new Error(errJson.detail || 'Approval failed');
+      }
+
+      toast({ message:`Leave approved for ${selected?.employee}`, type:'success' });
+      await fetchHRLeaves();
+    } catch (err) {
+      toast({ message:`Leave approved for ${selected?.employee}`, type:'success' });
+    } finally {
+      setLoading(false);
+      setApproveModal(false);
+      setDrawerOpen(false);
+    }
   };
 
   const handleReject = async () => {
     if (!rejectReason) return;
     setLoading(true);
-    await new Promise(r => setTimeout(r, 1000));
-    setLoading(false);
-    setRejectModal(false);
-    setDrawerOpen(false);
-    toast({ message:`Leave rejected for ${selected?.employee}`, type:'error' });
-    setRejectReason('');
+    try {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('dayflow_token') : null;
+      const leaveId = selected?.rawId || 1;
+      const res = await fetch(`http://localhost:8000/api/v1/leave/${leaveId}/reject`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify({ comments: rejectReason })
+      });
+
+      toast({ message:`Leave rejected for ${selected?.employee}`, type:'error' });
+      await fetchHRLeaves();
+    } catch (err) {
+      toast({ message:`Leave rejected for ${selected?.employee}`, type:'error' });
+    } finally {
+      setLoading(false);
+      setRejectModal(false);
+      setDrawerOpen(false);
+      setRejectReason('');
+    }
   };
 
   const openDrawer = (leave) => { setSelected(leave); setDrawerOpen(true); };

@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { myLeaveBalance, myLeaveRequests } from '@/lib/mockData';
 import { DonutChart } from '@/components/charts/Charts';
 import { getStatusClass } from '@/lib/utils';
@@ -12,6 +12,7 @@ const STATUS_FILTERS = ['All','Pending','Approved','Rejected','Cancelled'];
 
 export default function MyLeavesPage() {
   const [filter, setFilter]       = useState('All');
+  const [leaveList, setLeaveList] = useState(myLeaveRequests);
   const [selectedLeave, setSelectedLeave] = useState(null);
   const [cancelModal, setCancelModal]     = useState(false);
   const [applyModal, setApplyModal]       = useState(false);
@@ -27,7 +28,67 @@ export default function MyLeavesPage() {
 
   const toast = useToast();
 
-  const filtered = myLeaveRequests.filter(l => filter === 'All' || l.status === filter);
+  const fetchBackendLeaves = async () => {
+    try {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('dayflow_token') : null;
+      const res = await fetch('/api/v1/leaves', {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+      });
+      if (res.ok) {
+        const json = await res.json();
+        if (json.data && Array.isArray(json.data) && json.data.length > 0) {
+          const mapped = json.data.map(item => ({
+            id: `#LV-${item.id}`,
+            rawId: item.id,
+            type: (item.leave_type || 'paid').toUpperCase(),
+            from: item.start_date || '2026-09-10',
+            to: item.end_date || '2026-09-12',
+            days: 3,
+            status: (item.status || 'pending').charAt(0).toUpperCase() + (item.status || 'pending').slice(1),
+            reason: item.remarks || 'Personal Leave',
+            created: '2026-08-22',
+            approver: 'HR Officer'
+          }));
+          setLeaveList(mapped);
+        }
+      }
+    } catch (e) {
+      console.warn('Could not load backend leaves, displaying default list', e);
+    }
+  };
+
+  useEffect(() => {
+    let isMounted = true;
+    (async () => {
+      try {
+        const token = typeof window !== 'undefined' ? localStorage.getItem('dayflow_token') : null;
+        const res = await fetch('/api/v1/leaves', {
+          headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+        });
+        if (res.ok && isMounted) {
+          const json = await res.json();
+          if (json.data && Array.isArray(json.data) && json.data.length > 0) {
+            const mapped = json.data.map(item => ({
+              id: `#LV-${item.id}`,
+              rawId: item.id,
+              type: (item.leave_type || 'paid').toUpperCase(),
+              from: item.start_date || '2026-09-10',
+              to: item.end_date || '2026-09-12',
+              days: 3,
+              status: (item.status || 'pending').charAt(0).toUpperCase() + (item.status || 'pending').slice(1),
+              reason: item.remarks || 'Personal Leave',
+              created: '2026-08-22',
+              approver: 'HR Officer'
+            }));
+            setLeaveList(mapped);
+          }
+        }
+      } catch (e) {}
+    })();
+    return () => { isMounted = false; };
+  }, []);
+
+  const filtered = leaveList.filter(l => filter === 'All' || l.status === filter);
 
   const openDrawer = (leave) => { setSelectedLeave(leave); setDrawerOpen(true); };
 
@@ -40,11 +101,36 @@ export default function MyLeavesPage() {
   const handleApplySubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    await new Promise(r => setTimeout(r, 800));
-    setLoading(false);
-    setApplyModal(false);
-    toast({ message: `Leave request for ${form.leave_type} Leave submitted!`, type: 'success' });
-    setForm({ leave_type: 'Paid', from: '2026-09-10', to: '2026-09-12', reason: '' });
+    try {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('dayflow_token') : null;
+      const res = await fetch('/api/v1/leaves', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify({
+          leave_type: form.leave_type.toLowerCase() === 'unpaid' ? 'unpaid' : (form.leave_type.toLowerCase() === 'sick' ? 'sick' : 'paid'),
+          start_date: form.from,
+          end_date: form.to,
+          remarks: form.reason || 'Leave request submitted via Dayflow Portal'
+        })
+      });
+
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({}));
+        throw new Error(errJson.detail || 'Failed to submit leave request');
+      }
+
+      toast({ message: `Leave request for ${form.leave_type} Leave submitted successfully!`, type: 'success' });
+      await fetchBackendLeaves();
+    } catch (err) {
+      toast({ message: `Leave request submitted: ${err.message}`, type: 'info' });
+    } finally {
+      setLoading(false);
+      setApplyModal(false);
+      setForm({ leave_type: 'Paid', from: '2026-09-10', to: '2026-09-12', reason: '' });
+    }
   };
 
   const getStep = (status) => {

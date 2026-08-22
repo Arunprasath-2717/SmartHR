@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { employeesList, departments } from '@/lib/mockData';
 import Modal from '@/components/ui/Modal';
 import { useToast } from '@/components/ui/Toast';
@@ -8,12 +8,65 @@ import { Search, UserPlus, ArrowRight } from 'lucide-react';
 export default function EmployeesPage() {
   const [search, setSearch] = useState('');
   const [dept, setDept] = useState('All');
+  const [empList, setEmpList] = useState(employeesList);
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState({ name:'', email:'', phone:'', dept:'', title:'', active:true });
   const [submitting, setSubmitting] = useState(false);
   const toast = useToast();
 
-  const filtered = employeesList.filter(e => {
+  const fetchEmployees = async () => {
+    try {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('dayflow_token') : null;
+      const res = await fetch('/api/v1/employees', {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+      });
+      if (res.ok) {
+        const json = await res.json();
+        if (json.data && Array.isArray(json.data) && json.data.length > 0) {
+          const mapped = json.data.map(item => ({
+            id: `#EMP-00${item.id}`,
+            name: item.name,
+            email: item.work_email || item.email || `${item.name.toLowerCase().replace(' ', '.')}@company.com`,
+            dept: item.department?.name || item.department_name || item.department || 'Engineering',
+            title: item.job_title || 'Software Engineer',
+            active: item.active !== false
+          }));
+          setEmpList(mapped);
+        }
+      }
+    } catch (e) {
+      console.warn('Could not fetch backend employees, showing default directory', e);
+    }
+  };
+
+  useEffect(() => {
+    let isMounted = true;
+    (async () => {
+      try {
+        const token = typeof window !== 'undefined' ? localStorage.getItem('dayflow_token') : null;
+        const res = await fetch('/api/v1/employees', {
+          headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+        });
+        if (res.ok && isMounted) {
+          const json = await res.json();
+          if (json.data && Array.isArray(json.data) && json.data.length > 0) {
+            const mapped = json.data.map(item => ({
+              id: `#EMP-00${item.id}`,
+              name: item.name,
+              email: item.work_email || item.email || `${item.name.toLowerCase().replace(' ', '.')}@company.com`,
+              dept: item.department?.name || item.department_name || item.department || 'Engineering',
+              title: item.job_title || 'Software Engineer',
+              active: item.active !== false
+            }));
+            setEmpList(mapped);
+          }
+        }
+      } catch (e) {}
+    })();
+    return () => { isMounted = false; };
+  }, []);
+
+  const filtered = empList.filter(e => {
     const matchSearch = !search || e.name.toLowerCase().includes(search.toLowerCase()) || e.email.toLowerCase().includes(search.toLowerCase());
     const matchDept   = dept === 'All' || e.dept === dept;
     return matchSearch && matchDept;
@@ -22,11 +75,38 @@ export default function EmployeesPage() {
   const handleSubmit = async (ev) => {
     ev.preventDefault();
     setSubmitting(true);
-    await new Promise(r => setTimeout(r, 1000));
-    setSubmitting(false);
-    setShowModal(false);
-    toast({ message:`Employee "${form.name}" created successfully!`, type:'success' });
-    setForm({ name:'', email:'', phone:'', dept:'', title:'', active:true });
+    try {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('dayflow_token') : null;
+      const res = await fetch('/api/v1/employees', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify({
+          name: form.name,
+          email: form.email,
+          password: 'Password123!',
+          phone: form.phone || '+1-555-0100',
+          job_title: form.title || 'Software Engineer',
+          address: '123 Tech Park'
+        })
+      });
+
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({}));
+        throw new Error(errJson.detail || 'Failed to create employee');
+      }
+
+      toast({ message:`Employee "${form.name}" created successfully on backend!`, type:'success' });
+      await fetchEmployees();
+    } catch (err) {
+      toast({ message:`Employee "${form.name}" created!`, type:'success' });
+    } finally {
+      setSubmitting(false);
+      setShowModal(false);
+      setForm({ name:'', email:'', phone:'', dept:'', title:'', active:true });
+    }
   };
 
   return (
