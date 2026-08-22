@@ -98,12 +98,12 @@ export default function Sidebar({ role = 'hr' }) {
       {/* User Profile Header */}
       <div className={styles.profileSection} onClick={() => router.push('/profile')} style={{ cursor: 'pointer' }}>
         <div className={styles.avatarRing}>
-          <div className={styles.avatarInner}>{user.initials || 'CS'}</div>
+          <div className={styles.avatarInner} suppressHydrationWarning>{user?.initials || 'CS'}</div>
           <div className={styles.onlineDot} />
         </div>
         <div className={styles.profileInfo}>
-          <span className={styles.profileName}>{user.name || 'User'}</span>
-          <span className={styles.profileTitle}>{user.title || user.role?.toUpperCase()}</span>
+          <span className={styles.profileName} suppressHydrationWarning>{user?.name || 'User'}</span>
+          <span className={styles.profileTitle} suppressHydrationWarning>{user?.title || user?.role?.toUpperCase() || 'HR OFFICER'}</span>
         </div>
       </div>
 

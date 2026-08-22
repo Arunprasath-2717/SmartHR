@@ -169,8 +169,8 @@ export default function TopBar() {
         {/* User Profile Menu & Role Switcher */}
         <div style={{ position: 'relative' }} ref={userMenuRef}>
           <button className={styles.userChip} onClick={() => setUserMenuOpen(!userMenuOpen)}>
-            <div className={styles.userChipAvatar}>{user?.initials || 'CS'}</div>
-            <span className={styles.userChipName}>{user?.name?.split(' ')[0] || 'User'}</span>
+            <div className={styles.userChipAvatar} suppressHydrationWarning>{user?.initials || 'CS'}</div>
+            <span className={styles.userChipName} suppressHydrationWarning>{user?.name?.split(' ')[0] || 'User'}</span>
             <ChevronDown size={14} style={{ color:'rgba(255,255,255,0.7)', marginLeft:2 }} />
           </button>
 
