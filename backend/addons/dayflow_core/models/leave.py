@@ -30,3 +30,18 @@ class DayflowLeave(models.Model):
     ], string='Status', default='pending', required=True)
 
     approver_comments = fields.Text(string='Approver Comments')
+
+    # Phase 13 AI Anomaly Fields
+    ai_is_anomaly = fields.Boolean(string='AI Anomaly Flag', default=False)
+    ai_score = fields.Float(string='AI Anomaly Score', default=0.0)
+    ai_risk_level = fields.Selection([
+        ('low', 'Low'),
+        ('medium', 'Medium'),
+        ('high', 'High'),
+    ], string='AI Risk Level', default='low')
+    ai_reasons = fields.Text(string='AI Reasons')
+    ai_evaluation_status = fields.Selection([
+        ('evaluated', 'Evaluated'),
+        ('fallback', 'Fallback'),
+        ('skipped', 'Skipped'),
+    ], string='AI Evaluation Status', default='fallback')

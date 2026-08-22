@@ -10,6 +10,18 @@ try:
 except ImportError:
     def create_user_notification(*args, **kwargs):
         pass
+try:
+    from ..services.ai_client import evaluate_leave_anomaly
+except Exception:
+    def evaluate_leave_anomaly(*args, **kwargs):
+        return {
+            "is_anomaly": False,
+            "score": 0.0,
+            "risk_level": "low",
+            "reasons": "AI evaluation unavailable - default fallback applied",
+            "evaluation_status": "fallback",
+            "engine": "fallback"
+        }
 from .common import (
     api_response,
     paginated_response,
@@ -59,7 +71,13 @@ def format_leave_data(leave):
         "end_date": end_str,
         "remarks": rec.remarks or "",
         "status": rec.status,
-        "approver_comments": approver_comments
+        "approver_comments": approver_comments,
+        # Phase 13 AI Anomaly Fields
+        "ai_is_anomaly": bool(getattr(rec, 'ai_is_anomaly', False)),
+        "ai_score": float(getattr(rec, 'ai_score', 0.0) or 0.0),
+        "ai_risk_level": str(getattr(rec, 'ai_risk_level', 'low') or 'low'),
+        "ai_reasons": str(getattr(rec, 'ai_reasons', '') or ''),
+        "ai_evaluation_status": str(getattr(rec, 'ai_evaluation_status', 'fallback') or 'fallback')
     }
 
 
@@ -69,7 +87,8 @@ class DayflowLeaveController(http.Controller):
     @handle_api_exceptions
     def create_leave(self, **kwargs):
         """
-        Creates a new leave request in 'pending' status for the authenticated employee.
+        Creates a new leave request in 'pending' status for the authenticated employee,
+        invoking the isolated AI anomaly service with timeout and fallback.
         """
         user = get_authenticated_user()
         if not user:
@@ -122,6 +141,17 @@ class DayflowLeaveController(http.Controller):
             )
 
         remarks = str(payload.get('remarks', '')).strip()
+        duration_days = (dt_end - dt_start).days + 1
+
+        # Phase 13: Advisory AI Anomaly Evaluation (Non-blocking with fallback)
+        ai_eval = evaluate_leave_anomaly(
+            employee_id=employee.id,
+            leave_type=leave_type,
+            start_date=dt_start,
+            end_date=dt_end,
+            duration_days=duration_days,
+            remarks=remarks
+        )
 
         create_vals = {
             'employee_id': employee.id,
@@ -129,7 +159,13 @@ class DayflowLeaveController(http.Controller):
             'start_date': dt_start,
             'end_date': dt_end,
             'remarks': remarks,
-            'status': 'pending'  # Initial status strictly forced to 'pending'
+            'status': 'pending',  # Initial status strictly forced to 'pending'
+            # AI Anomaly Fields
+            'ai_is_anomaly': ai_eval.get('is_anomaly', False),
+            'ai_score': ai_eval.get('score', 0.0),
+            'ai_risk_level': ai_eval.get('risk_level', 'low'),
+            'ai_reasons': ai_eval.get('reasons', ''),
+            'ai_evaluation_status': ai_eval.get('evaluation_status', 'fallback')
         }
 
         leave_rec = request.env['dayflow.leave'].sudo().create(create_vals)
