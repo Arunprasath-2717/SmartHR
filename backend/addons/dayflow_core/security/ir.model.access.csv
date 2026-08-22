@@ -1,1 +1,4 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_dayflow_leave_employee,dayflow.leave.employee,model_dayflow_leave,dayflow_core.group_dayflow_employee,1,1,1,0
+access_dayflow_leave_hr_officer,dayflow.leave.hr_officer,model_dayflow_leave,dayflow_core.group_dayflow_hr_officer,1,1,1,1
+access_dayflow_leave_admin,dayflow.leave.admin,model_dayflow_leave,dayflow_core.group_dayflow_admin,1,1,1,1
