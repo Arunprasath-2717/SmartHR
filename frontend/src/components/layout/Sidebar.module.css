@@ -17,6 +17,12 @@
 
   /* Soft shadow separating sidebar from content */
   box-shadow: 4px 0 24px rgba(59,130,246,0.06), 2px 0 8px rgba(0,0,0,0.04);
+  transition: transform 400ms cubic-bezier(0.34,1.56,0.64,1), box-shadow 400ms ease;
+}
+
+.sidebar:hover {
+  transform: translateX(4px);
+  box-shadow: 8px 0 32px rgba(37,99,235,0.12), 4px 0 16px rgba(0,0,0,0.08);
 }
 
 /* ── User Profile Section ── */
@@ -160,18 +166,20 @@
   align-items: center;
   gap: 10px;
   width: 100%;
-  padding: 10px 12px;
+  padding: 10px 14px;
   border-radius: 10px;
   font-size: 13px;
-  font-weight: 500;
-  color: #64748B;
+  font-weight: 600;
+  color: #475569;
   cursor: pointer;
   position: relative;
+  overflow: hidden;
   z-index: 1;
   background: transparent;
   border: none;
   text-align: left;
-  transition: color 200ms, background 200ms;
+  outline: 2px solid transparent;
+  transition: all 600ms cubic-bezier(0.4, 0, 0.2, 1);
   animation: navItemIn 400ms ease-out both;
 }
 
@@ -180,28 +188,39 @@
   to   { opacity:1; transform:translateX(0); }
 }
 
-/* Hover — soft blue tint expands */
+/* Hover liquid skewed fill animation */
 .navItem::before {
-  content: '';
+  content: "";
   position: absolute;
-  inset: 0;
-  border-radius: 10px;
-  background: rgba(59,130,246,0.06);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 180ms ease;
+  left: -50px;
+  top: 0;
+  width: 0;
+  height: 100%;
+  background: linear-gradient(135deg, #2563EB, #1D4ED8);
+  transform: skewX(45deg);
   z-index: -1;
+  transition: width 600ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.navItem:hover::before { transform: scaleX(1); }
-.navItem:hover { color: #3B82F6; }
+.navItem:hover::before {
+  width: 250%;
+}
+
+.navItem:hover {
+  color: #ffffff;
+  transform: scale(1.04) translateX(4px);
+  outline: 2px solid #3B82F6;
+  box-shadow: 4px 5px 17px -4px rgba(37, 99, 235, 0.45);
+}
 
 .navItem.active {
   color: #FFFFFF;
-  font-weight: 600;
-  background: transparent;
+  font-weight: 700;
+  background: linear-gradient(135deg, #2563EB, #1D4ED8);
+  outline: 2px solid #3B82F6;
+  box-shadow: 4px 5px 17px -4px rgba(37, 99, 235, 0.5);
 }
-.navItem.active::before { transform:scaleX(0); }
+.navItem.active::before { width: 0; }
 
 .navIcon {
   font-size: 16px;
