@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useCounter } from '@/hooks/useCounter';
 import { useInView } from '@/hooks/useInView';
@@ -153,9 +153,35 @@ function BottomStatCard({ label, value, prefix='', suffix='', trend, color, spar
 
 /* ═══ MAIN PAGE ═══ */
 export default function HRDashboard() {
-  const d = hrDashboardData;
+  const [data, setData] = useState(hrDashboardData);
   const [checkedRows, setCheckedRows] = useState([]);
 
+  useEffect(() => {
+    let isMounted = true;
+    (async () => {
+      try {
+        const token = typeof window !== 'undefined' ? localStorage.getItem('dayflow_token') : null;
+        const res = await fetch('/api/v1/hr/dashboard', {
+          headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+        });
+        if (res.ok && isMounted) {
+          const json = await res.json();
+          if (json.data) {
+            setData(prev => ({
+              ...prev,
+              total_employees: json.data.total_employees ?? prev.total_employees,
+              present_today: json.data.present_today ?? prev.present_today,
+              on_leave: json.data.on_leave ?? prev.on_leave,
+              pending_leaves: json.data.pending_leaves ?? prev.pending_leaves
+            }));
+          }
+        }
+      } catch (e) {}
+    })();
+    return () => { isMounted = false; };
+  }, []);
+
+  const d = data;
   const attendanceSpark = d.monthly_attendance.map(m => m.rate);
   const presentSpark    = [68,72,75,70,80,78,85,82,88,84,90,87];
   const leaveSpark      = [5,8,6,10,4,7,9,5,11,8,6,9];

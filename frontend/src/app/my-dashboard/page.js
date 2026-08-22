@@ -1,4 +1,5 @@
 'use client';
+import { useState, useEffect } from 'react';
 import { useCounter } from '@/hooks/useCounter';
 import { DonutChart, MiniBarChart } from '@/components/charts/Charts';
 import { employeeDashboardData } from '@/lib/mockData';
@@ -15,7 +16,33 @@ import {
 import ShinyButton from '@/components/ui/ShinyButton';
 
 export default function EmployeeDashboard() {
-  const d = employeeDashboardData;
+  const [data, setData] = useState(employeeDashboardData);
+
+  useEffect(() => {
+    let isMounted = true;
+    (async () => {
+      try {
+        const token = typeof window !== 'undefined' ? localStorage.getItem('dayflow_token') : null;
+        const res = await fetch('/api/v1/dashboard', {
+          headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+        });
+        if (res.ok && isMounted) {
+          const json = await res.json();
+          if (json.data) {
+            setData(prev => ({
+              ...prev,
+              today_worked_hours: json.data.today_worked_hours ?? prev.today_worked_hours,
+              monthly_worked_hours: json.data.monthly_worked_hours ?? prev.monthly_worked_hours,
+              net_salary: json.data.net_salary ?? prev.net_salary
+            }));
+          }
+        }
+      } catch (e) {}
+    })();
+    return () => { isMounted = false; };
+  }, []);
+
+  const d = data;
   const hoursToday   = useCounter(d.today_worked_hours, 1200, 1, true);
   const monthlyHours = useCounter(d.monthly_worked_hours, 1200, 0, true);
   const leaveBalance = useCounter(d.leave_balance.annual, 1200, 0, true);
