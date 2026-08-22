@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import ShinyButton from '@/components/ui/ShinyButton';
 import { Hexagon, Lock, Mail, ArrowRight, ShieldCheck, AlertCircle } from 'lucide-react';
 
 export default function LoginPage() {
@@ -119,18 +120,17 @@ export default function LoginPage() {
             </div>
           </div>
 
-          <button
+          <ShinyButton
             type="submit"
-            className="btn btn-primary"
             disabled={loading}
-            style={{ width: '100%', justifyContent: 'center', padding: '12px 20px', borderRadius: 12, fontSize: 14 }}
+            style={{ width: '100%', justifyContent: 'center' }}
           >
             {loading ? 'Authenticating...' : (
-              <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <>
                 Sign In to Dashboard <ArrowRight size={16} />
-              </span>
+              </>
             )}
-          </button>
+          </ShinyButton>
         </form>
 
         {/* Quick RBAC Switcher for testing */}

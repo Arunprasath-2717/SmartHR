@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import ShinyButton from '@/components/ui/ShinyButton';
 import { Hexagon, Lock, Mail, User, Shield, ArrowRight, AlertCircle, CheckCircle2 } from 'lucide-react';
 
 export default function SignupPage() {
@@ -187,18 +188,17 @@ export default function SignupPage() {
             📧 Email verification link will be sent upon submission.
           </div>
 
-          <button
+          <ShinyButton
             type="submit"
-            className="btn btn-primary"
             disabled={loading}
-            style={{ width: '100%', justifyContent: 'center', padding: '12px 20px', borderRadius: 12, fontSize: 14 }}
+            style={{ width: '100%', justifyContent: 'center' }}
           >
             {loading ? 'Creating Account...' : (
-              <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <>
                 Complete Registration <ArrowRight size={16} />
-              </span>
+              </>
             )}
-          </button>
+          </ShinyButton>
         </form>
 
         <div style={{ textAlign: 'center', marginTop: 20, fontSize: 13, color: '#64748B' }}>
