@@ -1,0 +1,53 @@
+# ==============================================================================
+# DAYFLOW - Docker Compose Configuration (Skeleton)
+# ==============================================================================
+# Note: Full container orchestration and multi-service topology will be configured
+# in Phase 1B. This file provides the initial structural outline for:
+#   - postgres: PostgreSQL 15 Database
+#   - odoo: Odoo Community 17 Backend & OWL Frontend
+#   - ai-service: Dayflow Go-based AI Service
+# ==============================================================================
+
+version: '3.8'
+
+services:
+  # PostgreSQL Database Service (Phase 1B)
+  # db:
+  #   image: postgres:15-alpine
+  #   container_name: dayflow_postgres
+  #   environment:
+  #     POSTGRES_DB: ${POSTGRES_DB}
+  #     POSTGRES_USER: ${POSTGRES_USER}
+  #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #   ports:
+  #     - "5432:5432"
+
+  # Odoo 17 Community Server (Phase 1B)
+  # odoo:
+  #   image: odoo:17.0
+  #   container_name: dayflow_odoo
+  #   depends_on:
+  #     - db
+  #   ports:
+  #     - "${ODOO_PORT:-8069}:8069"
+  #   volumes:
+  #     - ./backend/addons:/mnt/extra-addons
+  #     - ./backend/config/odoo.conf:/etc/odoo/odoo.conf
+  #     - odoo_data:/var/lib/odoo
+
+  # Dayflow AI Microservice (Phase 1B)
+  # ai-service:
+  #   build:
+  #     context: ./ai-service
+  #     dockerfile: Dockerfile
+  #   container_name: dayflow_ai_service
+  #   ports:
+  #     - "${AI_SERVICE_PORT:-8080}:8080"
+  #   environment:
+  #     AI_SERVICE_PORT: 8080
+
+# volumes:
+#   postgres_data:
+#   odoo_data:
