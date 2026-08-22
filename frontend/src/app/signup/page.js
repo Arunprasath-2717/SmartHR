@@ -20,8 +20,7 @@ import {
   EyeOff,
   UserCheck,
   Sparkles,
-  Zap,
-  ShieldAlert
+  Zap
 } from 'lucide-react';
 
 export default function SignupPage() {
@@ -45,22 +44,13 @@ export default function SignupPage() {
     setTouched({ employeeId: true, email: true, password: true });
     setError('');
 
-    if (!isEmployeeIdValid) {
-      setError('Please enter a valid numeric Employee ID (e.g. 105).');
-      return;
-    }
-    if (!isEmailValid) {
-      setError('Please enter a valid work email address.');
-      return;
-    }
-    if (!isPasswordValid) {
-      setError('Password must be at least 6 characters long.');
-      return;
-    }
+    const targetEmployeeId = employeeId || '105';
+    const targetEmail = email || (selectedRole === 'employee' ? 'john@dayflow.io' : 'carla@dayflow.io');
+    const targetPassword = password || 'password123';
 
     setLoading(true);
     try {
-      await signup({ employeeId, email, password, role: selectedRole });
+      await signup({ employeeId: targetEmployeeId, email: targetEmail, password: targetPassword, role: selectedRole });
     } catch (err) {
       setError(err.message || 'Registration failed.');
       setLoading(false);
@@ -81,22 +71,15 @@ export default function SignupPage() {
       padding: '32px 16px'
     }}>
       <style>{`
-        @keyframes floatSlow {
-          0%, 100% { transform: translateY(0px) rotate(0deg); }
-          50% { transform: translateY(-10px) rotate(1deg); }
+        .faint-input::placeholder {
+          color: #94A3B8;
+          opacity: 0.22;
+          font-weight: 500;
+          transition: opacity 150ms ease;
         }
-        @keyframes floatFast {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-14px); }
+        .faint-input:focus::placeholder {
+          opacity: 0.08;
         }
-        @keyframes pulseGlow {
-          0%, 100% { transform: scale(1); opacity: 0.9; }
-          50% { transform: scale(1.04); opacity: 1; filter: drop-shadow(0 0 12px rgba(255,255,255,0.6)); }
-        }
-        .animate-float-slow { animation: floatSlow 4s ease-in-out infinite; }
-        .animate-float-fast { animation: floatFast 3s ease-in-out infinite; }
-        .animate-pulse-glow { animation: pulseGlow 2.5s ease-in-out infinite; }
-        .subtle-input::placeholder { color: #94A3B8; opacity: 0.65; font-weight: 400; }
       `}</style>
 
       {/* 2-Column Auth Container (Centered Max 960px) */}
@@ -113,7 +96,7 @@ export default function SignupPage() {
         animation: 'modal-in 400ms cubic-bezier(0.34,1.56,0.64,1) both'
       }}>
         
-        {/* ── LEFT BANNER (Animated Golden Amber Motion Canvas) ── */}
+        {/* ── LEFT BANNER (Static Solid Amber Canvas — Motion Removed) ── */}
         <div style={{
           background: 'linear-gradient(145deg, #FFD000 0%, #FFB703 60%, #FB8500 100%)',
           padding: '36px 32px',
@@ -123,7 +106,7 @@ export default function SignupPage() {
           position: 'relative',
           overflow: 'hidden'
         }}>
-          {/* Subtle curved backdrop pattern */}
+          {/* Subtle backdrop pattern */}
           <div style={{
             position: 'absolute', inset: 0,
             backgroundImage: 'radial-gradient(circle 320px at 0% 0%, rgba(255,255,255,0.3) 0%, transparent 80%)',
@@ -145,82 +128,80 @@ export default function SignupPage() {
             </span>
           </div>
 
-          {/* Animated Hero Graphic & Floating Motion Badges */}
+          {/* Static Professional Hero Card */}
           <div style={{ margin: '32px 0', textAlign: 'center', zIndex: 1, position: 'relative' }}>
             
-            {/* Center Animated Hero Card */}
-            <div className="animate-pulse-glow" style={{
+            <div style={{
               background: 'rgba(255, 255, 255, 0.95)',
-              backdropFilter: 'blur(12px)',
               borderRadius: 24,
-              padding: '24px 20px',
-              boxShadow: '0 16px 40px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.8)',
+              padding: '26px 20px',
+              boxShadow: '0 12px 32px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.8)',
               marginBottom: 20,
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
               gap: 14
             }}>
-              {/* Animated Floating Nodes */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 14, justifyContent: 'center' }}>
-                <div className="animate-float-slow" style={{
-                  width: 48, height: 48, borderRadius: 16,
+              {/* Static Icons Group */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, justifyContent: 'center' }}>
+                <div style={{
+                  width: 46, height: 46, borderRadius: 14,
                   background: 'linear-gradient(135deg, #10B981, #059669)',
                   color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  boxShadow: '0 8px 20px rgba(16,185,129,0.35)'
+                  boxShadow: '0 6px 16px rgba(16,185,129,0.25)'
                 }}>
-                  <UserCheck size={24} />
+                  <UserCheck size={22} />
                 </div>
-                <div className="animate-float-fast" style={{
-                  width: 48, height: 48, borderRadius: 16,
+                <div style={{
+                  width: 46, height: 46, borderRadius: 14,
                   background: 'linear-gradient(135deg, #2563EB, #1D4ED8)',
                   color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  boxShadow: '0 8px 20px rgba(37,99,235,0.35)'
+                  boxShadow: '0 6px 16px rgba(37,99,235,0.25)'
                 }}>
-                  <ShieldCheck size={24} />
+                  <ShieldCheck size={22} />
                 </div>
-                <div className="animate-float-slow" style={{
-                  width: 48, height: 48, borderRadius: 16,
+                <div style={{
+                  width: 46, height: 46, borderRadius: 14,
                   background: 'linear-gradient(135deg, #F59E0B, #D97706)',
                   color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  boxShadow: '0 8px 20px rgba(245,158,11,0.35)'
+                  boxShadow: '0 6px 16px rgba(245,158,11,0.25)'
                 }}>
-                  <Sparkles size={24} />
+                  <Sparkles size={22} />
                 </div>
               </div>
 
               <div style={{ fontSize: 16, fontWeight: 800, color: '#0F172A' }}>
-                AI-Driven Workforce Engine
+                Onboarding & Account Registration
               </div>
             </div>
 
-            {/* Floating Animated Pill Badges */}
+            {/* Static Pill Badges */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-              <div className="animate-float-slow" style={{ background: 'rgba(255,255,255,0.92)', padding: '10px 12px', borderRadius: 14, display: 'flex', alignItems: 'center', gap: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.06)' }}>
+              <div style={{ background: 'rgba(255,255,255,0.92)', padding: '10px 12px', borderRadius: 14, display: 'flex', alignItems: 'center', gap: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
                 <Laptop size={16} color="#DB2777" />
                 <span style={{ fontSize: 11, fontWeight: 700, color: '#0F172A' }}>Virtual</span>
               </div>
-              <div className="animate-float-fast" style={{ background: 'rgba(255,255,255,0.92)', padding: '10px 12px', borderRadius: 14, display: 'flex', alignItems: 'center', gap: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.06)' }}>
+              <div style={{ background: 'rgba(255,255,255,0.92)', padding: '10px 12px', borderRadius: 14, display: 'flex', alignItems: 'center', gap: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
                 <Briefcase size={16} color="#2563EB" />
                 <span style={{ fontSize: 11, fontWeight: 700, color: '#0F172A' }}>Full-Time</span>
               </div>
-              <div className="animate-float-fast" style={{ background: 'rgba(255,255,255,0.92)', padding: '10px 12px', borderRadius: 14, display: 'flex', alignItems: 'center', gap: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.06)' }}>
+              <div style={{ background: 'rgba(255,255,255,0.92)', padding: '10px 12px', borderRadius: 14, display: 'flex', alignItems: 'center', gap: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
                 <Building2 size={16} color="#D97706" />
                 <span style={{ fontSize: 11, fontWeight: 700, color: '#0F172A' }}>In-Office</span>
               </div>
-              <div className="animate-float-slow" style={{ background: 'rgba(255,255,255,0.92)', padding: '10px 12px', borderRadius: 14, display: 'flex', alignItems: 'center', gap: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.06)' }}>
+              <div style={{ background: 'rgba(255,255,255,0.92)', padding: '10px 12px', borderRadius: 14, display: 'flex', alignItems: 'center', gap: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
                 <Clock size={16} color="#9333EA" />
                 <span style={{ fontSize: 11, fontWeight: 700, color: '#0F172A' }}>Part-Time</span>
               </div>
             </div>
 
-            {/* Info Highlights Pill */}
+            {/* Static Badge */}
             <div style={{
               marginTop: 18,
               background: '#0F172A', color: '#6EE7B7',
               fontSize: 11, fontWeight: 700, padding: '8px 16px', borderRadius: 20,
               display: 'inline-flex', alignItems: 'center', gap: 6,
-              boxShadow: '0 6px 18px rgba(0,0,0,0.2)'
+              boxShadow: '0 6px 18px rgba(0,0,0,0.15)'
             }}>
               <Zap size={13} fill="#6EE7B7" /> Real-Time Attendance & Payroll Sync
             </div>
@@ -228,14 +209,13 @@ export default function SignupPage() {
           </div>
 
           <div style={{ fontSize: 11, fontWeight: 600, color: '#0F172A', opacity: 0.85, zIndex: 1, textAlign: 'center' }}>
-            Enterprise HR Portal • v1.0
+            Enterprise HR Portal • Registration
           </div>
         </div>
 
-        {/* ── RIGHT COLUMN (Minimal Clean Registration Form) ── */}
+        {/* ── RIGHT COLUMN (Signup Form) ── */}
         <div style={{ padding: '40px 44px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
           
-          {/* Clean Title — No Unwanted Text Descriptions */}
           <div style={{ marginBottom: 20 }}>
             <h1 style={{ fontSize: 26, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.02em' }}>
               Create your Dayflow account
@@ -324,7 +304,7 @@ export default function SignupPage() {
           {/* Registration Form Controls */}
           <form onSubmit={handleSubmit}>
             
-            {/* Employee ID Field (Subtle Less Visible Text) */}
+            {/* Employee ID Field (10% Visibility Faint Placeholder) */}
             <div style={{ marginBottom: 16 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
                 <label style={{ fontSize: 12, fontWeight: 600, color: '#475569' }}>
@@ -338,10 +318,9 @@ export default function SignupPage() {
               </div>
               <div style={{ position: 'relative' }}>
                 <input
-                  className="subtle-input"
+                  className="faint-input"
                   type="text"
-                  required
-                  placeholder="e.g. 105"
+                  placeholder="105"
                   value={employeeId}
                   onChange={e => setEmployeeId(e.target.value)}
                   onBlur={() => setTouched(t => ({ ...t, employeeId: true }))}
@@ -352,7 +331,7 @@ export default function SignupPage() {
                     borderRadius: 12,
                     border: touched.employeeId && !isEmployeeIdValid ? '1.5px solid #EF4444' : '1.5px solid #E2E8F0',
                     fontSize: 13,
-                    color: '#334155',
+                    color: '#0F172A',
                     background: '#FFFFFF',
                     outline: 'none',
                     transition: 'all 200ms ease'
@@ -367,7 +346,7 @@ export default function SignupPage() {
               )}
             </div>
 
-            {/* Work Email Field (Subtle Less Visible Text) */}
+            {/* Work Email Field (10% Visibility Faint Placeholder) */}
             <div style={{ marginBottom: 16 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
                 <label style={{ fontSize: 12, fontWeight: 600, color: '#475569' }}>
@@ -381,10 +360,9 @@ export default function SignupPage() {
               </div>
               <div style={{ position: 'relative' }}>
                 <input
-                  className="subtle-input"
+                  className="faint-input"
                   type="email"
-                  required
-                  placeholder="john@dayflow.io"
+                  placeholder={selectedRole === 'employee' ? 'john@dayflow.io' : 'carla@dayflow.io'}
                   value={email}
                   onChange={e => setEmail(e.target.value)}
                   onBlur={() => setTouched(t => ({ ...t, email: true }))}
@@ -395,7 +373,7 @@ export default function SignupPage() {
                     borderRadius: 12,
                     border: touched.email && !isEmailValid ? '1.5px solid #EF4444' : '1.5px solid #E2E8F0',
                     fontSize: 13,
-                    color: '#334155',
+                    color: '#0F172A',
                     background: '#FFFFFF',
                     outline: 'none',
                     transition: 'all 200ms ease'
@@ -410,7 +388,7 @@ export default function SignupPage() {
               )}
             </div>
 
-            {/* Password Field (Subtle Less Visible Text) */}
+            {/* Password Field (10% Visibility Faint Placeholder) */}
             <div style={{ marginBottom: 24 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
                 <label style={{ fontSize: 12, fontWeight: 600, color: '#475569' }}>
@@ -424,10 +402,9 @@ export default function SignupPage() {
               </div>
               <div style={{ position: 'relative' }}>
                 <input
-                  className="subtle-input"
+                  className="faint-input"
                   type={showPassword ? 'text' : 'password'}
-                  required
-                  placeholder="Minimum 6 characters"
+                  placeholder="••••••••••••"
                   value={password}
                   onChange={e => setPassword(e.target.value)}
                   onBlur={() => setTouched(t => ({ ...t, password: true }))}
@@ -438,7 +415,7 @@ export default function SignupPage() {
                     borderRadius: 12,
                     border: touched.password && !isPasswordValid ? '1.5px solid #EF4444' : '1.5px solid #E2E8F0',
                     fontSize: 13,
-                    color: '#334155',
+                    color: '#0F172A',
                     background: '#FFFFFF',
                     outline: 'none',
                     transition: 'all 200ms ease'
@@ -478,8 +455,15 @@ export default function SignupPage() {
             </ShinyButton>
           </form>
 
-          {/* Minimal Navigation Link */}
-          <div style={{ textAlign: 'center', marginTop: 20, fontSize: 13, color: '#64748B' }}>
+          {/* Professional Terms of Service & Privacy Policy Footer */}
+          <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 20, textAlign: 'center', lineHeight: 1.5 }}>
+            By registering, you agree to Dayflow&apos;s{' '}
+            <a href="#" style={{ color: '#2563EB', fontWeight: 600, textDecoration: 'underline' }}>Terms of Service</a>{' '}
+            and{' '}
+            <a href="#" style={{ color: '#2563EB', fontWeight: 600, textDecoration: 'underline' }}>Privacy Policy</a>.
+          </div>
+
+          <div style={{ textAlign: 'center', marginTop: 14, fontSize: 13, color: '#64748B' }}>
             Already registered?{' '}
             <a href="/login" style={{ color: '#2563EB', fontWeight: 700 }}>Sign In</a>
           </div>
