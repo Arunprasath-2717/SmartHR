@@ -115,7 +115,6 @@ export default function MyLeavesPage() {
           <table className="data-table">
             <thead>
               <tr>
-                <th><input type="checkbox" style={{ accentColor:'var(--accent)' }} /></th>
                 <th>Leave Type</th><th>Date Range</th><th>Days</th><th>Reason</th><th>Status</th><th>Created</th><th>Actions</th>
               </tr>
             </thead>
@@ -126,7 +125,6 @@ export default function MyLeavesPage() {
                   style={{ animation:`card-in 300ms ease-out ${i*40}ms both`, cursor:'pointer' }}
                   onClick={() => openDrawer(leave)}
                 >
-                  <td onClick={e => e.stopPropagation()}><input type="checkbox" style={{ accentColor:'var(--accent)' }} /></td>
                   <td><span className="pill pill-info">{leave.type}</span></td>
                   <td className="text-sm">{leave.from} → {leave.to}</td>
                   <td style={{ fontWeight:700 }}>{leave.days}d</td>
