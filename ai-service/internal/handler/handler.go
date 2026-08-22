@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	"ai-service/internal/anomaly"
+	"dayflow/ai-service/internal/anomaly"
 )
 
 // HealthResponse defines the JSON structure for GET /health.

@@ -7,8 +7,8 @@ import (
 	"os"
 	"strings"
 
-	"ai-service/internal/anomaly"
-	"ai-service/internal/handler"
+	"dayflow/ai-service/internal/anomaly"
+	"dayflow/ai-service/internal/handler"
 )
 
 func main() {
