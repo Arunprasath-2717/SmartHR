@@ -2,14 +2,29 @@
 import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import ShinyButton from '@/components/ui/ShinyButton';
-import { Hexagon, Lock, Mail, User, Shield, ArrowRight, AlertCircle, CheckCircle2 } from 'lucide-react';
+import {
+  Hexagon,
+  Lock,
+  Mail,
+  User,
+  ShieldCheck,
+  Users,
+  ArrowRight,
+  AlertCircle,
+  Laptop,
+  Briefcase,
+  Building2,
+  Clock,
+  Sparkles,
+  CheckCircle2
+} from 'lucide-react';
 
 export default function SignupPage() {
   const { signup } = useAuth();
+  const [selectedRole, setSelectedRole] = useState('employee'); // 'employee' | 'hr'
   const [employeeId, setEmployeeId] = useState('105');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState('employee');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -31,7 +46,7 @@ export default function SignupPage() {
 
     setLoading(true);
     try {
-      await signup({ employeeId, email, password, role });
+      await signup({ employeeId, email, password, role: selectedRole });
     } catch (err) {
       setError(err.message || 'Registration failed.');
       setLoading(false);
@@ -44,167 +59,285 @@ export default function SignupPage() {
       display: 'flex',
       alignItems: 'center',
       justify: 'center',
-      background: 'linear-gradient(135deg, #0B1E3D 0%, #1A3A6B 55%, #2563EB 100%)',
+      background: '#F8FAFC',
+      backgroundImage: 'radial-gradient(#E2E8F0 1px, transparent 1px)',
+      backgroundSize: '24px 24px',
       position: 'relative',
-      overflow: 'hidden',
       padding: 24
     }}>
-      {/* Radial overlay */}
-      <div style={{
-        position: 'absolute', inset: 0,
-        background: 'radial-gradient(ellipse 60% 50% at 20% 50%, rgba(59,130,246,0.25) 0%,transparent 70%), radial-gradient(ellipse 40% 60% at 80% 20%, rgba(139,92,246,0.2) 0%,transparent 70%)',
-        pointerEvents: 'none'
-      }} />
-
+      {/* 2-Column Auth Layout (Reframed matching Unstop design) */}
       <div style={{
         width: '100%',
-        maxWidth: 460,
-        background: 'rgba(255, 255, 255, 0.95)',
-        backdropFilter: 'blur(24px) saturate(180%)',
-        borderRadius: 24,
-        padding: '36px 36px',
-        boxShadow: '0 24px 60px rgba(0,0,0,0.3), 0 4px 16px rgba(59,130,246,0.2)',
-        border: '1px solid rgba(255, 255, 255, 0.4)',
-        position: 'relative',
-        zIndex: 1,
-        animation: 'modal-in 400ms cubic-bezier(0.34,1.56,0.64,1) both'
+        maxWidth: 960,
+        background: '#FFFFFF',
+        borderRadius: 28,
+        boxShadow: '0 24px 70px rgba(0,0,0,0.08), 0 4px 20px rgba(59,130,246,0.06)',
+        border: '1px solid rgba(0,0,0,0.06)',
+        display: 'grid',
+        gridTemplateColumns: '400px 1fr',
+        overflow: 'hidden',
+        animation: 'modal-in 450ms cubic-bezier(0.34,1.56,0.64,1) both'
       }}>
-        {/* Brand Logo */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'center', marginBottom: 20 }}>
-          <div style={{ width: 40, height: 40, borderRadius: 12, background: 'linear-gradient(135deg, #3B82F6, #1D4ED8)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', boxShadow: '0 8px 20px rgba(59,130,246,0.4)' }}>
-            <Hexagon size={22} />
-          </div>
-          <span style={{ fontSize: 22, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.02em' }}>Dayflow</span>
-        </div>
-
-        <div style={{ textAlign: 'center', marginBottom: 24 }}>
-          <h2 style={{ fontSize: 20, fontWeight: 700, color: '#0F172A' }}>Create Your Account</h2>
-          <p style={{ fontSize: 12, color: '#64748B', marginTop: 4 }}>Sign up using your Employee ID and work email</p>
-        </div>
-
-        {error && (
+        
+        {/* ── LEFT BANNER (Vibrant Yellow/Amber matching Reference Image) ── */}
+        <div style={{
+          background: 'linear-gradient(145deg, #FFD000 0%, #FFB703 60%, #FB8500 100%)',
+          padding: '32px 28px',
+          display: 'flex',
+          flexDirection: 'column',
+          justify: 'space-between',
+          position: 'relative',
+          overflow: 'hidden'
+        }}>
+          {/* Subtle curved background pattern */}
           <div style={{
-            display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', borderRadius: 12,
-            background: '#FEE2E2', border: '1px solid rgba(239,68,68,0.2)', color: '#991B1B',
-            fontSize: 12, fontWeight: 600, marginBottom: 18
-          }}>
-            <AlertCircle size={16} flexShrink={0} />
-            <span>{error}</span>
-          </div>
-        )}
+            position: 'absolute', inset: 0,
+            backgroundImage: 'radial-gradient(circle 300px at 0% 0%, rgba(255,255,255,0.2) 0%, transparent 80%)',
+            pointerEvents: 'none'
+          }} />
 
-        <form onSubmit={handleSubmit}>
-          {/* Employee ID */}
-          <div className="form-group" style={{ marginBottom: 14 }}>
-            <label style={{ display: 'block', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#64748B', marginBottom: 4 }}>
-              Employee ID *
-            </label>
-            <div style={{ position: 'relative' }}>
-              <input
-                className="input"
-                type="text"
-                required
-                placeholder="e.g. 105"
-                value={employeeId}
-                onChange={e => setEmployeeId(e.target.value)}
-                style={{ paddingLeft: 40, borderRadius: 12 }}
-              />
-              <User size={16} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: '#94A3B8' }} />
+          {/* Top Brand Logo */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, zIndex: 1 }}>
+            <div style={{
+              width: 38, height: 38, borderRadius: 12,
+              background: '#0F172A', color: '#FFD000',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxShadow: '0 4px 14px rgba(0,0,0,0.15)'
+            }}>
+              <Hexagon size={20} fill="#FFD000" />
+            </div>
+            <span style={{ fontSize: 22, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em' }}>
+              dayflow
+            </span>
+          </div>
+
+          {/* Center Graphic — Floating Badges & Hero Persona */}
+          <div style={{ position: 'relative', margin: '36px 0', textAlign: 'center', zIndex: 1 }}>
+            {/* Floating pill badges around center card */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 16 }}>
+              <div style={{ background: 'rgba(255,255,255,0.92)', padding: '10px 14px', borderRadius: 16, display: 'flex', alignItems: 'center', gap: 8, boxShadow: '0 4px 14px rgba(0,0,0,0.06)' }}>
+                <div style={{ width: 28, height: 28, borderRadius: 8, background: '#FCE7F3', color: '#DB2777', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Laptop size={15} />
+                </div>
+                <span style={{ fontSize: 11, fontWeight: 700, color: '#0F172A' }}>Virtual</span>
+              </div>
+              <div style={{ background: 'rgba(255,255,255,0.92)', padding: '10px 14px', borderRadius: 16, display: 'flex', alignItems: 'center', gap: 8, boxShadow: '0 4px 14px rgba(0,0,0,0.06)' }}>
+                <div style={{ width: 28, height: 28, borderRadius: 8, background: '#EFF6FF', color: '#2563EB', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Briefcase size={15} />
+                </div>
+                <span style={{ fontSize: 11, fontWeight: 700, color: '#0F172A' }}>Full-Time</span>
+              </div>
+              <div style={{ background: 'rgba(255,255,255,0.92)', padding: '10px 14px', borderRadius: 16, display: 'flex', alignItems: 'center', gap: 8, boxShadow: '0 4px 14px rgba(0,0,0,0.06)' }}>
+                <div style={{ width: 28, height: 28, borderRadius: 8, background: '#FEF3C7', color: '#D97706', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Building2 size={15} />
+                </div>
+                <span style={{ fontSize: 11, fontWeight: 700, color: '#0F172A' }}>In-Office</span>
+              </div>
+              <div style={{ background: 'rgba(255,255,255,0.92)', padding: '10px 14px', borderRadius: 16, display: 'flex', alignItems: 'center', gap: 8, boxShadow: '0 4px 14px rgba(0,0,0,0.06)' }}>
+                <div style={{ width: 28, height: 28, borderRadius: 8, background: '#F3E8FF', color: '#9333EA', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Clock size={15} />
+                </div>
+                <span style={{ fontSize: 11, fontWeight: 700, color: '#0F172A' }}>Part-Time</span>
+              </div>
+            </div>
+
+            {/* Bottom Floating White Showcase Card */}
+            <div style={{
+              background: '#FFFFFF',
+              borderRadius: 20,
+              padding: '16px 20px',
+              boxShadow: '0 12px 30px rgba(0,0,0,0.12)',
+              border: '1px solid rgba(255,255,255,0.8)'
+            }}>
+              <div style={{ fontSize: 18, fontWeight: 800, color: '#0F172A', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                <Sparkles size={18} color="#F59E0B" /> Smart HRMS
+              </div>
+              <div style={{ fontSize: 11, color: '#64748B', marginTop: 2 }}>
+                Supporting various employment & attendance types
+              </div>
             </div>
           </div>
 
-          {/* Work Email */}
-          <div className="form-group" style={{ marginBottom: 14 }}>
-            <label style={{ display: 'block', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#64748B', marginBottom: 4 }}>
-              Work Email *
-            </label>
-            <div style={{ position: 'relative' }}>
-              <input
-                className="input"
-                type="email"
-                required
-                placeholder="john@dayflow.io"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                style={{ paddingLeft: 40, borderRadius: 12 }}
-              />
-              <Mail size={16} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: '#94A3B8' }} />
-            </div>
+          {/* Bottom badge */}
+          <div style={{ fontSize: 11, fontWeight: 600, color: '#0F172A', opacity: 0.8, zIndex: 1, textAlign: 'center' }}>
+            Dayflow Enterprise v1.0 • Account Registration
           </div>
-
-          {/* Password */}
-          <div className="form-group" style={{ marginBottom: 14 }}>
-            <label style={{ display: 'block', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#64748B', marginBottom: 4 }}>
-              Password *
-            </label>
-            <div style={{ position: 'relative' }}>
-              <input
-                className="input"
-                type="password"
-                required
-                placeholder="Minimum 6 characters"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                style={{ paddingLeft: 40, borderRadius: 12 }}
-              />
-              <Lock size={16} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: '#94A3B8' }} />
-            </div>
-          </div>
-
-          {/* Role Selection */}
-          <div className="form-group" style={{ marginBottom: 20 }}>
-            <label style={{ display: 'block', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#64748B', marginBottom: 6 }}>
-              Select Role *
-            </label>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-              <button
-                type="button"
-                style={{
-                  padding: '10px 14px', borderRadius: 12, border: role === 'employee' ? '2px solid #3B82F6' : '1px solid var(--border-med)',
-                  background: role === 'employee' ? 'rgba(59,130,246,0.08)' : '#fff',
-                  fontWeight: 600, fontSize: 13, color: role === 'employee' ? '#3B82F6' : '#64748B',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, cursor: 'pointer', transition: 'all 200ms'
-                }}
-                onClick={() => setRole('employee')}
-              >
-                {role === 'employee' && <CheckCircle2 size={14} />} Employee
-              </button>
-              <button
-                type="button"
-                style={{
-                  padding: '10px 14px', borderRadius: 12, border: role === 'hr' ? '2px solid #3B82F6' : '1px solid var(--border-med)',
-                  background: role === 'hr' ? 'rgba(59,130,246,0.08)' : '#fff',
-                  fontWeight: 600, fontSize: 13, color: role === 'hr' ? '#3B82F6' : '#64748B',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, cursor: 'pointer', transition: 'all 200ms'
-                }}
-                onClick={() => setRole('hr')}
-              >
-                {role === 'hr' && <Shield size={14} />} HR Officer
-              </button>
-            </div>
-          </div>
-
-          <div style={{ fontSize: 11, color: '#64748B', marginBottom: 20, textAlign: 'center' }}>
-            📧 Email verification link will be sent upon submission.
-          </div>
-
-          <ShinyButton
-            type="submit"
-            disabled={loading}
-            style={{ width: '100%', justifyContent: 'center' }}
-          >
-            {loading ? 'Creating Account...' : (
-              <>
-                Complete Registration <ArrowRight size={16} />
-              </>
-            )}
-          </ShinyButton>
-        </form>
-
-        <div style={{ textAlign: 'center', marginTop: 20, fontSize: 13, color: '#64748B' }}>
-          Already registered?{' '}
-          <a href="/login" style={{ color: '#3B82F6', fontWeight: 600 }}>Sign In</a>
         </div>
+
+        {/* ── RIGHT COLUMN (Account Registration & Selection) ── */}
+        <div style={{ padding: '36px 44px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          
+          <div style={{ marginBottom: 20 }}>
+            <h1 style={{ fontSize: 24, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.02em' }}>
+              Create your Dayflow account
+            </h1>
+            <p style={{ fontSize: 12, color: '#64748B', marginTop: 4 }}>
+              Register with your Employee ID and work credentials to access your portal
+            </p>
+          </div>
+
+          {/* Account Type Selection Cards (Exact Unstop UI Variant) */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 18 }}>
+            
+            {/* Card 1: Employee */}
+            <div
+              onClick={() => setSelectedRole('employee')}
+              style={{
+                padding: '12px 14px',
+                borderRadius: 16,
+                background: selectedRole === 'employee' ? '#FFFBEB' : '#F8FAFC',
+                border: selectedRole === 'employee' ? '2px solid #F59E0B' : '1.5px solid #E2E8F0',
+                cursor: 'pointer',
+                transition: 'all 200ms ease',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 10
+              }}
+            >
+              <div style={{
+                width: 32, height: 32, borderRadius: 10,
+                background: selectedRole === 'employee' ? '#F59E0B' : '#E2E8F0',
+                color: selectedRole === 'employee' ? '#FFFFFF' : '#64748B',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0
+              }}>
+                <Users size={16} />
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: '#0F172A', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <span>Employee</span>
+                  {selectedRole === 'employee' && <CheckCircle2 size={14} color="#F59E0B" />}
+                </div>
+              </div>
+            </div>
+
+            {/* Card 2: HR Officer / Admin */}
+            <div
+              onClick={() => setSelectedRole('hr')}
+              style={{
+                padding: '12px 14px',
+                borderRadius: 16,
+                background: selectedRole === 'hr' ? '#EFF6FF' : '#F8FAFC',
+                border: selectedRole === 'hr' ? '2px solid #2563EB' : '1.5px solid #E2E8F0',
+                cursor: 'pointer',
+                transition: 'all 200ms ease',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 10
+              }}
+            >
+              <div style={{
+                width: 32, height: 32, borderRadius: 10,
+                background: selectedRole === 'hr' ? '#2563EB' : '#E2E8F0',
+                color: selectedRole === 'hr' ? '#FFFFFF' : '#64748B',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0
+              }}>
+                <ShieldCheck size={16} />
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: '#0F172A', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <span>HR Officer</span>
+                  {selectedRole === 'hr' && <CheckCircle2 size={14} color="#2563EB" />}
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          {error && (
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', borderRadius: 12,
+              background: '#FEE2E2', border: '1px solid rgba(239,68,68,0.2)', color: '#991B1B',
+              fontSize: 12, fontWeight: 600, marginBottom: 14
+            }}>
+              <AlertCircle size={16} flexShrink={0} />
+              <span>{error}</span>
+            </div>
+          )}
+
+          {/* Registration Form */}
+          <form onSubmit={handleSubmit}>
+            {/* Employee ID */}
+            <div className="form-group" style={{ marginBottom: 12 }}>
+              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#64748B', marginBottom: 4 }}>
+                Employee ID *
+              </label>
+              <div style={{ position: 'relative' }}>
+                <input
+                  className="input"
+                  type="text"
+                  required
+                  placeholder="e.g. 105"
+                  value={employeeId}
+                  onChange={e => setEmployeeId(e.target.value)}
+                  style={{ paddingLeft: 40, borderRadius: 12 }}
+                />
+                <User size={16} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: '#94A3B8' }} />
+              </div>
+            </div>
+
+            {/* Work Email */}
+            <div className="form-group" style={{ marginBottom: 12 }}>
+              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#64748B', marginBottom: 4 }}>
+                Work Email *
+              </label>
+              <div style={{ position: 'relative' }}>
+                <input
+                  className="input"
+                  type="email"
+                  required
+                  placeholder="john@dayflow.io"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  style={{ paddingLeft: 40, borderRadius: 12 }}
+                />
+                <Mail size={16} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: '#94A3B8' }} />
+              </div>
+            </div>
+
+            {/* Password */}
+            <div className="form-group" style={{ marginBottom: 16 }}>
+              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#64748B', marginBottom: 4 }}>
+                Password *
+              </label>
+              <div style={{ position: 'relative' }}>
+                <input
+                  className="input"
+                  type="password"
+                  required
+                  placeholder="Minimum 6 characters"
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  style={{ paddingLeft: 40, borderRadius: 12 }}
+                />
+                <Lock size={16} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: '#94A3B8' }} />
+              </div>
+            </div>
+
+            <ShinyButton
+              type="submit"
+              disabled={loading}
+              style={{ width: '100%', justifyContent: 'center' }}
+            >
+              {loading ? 'Creating Account...' : (
+                <>
+                  Complete Registration <ArrowRight size={16} />
+                </>
+              )}
+            </ShinyButton>
+          </form>
+
+          {/* Legal Notice Footer */}
+          <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 16, textAlign: 'center', lineHeight: 1.5 }}>
+            By registering, you accept the <a href="#" style={{ color: '#2563EB', fontWeight: 600 }}>Terms of Service</a> and acknowledge our <a href="#" style={{ color: '#2563EB', fontWeight: 600 }}>Privacy Policy</a>.
+          </div>
+
+          <div style={{ textAlign: 'center', marginTop: 14, fontSize: 13, color: '#64748B' }}>
+            Already registered?{' '}
+            <a href="/login" style={{ color: '#2563EB', fontWeight: 700 }}>Sign In</a>
+          </div>
+
+        </div>
+
       </div>
     </div>
   );

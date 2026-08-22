@@ -2,14 +2,38 @@
 import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import ShinyButton from '@/components/ui/ShinyButton';
-import { Hexagon, Lock, Mail, ArrowRight, ShieldCheck, AlertCircle } from 'lucide-react';
+import {
+  Hexagon,
+  Lock,
+  Mail,
+  ArrowRight,
+  ShieldCheck,
+  Users,
+  AlertCircle,
+  Laptop,
+  Briefcase,
+  Building2,
+  Clock,
+  Sparkles,
+  CheckCircle2
+} from 'lucide-react';
 
 export default function LoginPage() {
   const { login } = useAuth();
+  const [selectedRole, setSelectedRole] = useState('hr'); // 'employee' | 'hr'
   const [email, setEmail] = useState('carla@dayflow.io');
   const [password, setPassword] = useState('password123');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const handleRoleSelect = (roleKey) => {
+    setSelectedRole(roleKey);
+    if (roleKey === 'hr') {
+      setEmail('carla@dayflow.io');
+    } else {
+      setEmail('john@dayflow.io');
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -23,145 +47,278 @@ export default function LoginPage() {
     }
   };
 
-  const setQuickRole = (roleEmail) => {
-    setEmail(roleEmail);
-    setPassword('password123');
-  };
-
   return (
     <div style={{
       minHeight: '100vh',
       display: 'flex',
       alignItems: 'center',
-      justify: 'center',
-      background: 'linear-gradient(135deg, #0B1E3D 0%, #1A3A6B 55%, #2563EB 100%)',
+      justifyContent: 'center',
+      background: '#F8FAFC',
+      backgroundImage: 'radial-gradient(#E2E8F0 1px, transparent 1px)',
+      backgroundSize: '24px 24px',
       position: 'relative',
-      overflow: 'hidden',
       padding: 24
     }}>
-      {/* Background radial effects */}
-      <div style={{
-        position: 'absolute', inset: 0,
-        background: 'radial-gradient(ellipse 60% 50% at 20% 50%, rgba(59,130,246,0.25) 0%,transparent 70%), radial-gradient(ellipse 40% 60% at 80% 20%, rgba(139,92,246,0.2) 0%,transparent 70%)',
-        pointerEvents: 'none'
-      }} />
-
+      {/* 2-Column Auth Layout (Reframed matching Unstop design) */}
       <div style={{
         width: '100%',
-        maxWidth: 440,
-        background: 'rgba(255, 255, 255, 0.95)',
-        backdropFilter: 'blur(24px) saturate(180%)',
-        borderRadius: 24,
-        padding: '40px 36px',
-        boxShadow: '0 24px 60px rgba(0,0,0,0.3), 0 4px 16px rgba(59,130,246,0.2)',
-        border: '1px solid rgba(255, 255, 255, 0.4)',
-        position: 'relative',
-        zIndex: 1,
-        animation: 'modal-in 400ms cubic-bezier(0.34,1.56,0.64,1) both'
+        maxWidth: 960,
+        background: '#FFFFFF',
+        borderRadius: 28,
+        boxShadow: '0 24px 70px rgba(0,0,0,0.08), 0 4px 20px rgba(59,130,246,0.06)',
+        border: '1px solid rgba(0,0,0,0.06)',
+        display: 'grid',
+        gridTemplateColumns: '400px 1fr',
+        overflow: 'hidden',
+        animation: 'modal-in 450ms cubic-bezier(0.34,1.56,0.64,1) both'
       }}>
-        {/* Brand Logo */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'center', marginBottom: 24 }}>
-          <div style={{ width: 44, height: 44, borderRadius: 14, background: 'linear-gradient(135deg, #3B82F6, #1D4ED8)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', boxShadow: '0 8px 20px rgba(59,130,246,0.4)' }}>
-            <Hexagon size={24} />
-          </div>
-          <span style={{ fontSize: 24, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.02em' }}>Dayflow</span>
-        </div>
-
-        <div style={{ textAlign: 'center', marginBottom: 28 }}>
-          <h2 style={{ fontSize: 22, fontWeight: 700, color: '#0F172A' }}>Sign In to Dayflow HRMS</h2>
-          <p style={{ fontSize: 13, color: '#64748B', marginTop: 4 }}>Enter your credentials to access your dashboard</p>
-        </div>
-
-        {error && (
+        
+        {/* ── LEFT BANNER (Vibrant Yellow/Amber matching Reference Image) ── */}
+        <div style={{
+          background: 'linear-gradient(145deg, #FFD000 0%, #FFB703 60%, #FB8500 100%)',
+          padding: '32px 28px',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+          position: 'relative',
+          overflow: 'hidden'
+        }}>
+          {/* Subtle curved background pattern */}
           <div style={{
-            display: 'flex', alignItems: 'center', gap: 8, padding: '12px 14px', borderRadius: 12,
-            background: '#FEE2E2', border: '1px solid rgba(239,68,68,0.2)', color: '#991B1B',
-            fontSize: 12, fontWeight: 600, marginBottom: 20
-          }}>
-            <AlertCircle size={16} flexShrink={0} />
-            <span>{error}</span>
-          </div>
-        )}
+            position: 'absolute', inset: 0,
+            backgroundImage: 'radial-gradient(circle 300px at 0% 0%, rgba(255,255,255,0.2) 0%, transparent 80%)',
+            pointerEvents: 'none'
+          }} />
 
-        <form onSubmit={handleSubmit}>
-          <div className="form-group" style={{ marginBottom: 18 }}>
-            <label style={{ display: 'block', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#64748B', marginBottom: 6 }}>
-              Work Email
-            </label>
-            <div style={{ position: 'relative' }}>
-              <input
-                className="input"
-                type="email"
-                required
-                placeholder="name@company.com"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                style={{ paddingLeft: 40, borderRadius: 12 }}
-              />
-              <Mail size={16} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: '#94A3B8' }} />
+          {/* Top Brand Logo */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, zIndex: 1 }}>
+            <div style={{
+              width: 38, height: 38, borderRadius: 12,
+              background: '#0F172A', color: '#FFD000',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxShadow: '0 4px 14px rgba(0,0,0,0.15)'
+            }}>
+              <Hexagon size={20} fill="#FFD000" />
+            </div>
+            <span style={{ fontSize: 22, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em' }}>
+              dayflow
+            </span>
+          </div>
+
+          {/* Center Graphic — Floating Badges & Hero Persona */}
+          <div style={{ position: 'relative', margin: '36px 0', textAlign: 'center', zIndex: 1 }}>
+            {/* Floating pill badges around center card */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 16 }}>
+              <div style={{ background: 'rgba(255,255,255,0.92)', padding: '10px 14px', borderRadius: 16, display: 'flex', alignItems: 'center', gap: 8, boxShadow: '0 4px 14px rgba(0,0,0,0.06)' }}>
+                <div style={{ width: 28, height: 28, borderRadius: 8, background: '#FCE7F3', color: '#DB2777', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Laptop size={15} />
+                </div>
+                <span style={{ fontSize: 11, fontWeight: 700, color: '#0F172A' }}>Virtual</span>
+              </div>
+              <div style={{ background: 'rgba(255,255,255,0.92)', padding: '10px 14px', borderRadius: 16, display: 'flex', alignItems: 'center', gap: 8, boxShadow: '0 4px 14px rgba(0,0,0,0.06)' }}>
+                <div style={{ width: 28, height: 28, borderRadius: 8, background: '#EFF6FF', color: '#2563EB', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Briefcase size={15} />
+                </div>
+                <span style={{ fontSize: 11, fontWeight: 700, color: '#0F172A' }}>Full-Time</span>
+              </div>
+              <div style={{ background: 'rgba(255,255,255,0.92)', padding: '10px 14px', borderRadius: 16, display: 'flex', alignItems: 'center', gap: 8, boxShadow: '0 4px 14px rgba(0,0,0,0.06)' }}>
+                <div style={{ width: 28, height: 28, borderRadius: 8, background: '#FEF3C7', color: '#D97706', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Building2 size={15} />
+                </div>
+                <span style={{ fontSize: 11, fontWeight: 700, color: '#0F172A' }}>In-Office</span>
+              </div>
+              <div style={{ background: 'rgba(255,255,255,0.92)', padding: '10px 14px', borderRadius: 16, display: 'flex', alignItems: 'center', gap: 8, boxShadow: '0 4px 14px rgba(0,0,0,0.06)' }}>
+                <div style={{ width: 28, height: 28, borderRadius: 8, background: '#F3E8FF', color: '#9333EA', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Clock size={15} />
+                </div>
+                <span style={{ fontSize: 11, fontWeight: 700, color: '#0F172A' }}>Part-Time</span>
+              </div>
+            </div>
+
+            {/* Bottom Floating White Showcase Card */}
+            <div style={{
+              background: '#FFFFFF',
+              borderRadius: 20,
+              padding: '16px 20px',
+              boxShadow: '0 12px 30px rgba(0,0,0,0.12)',
+              border: '1px solid rgba(255,255,255,0.8)'
+            }}>
+              <div style={{ fontSize: 18, fontWeight: 800, color: '#0F172A', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                <Sparkles size={18} color="#F59E0B" /> Smart HRMS
+              </div>
+              <div style={{ fontSize: 11, color: '#64748B', marginTop: 2 }}>
+                Supporting various employment & attendance types
+              </div>
             </div>
           </div>
 
-          <div className="form-group" style={{ marginBottom: 24 }}>
-            <label style={{ display: 'block', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#64748B', marginBottom: 6 }}>
-              Password
-            </label>
-            <div style={{ position: 'relative' }}>
-              <input
-                className="input"
-                type="password"
-                required
-                placeholder="••••••••"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                style={{ paddingLeft: 40, borderRadius: 12 }}
-              />
-              <Lock size={16} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: '#94A3B8' }} />
+          {/* Bottom badge */}
+          <div style={{ fontSize: 11, fontWeight: 600, color: '#0F172A', opacity: 0.8, zIndex: 1, textAlign: 'center' }}>
+            Dayflow Enterprise v1.0 • Secure Authentication
+          </div>
+        </div>
+
+        {/* ── RIGHT COLUMN (Account Type Selection & Credentials Form) ── */}
+        <div style={{ padding: '40px 44px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          
+          <div style={{ marginBottom: 24 }}>
+            <h1 style={{ fontSize: 26, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.02em' }}>
+              Identify your account type
+            </h1>
+            <p style={{ fontSize: 13, color: '#64748B', marginTop: 6 }}>
+              Join Dayflow to manage your workforce, track attendance, and process payroll
+            </p>
+          </div>
+
+          {/* Account Type Selection Cards (Exact Unstop UI Variant) */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginBottom: 24 }}>
+            
+            {/* Card 1: Employee */}
+            <div
+              onClick={() => handleRoleSelect('employee')}
+              style={{
+                padding: '16px 20px',
+                borderRadius: 18,
+                background: selectedRole === 'employee' ? '#FFFBEB' : '#F8FAFC',
+                border: selectedRole === 'employee' ? '2px solid #F59E0B' : '1.5px solid #E2E8F0',
+                cursor: 'pointer',
+                transition: 'all 200ms ease',
+                boxShadow: selectedRole === 'employee' ? '0 8px 20px rgba(245,158,11,0.12)' : 'none',
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: 14
+              }}
+            >
+              <div style={{
+                width: 38, height: 38, borderRadius: 12,
+                background: selectedRole === 'employee' ? '#F59E0B' : '#E2E8F0',
+                color: selectedRole === 'employee' ? '#FFFFFF' : '#64748B',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0
+              }}>
+                <Users size={20} />
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 14, fontWeight: 700, color: '#0F172A', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <span>I&apos;m an Employee</span>
+                  {selectedRole === 'employee' && <CheckCircle2 size={16} color="#F59E0B" />}
+                </div>
+                <div style={{ fontSize: 12, color: '#64748B', marginTop: 2, lineHeight: 1.4 }}>
+                  Clock shift attendance, apply for leaves, view payslips & manage profile
+                </div>
+              </div>
             </div>
+
+            {/* Card 2: HR Officer / Admin */}
+            <div
+              onClick={() => handleRoleSelect('hr')}
+              style={{
+                padding: '16px 20px',
+                borderRadius: 18,
+                background: selectedRole === 'hr' ? '#EFF6FF' : '#F8FAFC',
+                border: selectedRole === 'hr' ? '2px solid #2563EB' : '1.5px solid #E2E8F0',
+                cursor: 'pointer',
+                transition: 'all 200ms ease',
+                boxShadow: selectedRole === 'hr' ? '0 8px 20px rgba(37,99,235,0.12)' : 'none',
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: 14
+              }}
+            >
+              <div style={{
+                width: 38, height: 38, borderRadius: 12,
+                background: selectedRole === 'hr' ? '#2563EB' : '#E2E8F0',
+                color: selectedRole === 'hr' ? '#FFFFFF' : '#64748B',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0
+              }}>
+                <ShieldCheck size={20} />
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 14, fontWeight: 700, color: '#0F172A', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <span>I&apos;m an HR Officer / Employer</span>
+                  {selectedRole === 'hr' && <CheckCircle2 size={16} color="#2563EB" />}
+                </div>
+                <div style={{ fontSize: 12, color: '#64748B', marginTop: 2, lineHeight: 1.4 }}>
+                  Manage team members, approve leave requests, process payroll & AI insights
+                </div>
+              </div>
+            </div>
+
           </div>
 
-          <ShinyButton
-            type="submit"
-            disabled={loading}
-            style={{ width: '100%', justifyContent: 'center' }}
-          >
-            {loading ? 'Authenticating...' : (
-              <>
-                Sign In to Dashboard <ArrowRight size={16} />
-              </>
-            )}
-          </ShinyButton>
-        </form>
+          {error && (
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', borderRadius: 12,
+              background: '#FEE2E2', border: '1px solid rgba(239,68,68,0.2)', color: '#991B1B',
+              fontSize: 12, fontWeight: 600, marginBottom: 16
+            }}>
+              <AlertCircle size={16} flexShrink={0} />
+              <span>{error}</span>
+            </div>
+          )}
 
-        {/* Quick RBAC Switcher for testing */}
-        <div style={{ marginTop: 24, paddingTop: 20, borderTop: '1px solid rgba(59,130,246,0.1)', textAlign: 'center' }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>
-            Demo Quick Login Roles
-          </div>
-          <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
-            <button
-              type="button"
-              className="btn btn-ghost btn-sm"
-              onClick={() => setQuickRole('carla@dayflow.io')}
-              style={{ fontSize: 11, borderRadius: 20 }}
+          {/* Login Credentials Form */}
+          <form onSubmit={handleSubmit}>
+            <div className="form-group" style={{ marginBottom: 14 }}>
+              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#64748B', marginBottom: 4 }}>
+                Work Email
+              </label>
+              <div style={{ position: 'relative' }}>
+                <input
+                  className="input"
+                  type="email"
+                  required
+                  placeholder="name@company.com"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  style={{ paddingLeft: 40, borderRadius: 12 }}
+                />
+                <Mail size={16} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: '#94A3B8' }} />
+              </div>
+            </div>
+
+            <div className="form-group" style={{ marginBottom: 20 }}>
+              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#64748B', marginBottom: 4 }}>
+                Password
+              </label>
+              <div style={{ position: 'relative' }}>
+                <input
+                  className="input"
+                  type="password"
+                  required
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  style={{ paddingLeft: 40, borderRadius: 12 }}
+                />
+                <Lock size={16} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: '#94A3B8' }} />
+              </div>
+            </div>
+
+            <ShinyButton
+              type="submit"
+              disabled={loading}
+              style={{ width: '100%', justifyContent: 'center' }}
             >
-              <ShieldCheck size={13} color="#3B82F6" /> HR Officer
-            </button>
-            <button
-              type="button"
-              className="btn btn-ghost btn-sm"
-              onClick={() => setQuickRole('john@dayflow.io')}
-              style={{ fontSize: 11, borderRadius: 20 }}
-            >
-              Employee User
-            </button>
+              {loading ? 'Authenticating...' : (
+                <>
+                  Sign In to Dashboard <ArrowRight size={16} />
+                </>
+              )}
+            </ShinyButton>
+          </form>
+
+          {/* Legal Notice Footer */}
+          <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 20, textAlign: 'center', lineHeight: 1.5 }}>
+            By signing in, you accept the <a href="#" style={{ color: '#2563EB', fontWeight: 600 }}>Terms of Service</a> and acknowledge our <a href="#" style={{ color: '#2563EB', fontWeight: 600 }}>Privacy Policy</a>.
           </div>
+
+          <div style={{ textAlign: 'center', marginTop: 16, fontSize: 13, color: '#64748B' }}>
+            Don&apos;t have an account?{' '}
+            <a href="/signup" style={{ color: '#2563EB', fontWeight: 700 }}>Create an Account</a>
+          </div>
+
         </div>
 
-        <div style={{ textAlign: 'center', marginTop: 20, fontSize: 13, color: '#64748B' }}>
-          Don&apos;t have an account?{' '}
-          <a href="/signup" style={{ color: '#3B82F6', fontWeight: 600 }}>Create an Account</a>
-        </div>
       </div>
     </div>
   );
