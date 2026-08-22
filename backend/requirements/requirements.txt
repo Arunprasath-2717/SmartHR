@@ -1,0 +1,8 @@
+# ==============================================================================
+# DAYFLOW - Backend Python Requirements (Phase 0)
+# ==============================================================================
+# Official Odoo 17 runtime dependencies are pre-installed in the base Odoo container image.
+#
+# Custom Python package dependencies required by Dayflow backend services
+# will be pinned here when introduced in future phases.
+# ==============================================================================

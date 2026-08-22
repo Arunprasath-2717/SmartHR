@@ -136,20 +136,14 @@ dayflow/
 │
 ├── backend/                        # Odoo 17 backend and custom modules
 │   ├── addons/
-│   │   └── dayflow_hrms/           # Primary Dayflow HRMS custom Odoo module
+│   │   └── dayflow_core/           # Primary Dayflow Core custom Odoo module
 │   │       ├── __init__.py         # Package root
 │   │       ├── __manifest__.py     # Odoo module manifest
 │   │       ├── models/             # Business models & ORM extensions
-│   │       ├── controllers/        # HTTP routing & API endpoints
+│   │       ├── controllers/        # HTTP routing & API endpoints (e.g. /api/v1/health)
 │   │       ├── services/           # Backend service layer & AI client
 │   │       ├── security/           # Access rights (ir.model.access.csv) & record rules
-│   │       ├── views/              # XML views, actions, and menus
 │   │       ├── data/               # Data files, sequences, and seed records
-│   │       ├── utils/              # Backend helper utilities
-│   │       ├── static/src/         # Production OWL components, JS, and SCSS assets
-│   │       │   ├── components/     # Production OWL components
-│   │       │   ├── js/             # Production JavaScript assets
-│   │       │   └── scss/           # Production SCSS stylesheets
 │   │       └── tests/              # Odoo unit tests (TransactionCase, HttpCase)
 │   └── config/
 │       └── odoo.conf               # Development Odoo server configuration
@@ -201,8 +195,8 @@ dayflow/
 
 ## Directory Overview
 
-- **`frontend/`**: Contains the organizational skeleton for component architecture, design system planning, and frontend state management. Production OWL components reside directly inside `backend/addons/dayflow_hrms/static/src/`.
-- **`backend/`**: Contains the Odoo custom addon `dayflow_hrms` along with the development server configuration `backend/config/odoo.conf`.
+- **`frontend/`**: Contains the organizational skeleton for component architecture, design system planning, and frontend state management.
+- **`backend/`**: Contains the Odoo custom addon `dayflow_core` along with the development server configuration `backend/config/odoo.conf`.
 - **`ai-service/`**: Contains the independent Go service for AI anomaly detection, structured according to standard Go project layout standards (`cmd/`, `internal/`).
 - **`database/`**: Dedicated to demo data, seed fixtures, and development data dumps. Odoo ORM remains the sole schema authority.
 - **`infrastructure/`**: Houses Docker container recipes, postgres initialization scripts, and operational maintenance scripts.

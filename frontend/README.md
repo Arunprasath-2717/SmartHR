@@ -16,7 +16,7 @@ Dayflow is built directly on **Odoo Community 17**. User interface components in
 3. **Production Asset Location**:
    - All production OWL components, JavaScript controllers, and SCSS stylesheets must reside within the Odoo module:
      ```
-     backend/addons/dayflow_hrms/static/src/
+     backend/addons/dayflow_core/static/src/
      ├── components/
      ├── js/
      └── scss/
