@@ -18,13 +18,15 @@ logger = logging.getLogger("dayflow.app")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup: Ensure database tables are created
+    # Startup: Verify database connection
     logger.info("Initializing Dayflow FastAPI application...")
     try:
-        Base.metadata.create_all(bind=engine)
-        logger.info("Database schema verified and synchronized.")
+        from sqlalchemy import text
+        with engine.connect() as conn:
+            conn.execute(text("SELECT 1"))
+        logger.info("Database connection established successfully.")
     except Exception as e:
-        logger.error("Database connection initialization failed: %s", str(e))
+        logger.error("Database connection check failed: %s", str(e))
     yield
     # Shutdown
     logger.info("Shutting down Dayflow FastAPI application.")
