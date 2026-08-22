@@ -200,26 +200,6 @@ export default function TopBar() {
 
                 <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', margin: '4px 0' }} />
 
-                <div style={{ padding: '6px 12px', fontSize: 10, fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase' }}>
-                  Switch Role (RBAC)
-                </div>
-                <button
-                  className="dropdown-item"
-                  onClick={() => { setUserMenuOpen(false); switchRole('hr'); }}
-                  style={{ width: '100%', borderRadius: 8, color: role === 'hr' ? '#3B82F6' : '#0F172A', fontWeight: role === 'hr' ? 700 : 400 }}
-                >
-                  <Shield size={14} /> HR Officer View
-                </button>
-                <button
-                  className="dropdown-item"
-                  onClick={() => { setUserMenuOpen(false); switchRole('employee'); }}
-                  style={{ width: '100%', borderRadius: 8, color: role === 'employee' ? '#3B82F6' : '#0F172A', fontWeight: role === 'employee' ? 700 : 400 }}
-                >
-                  <User size={14} /> Employee View
-                </button>
-
-                <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', margin: '4px 0' }} />
-
                 <button
                   className="dropdown-item danger"
                   onClick={() => { setUserMenuOpen(false); logout(); }}

@@ -115,21 +115,6 @@ export function AuthProvider({ children }) {
     router.push('/login');
   };
 
-  const switchRole = (newRole) => {
-    setUser(prev => {
-      const updated = {
-        ...prev,
-        role: newRole,
-        roles: [newRole],
-        title: newRole === 'hr' ? 'HR Officer' : 'Software Engineer',
-        name: newRole === 'hr' ? 'Carla Sanford' : 'John Doe',
-        initials: newRole === 'hr' ? 'CS' : 'JD',
-      };
-      return updated;
-    });
-    router.push(newRole === 'hr' ? '/dashboard' : '/my-dashboard');
-  };
-
   const updateProfile = (updates) => {
     setUser(prev => ({ ...prev, ...updates }));
   };
@@ -142,7 +127,6 @@ export function AuthProvider({ children }) {
       login,
       signup,
       logout,
-      switchRole,
       updateProfile
     }}>
       {children}
