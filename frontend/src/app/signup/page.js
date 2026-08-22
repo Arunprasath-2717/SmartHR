@@ -16,7 +16,11 @@ import {
   Building2,
   Clock,
   Sparkles,
-  CheckCircle2
+  CheckCircle2,
+  Eye,
+  EyeOff,
+  TrendingUp,
+  UserCheck
 } from 'lucide-react';
 
 export default function SignupPage() {
@@ -25,22 +29,32 @@ export default function SignupPage() {
   const [employeeId, setEmployeeId] = useState('105');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [touched, setTouched] = useState({ employeeId: false, email: false, password: false });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  // Field validators
+  const isEmployeeIdValid = employeeId.trim().length > 0 && /^\d+$/.test(employeeId.trim());
+  const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const isPasswordValid = password.length >= 6;
+  const isFormValid = isEmployeeIdValid && isEmailValid && isPasswordValid;
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setTouched({ employeeId: true, email: true, password: true });
     setError('');
-    if (!employeeId) {
-      setError('Employee ID is required.');
+
+    if (!isEmployeeIdValid) {
+      setError('Please enter a valid numeric Employee ID (e.g. 105).');
       return;
     }
-    if (!email.includes('@')) {
-      setError('Valid work email is required.');
+    if (!isEmailValid) {
+      setError('Please enter a valid work email address.');
       return;
     }
-    if (password.length < 6) {
-      setError('Password must follow security rules (min 6 characters).');
+    if (!isPasswordValid) {
+      setError('Password must be at least 6 characters long.');
       return;
     }
 
@@ -60,12 +74,12 @@ export default function SignupPage() {
       alignItems: 'center',
       justify: 'center',
       background: '#F8FAFC',
-      backgroundImage: 'radial-gradient(#E2E8F0 1px, transparent 1px)',
+      backgroundImage: 'radial-gradient(#CBD5E1 1px, transparent 1px)',
       backgroundSize: '24px 24px',
       position: 'relative',
       padding: 24
     }}>
-      {/* 2-Column Auth Layout (Reframed matching Unstop design) */}
+      {/* 2-Column Auth Layout */}
       <div style={{
         width: '100%',
         maxWidth: 960,
@@ -89,31 +103,85 @@ export default function SignupPage() {
           position: 'relative',
           overflow: 'hidden'
         }}>
-          {/* Subtle curved background pattern */}
+          {/* Subtle background radial pattern */}
           <div style={{
             position: 'absolute', inset: 0,
-            backgroundImage: 'radial-gradient(circle 300px at 0% 0%, rgba(255,255,255,0.2) 0%, transparent 80%)',
+            backgroundImage: 'radial-gradient(circle 300px at 0% 0%, rgba(255,255,255,0.25) 0%, transparent 80%)',
             pointerEvents: 'none'
           }} />
 
           {/* Top Brand Logo */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, zIndex: 1 }}>
             <div style={{
-              width: 38, height: 38, borderRadius: 12,
+              width: 40, height: 40, borderRadius: 12,
               background: '#0F172A', color: '#FFD000',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               boxShadow: '0 4px 14px rgba(0,0,0,0.15)'
             }}>
-              <Hexagon size={20} fill="#FFD000" />
+              <Hexagon size={22} fill="#FFD000" />
             </div>
-            <span style={{ fontSize: 22, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em' }}>
+            <span style={{ fontSize: 24, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em' }}>
               dayflow
             </span>
           </div>
 
-          {/* Center Graphic — Floating Badges & Hero Persona */}
-          <div style={{ position: 'relative', margin: '36px 0', textAlign: 'center', zIndex: 1 }}>
-            {/* Floating pill badges around center card */}
+          {/* 3D HR Showcase Graphics Area */}
+          <div style={{ position: 'relative', margin: '24px 0', textAlign: 'center', zIndex: 1 }}>
+            {/* Center Professional Avatar Card with Floating Node Badges */}
+            <div style={{
+              background: 'rgba(255, 255, 255, 0.95)',
+              borderRadius: 24,
+              padding: '24px 20px',
+              boxShadow: '0 16px 40px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.8)',
+              marginBottom: 20,
+              position: 'relative',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center'
+            }}>
+              {/* Floating Live Sync Chip */}
+              <div style={{
+                position: 'absolute', top: -14, right: 16,
+                background: '#0F172A', color: '#6EE7B7',
+                fontSize: 10, fontWeight: 800, padding: '4px 10px', borderRadius: 20,
+                display: 'flex', alignItems: 'center', gap: 4,
+                boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
+              }}>
+                <UserCheck size={12} /> Instant Onboarding
+              </div>
+
+              {/* Persona Avatar */}
+              <div style={{
+                width: 68, height: 68, borderRadius: '50%',
+                background: 'linear-gradient(135deg, #10B981, #059669)',
+                color: '#fff', fontSize: 24, fontWeight: 800,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                boxShadow: '0 8px 24px rgba(16,185,129,0.3)',
+                border: '3px solid #fff', marginBottom: 10
+              }}>
+                JD
+              </div>
+              <div style={{ fontSize: 15, fontWeight: 800, color: '#0F172A' }}>John Doe</div>
+              <div style={{ fontSize: 11, fontWeight: 600, color: '#059669', background: '#ECFDF5', padding: '2px 10px', borderRadius: 20, marginTop: 4 }}>
+                Software Engineer Candidate
+              </div>
+
+              <div style={{ display: 'flex', gap: 12, marginTop: 14, paddingTop: 12, borderTop: '1px solid rgba(0,0,0,0.06)', width: '100%', justifyContent: 'center' }}>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: '#0F172A' }}>ID #105</div>
+                  <div style={{ fontSize: 9, fontWeight: 700, color: '#64748B', textTransform: 'uppercase' }}>Verified</div>
+                </div>
+                <div style={{ width: 1, height: 24, background: 'rgba(0,0,0,0.08)' }} />
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: '#10B981', display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <TrendingUp size={12} /> Ready
+                  </div>
+                  <div style={{ fontSize: 9, fontWeight: 700, color: '#64748B', textTransform: 'uppercase' }}>Portal</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Floating pill badges grid */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 16 }}>
               <div style={{ background: 'rgba(255,255,255,0.92)', padding: '10px 14px', borderRadius: 16, display: 'flex', alignItems: 'center', gap: 8, boxShadow: '0 4px 14px rgba(0,0,0,0.06)' }}>
                 <div style={{ width: 28, height: 28, borderRadius: 8, background: '#FCE7F3', color: '#DB2777', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -141,16 +209,16 @@ export default function SignupPage() {
               </div>
             </div>
 
-            {/* Bottom Floating White Showcase Card */}
+            {/* Bottom Showcase Card */}
             <div style={{
               background: '#FFFFFF',
-              borderRadius: 20,
-              padding: '16px 20px',
-              boxShadow: '0 12px 30px rgba(0,0,0,0.12)',
+              borderRadius: 18,
+              padding: '14px 18px',
+              boxShadow: '0 10px 24px rgba(0,0,0,0.08)',
               border: '1px solid rgba(255,255,255,0.8)'
             }}>
-              <div style={{ fontSize: 18, fontWeight: 800, color: '#0F172A', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
-                <Sparkles size={18} color="#F59E0B" /> Smart HRMS
+              <div style={{ fontSize: 16, fontWeight: 800, color: '#0F172A', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                <Sparkles size={16} color="#F59E0B" /> Smart HRMS Engine
               </div>
               <div style={{ fontSize: 11, color: '#64748B', marginTop: 2 }}>
                 Supporting various employment & attendance types
@@ -158,16 +226,16 @@ export default function SignupPage() {
             </div>
           </div>
 
-          {/* Bottom badge */}
-          <div style={{ fontSize: 11, fontWeight: 600, color: '#0F172A', opacity: 0.8, zIndex: 1, textAlign: 'center' }}>
+          {/* Bottom Footer Badge */}
+          <div style={{ fontSize: 11, fontWeight: 600, color: '#0F172A', opacity: 0.85, zIndex: 1, textAlign: 'center' }}>
             Dayflow Enterprise v1.0 • Account Registration
           </div>
         </div>
 
-        {/* ── RIGHT COLUMN (Account Registration & Selection) ── */}
-        <div style={{ padding: '36px 44px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+        {/* ── RIGHT COLUMN (Account Registration & Validated Form) ── */}
+        <div style={{ padding: '32px 40px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
           
-          <div style={{ marginBottom: 20 }}>
+          <div style={{ marginBottom: 16 }}>
             <h1 style={{ fontSize: 24, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.02em' }}>
               Create your Dayflow account
             </h1>
@@ -176,8 +244,8 @@ export default function SignupPage() {
             </p>
           </div>
 
-          {/* Account Type Selection Cards (Exact Unstop UI Variant) */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 18 }}>
+          {/* Account Role Selection Cards */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 16 }}>
             
             {/* Card 1: Employee */}
             <div
@@ -254,68 +322,156 @@ export default function SignupPage() {
             </div>
           )}
 
-          {/* Registration Form */}
+          {/* Registration Form with Strict Alignment & Real-Time Validators */}
           <form onSubmit={handleSubmit}>
-            {/* Employee ID */}
-            <div className="form-group" style={{ marginBottom: 12 }}>
-              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#64748B', marginBottom: 4 }}>
-                Employee ID *
-              </label>
+            
+            {/* Employee ID Group */}
+            <div style={{ marginBottom: 12 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                <label style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#475569' }}>
+                  Employee ID <span style={{ color: '#EF4444' }}>*</span>
+                </label>
+                {touched.employeeId && isEmployeeIdValid && (
+                  <span style={{ fontSize: 11, fontWeight: 600, color: '#10B981', display: 'flex', alignItems: 'center', gap: 4 }}>
+                    <CheckCircle2 size={13} /> Valid ID
+                  </span>
+                )}
+              </div>
               <div style={{ position: 'relative' }}>
                 <input
-                  className="input"
                   type="text"
                   required
                   placeholder="e.g. 105"
                   value={employeeId}
-                  onChange={e => setEmployeeId(e.target.value)}
-                  style={{ paddingLeft: 40, borderRadius: 12 }}
+                  onChange={e => {
+                    setEmployeeId(e.target.value);
+                    setTouched(t => ({ ...t, employeeId: true }));
+                  }}
+                  onBlur={() => setTouched(t => ({ ...t, employeeId: true }))}
+                  style={{
+                    width: '100%',
+                    padding: '10px 14px 10px 40px',
+                    borderRadius: 12,
+                    border: touched.employeeId && !isEmployeeIdValid ? '1.5px solid #EF4444' : '1.5px solid #CBD5E1',
+                    fontSize: 13,
+                    color: '#0F172A',
+                    background: '#FFFFFF',
+                    outline: 'none',
+                    transition: 'all 200ms ease'
+                  }}
                 />
-                <User size={16} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: '#94A3B8' }} />
+                <User size={16} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: touched.employeeId && !isEmployeeIdValid ? '#EF4444' : '#94A3B8' }} />
               </div>
+              {touched.employeeId && !isEmployeeIdValid && (
+                <div style={{ fontSize: 11, color: '#EF4444', fontWeight: 600, marginTop: 4, display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <AlertCircle size={12} /> Employee ID must be numeric (e.g. 105)
+                </div>
+              )}
             </div>
 
-            {/* Work Email */}
-            <div className="form-group" style={{ marginBottom: 12 }}>
-              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#64748B', marginBottom: 4 }}>
-                Work Email *
-              </label>
+            {/* Work Email Group */}
+            <div style={{ marginBottom: 12 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                <label style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#475569' }}>
+                  Work Email <span style={{ color: '#EF4444' }}>*</span>
+                </label>
+                {touched.email && isEmailValid && (
+                  <span style={{ fontSize: 11, fontWeight: 600, color: '#10B981', display: 'flex', alignItems: 'center', gap: 4 }}>
+                    <CheckCircle2 size={13} /> Valid Email
+                  </span>
+                )}
+              </div>
               <div style={{ position: 'relative' }}>
                 <input
-                  className="input"
                   type="email"
                   required
                   placeholder="john@dayflow.io"
                   value={email}
-                  onChange={e => setEmail(e.target.value)}
-                  style={{ paddingLeft: 40, borderRadius: 12 }}
+                  onChange={e => {
+                    setEmail(e.target.value);
+                    setTouched(t => ({ ...t, email: true }));
+                  }}
+                  onBlur={() => setTouched(t => ({ ...t, email: true }))}
+                  style={{
+                    width: '100%',
+                    padding: '10px 14px 10px 40px',
+                    borderRadius: 12,
+                    border: touched.email && !isEmailValid ? '1.5px solid #EF4444' : '1.5px solid #CBD5E1',
+                    fontSize: 13,
+                    color: '#0F172A',
+                    background: '#FFFFFF',
+                    outline: 'none',
+                    transition: 'all 200ms ease'
+                  }}
                 />
-                <Mail size={16} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: '#94A3B8' }} />
+                <Mail size={16} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: touched.email && !isEmailValid ? '#EF4444' : '#94A3B8' }} />
               </div>
+              {touched.email && !isEmailValid && (
+                <div style={{ fontSize: 11, color: '#EF4444', fontWeight: 600, marginTop: 4, display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <AlertCircle size={12} /> Please enter a valid email address (e.g. john@dayflow.io)
+                </div>
+              )}
             </div>
 
-            {/* Password */}
-            <div className="form-group" style={{ marginBottom: 16 }}>
-              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#64748B', marginBottom: 4 }}>
-                Password *
-              </label>
+            {/* Password Group with Show/Hide Toggle */}
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                <label style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#475569' }}>
+                  Password <span style={{ color: '#EF4444' }}>*</span>
+                </label>
+                {touched.password && isPasswordValid && (
+                  <span style={{ fontSize: 11, fontWeight: 600, color: '#10B981', display: 'flex', alignItems: 'center', gap: 4 }}>
+                    <CheckCircle2 size={13} /> Valid Password
+                  </span>
+                )}
+              </div>
               <div style={{ position: 'relative' }}>
                 <input
-                  className="input"
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   required
                   placeholder="Minimum 6 characters"
                   value={password}
-                  onChange={e => setPassword(e.target.value)}
-                  style={{ paddingLeft: 40, borderRadius: 12 }}
+                  onChange={e => {
+                    setPassword(e.target.value);
+                    setTouched(t => ({ ...t, password: true }));
+                  }}
+                  onBlur={() => setTouched(t => ({ ...t, password: true }))}
+                  style={{
+                    width: '100%',
+                    padding: '10px 42px 10px 40px',
+                    borderRadius: 12,
+                    border: touched.password && !isPasswordValid ? '1.5px solid #EF4444' : '1.5px solid #CBD5E1',
+                    fontSize: 13,
+                    color: '#0F172A',
+                    background: '#FFFFFF',
+                    outline: 'none',
+                    transition: 'all 200ms ease'
+                  }}
                 />
-                <Lock size={16} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: '#94A3B8' }} />
+                <Lock size={16} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: touched.password && !isPasswordValid ? '#EF4444' : '#94A3B8' }} />
+                
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  style={{
+                    position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)',
+                    background: 'none', border: 'none', cursor: 'pointer', color: '#94A3B8', display: 'flex', alignItems: 'center'
+                  }}
+                  aria-label="Toggle Password Visibility"
+                >
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
               </div>
+              {touched.password && !isPasswordValid && (
+                <div style={{ fontSize: 11, color: '#EF4444', fontWeight: 600, marginTop: 4, display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <AlertCircle size={12} /> Password must be at least 6 characters long
+                </div>
+              )}
             </div>
 
             <ShinyButton
               type="submit"
-              disabled={loading}
+              disabled={loading || (touched.email && !isFormValid)}
               style={{ width: '100%', justifyContent: 'center' }}
             >
               {loading ? 'Creating Account...' : (
@@ -327,11 +483,11 @@ export default function SignupPage() {
           </form>
 
           {/* Legal Notice Footer */}
-          <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 16, textAlign: 'center', lineHeight: 1.5 }}>
+          <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 14, textAlign: 'center', lineHeight: 1.5 }}>
             By registering, you accept the <a href="#" style={{ color: '#2563EB', fontWeight: 600 }}>Terms of Service</a> and acknowledge our <a href="#" style={{ color: '#2563EB', fontWeight: 600 }}>Privacy Policy</a>.
           </div>
 
-          <div style={{ textAlign: 'center', marginTop: 14, fontSize: 13, color: '#64748B' }}>
+          <div style={{ textAlign: 'center', marginTop: 12, fontSize: 13, color: '#64748B' }}>
             Already registered?{' '}
             <a href="/login" style={{ color: '#2563EB', fontWeight: 700 }}>Sign In</a>
           </div>
