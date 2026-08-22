@@ -28,7 +28,7 @@ const navGroups = [
       { id:'dashboard',    href:'/dashboard',    icon: LayoutDashboard, label:'Dashboard',     roles:['hr'] },
       { id:'my-dashboard', href:'/my-dashboard', icon: LayoutDashboard, label:'Dashboard',     roles:['employee'] },
       { id:'employees',    href:'/employees',    icon: Users,           label:'Team Members',  roles:['hr'] },
-      { id:'attendance',   href:'/attendance',   icon: CalendarCheck,   label:'Attendance',    roles:['hr','employee'] },
+      { id:'attendance',   href:'/attendance',   icon: CalendarCheck,   label:'Attendance',    roles:['hr'] },
     ],
   },
   {

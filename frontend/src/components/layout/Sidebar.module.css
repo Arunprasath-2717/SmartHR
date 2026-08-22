@@ -1,12 +1,22 @@
 /* ══ Sidebar — White, Premium, Matching Reference ══ */
 
+@property --sidebar-gradient-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes sidebar-gradient-angle {
+  to { --sidebar-gradient-angle: 360deg; }
+}
+
 .sidebar {
   width: 88px;
   height: 100vh;
   background: #FFFFFF;
   position: fixed;
   left: 0; top: 0; bottom: 0;
-  z-index: 50;
+  z-index: 1010;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
@@ -188,49 +198,31 @@
   to   { opacity:1; transform:translateX(0); }
 }
 
-/* Hover liquid skewed fill animation */
-.navItem::before {
-  content: "";
-  position: absolute;
-  left: -50px;
-  top: 0;
-  width: 0;
-  height: 100%;
-  background: linear-gradient(135deg, #2563EB, #1D4ED8);
-  transform: skewX(45deg);
-  z-index: -1;
-  transition: width 600ms cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.navItem:hover::before {
-  width: 250%;
-}
-
+/* Hover subtle fill animation (no skew) */
 .navItem:hover {
-  color: #ffffff;
-  transform: scale(1.04) translateX(4px);
-  outline: 2px solid #3B82F6;
-  box-shadow: 4px 5px 17px -4px rgba(37, 99, 235, 0.45);
+  background: rgba(37, 99, 235, 0.08);
+  color: #2563EB;
+  transform: scale(1.02) translateX(2px);
 }
 
 .navItem.active {
   color: #FFFFFF;
   font-weight: 700;
-  background: linear-gradient(135deg, #2563EB, #1D4ED8);
-  outline: 2px solid #3B82F6;
-  box-shadow: 4px 5px 17px -4px rgba(37, 99, 235, 0.5);
+  background: linear-gradient(#1E293B, #1E293B) padding-box,
+              conic-gradient(from var(--sidebar-gradient-angle), transparent, #3B82F6, #8B5CF6, transparent 40%) border-box;
+  animation: sidebar-gradient-angle 3s linear infinite;
+  box-shadow: 0 4px 16px rgba(59,130,246,0.3);
 }
-.navItem.active::before { width: 0; }
 
 .navIcon {
   font-size: 16px;
   width: 22px;
   text-align: center;
   flex-shrink: 0;
-  transition: transform 200ms cubic-bezier(0.34,1.56,0.64,1);
+  transition: transform 200ms cubic-bezier(0.34,1.56,0.64,1), color 200ms ease;
 }
-.navItem:hover .navIcon { transform: scale(1.15); }
-.navItem.active .navIcon { transform: scale(1.1); }
+.navItem:hover .navIcon { transform: scale(1.15); color: #2563EB; }
+.navItem.active .navIcon { transform: scale(1.1); color: #60A5FA; }
 
 .navLabel { flex: 1; }
 
