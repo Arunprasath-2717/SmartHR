@@ -1,49 +1,36 @@
-# Dayflow Frontend Architecture & Organization
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-## Architecture Overview
+## Getting Started
 
-Dayflow is built directly on **Odoo Community 17**. User interface components in Dayflow are implemented using **Odoo OWL (Odoo Web Library)**, JavaScript, and SCSS.
+First, run the development server:
 
-### Important Architectural Principles:
-
-1. **No Standalone SPA Frameworks**:
-   - We do **NOT** use React, Next.js, Vite, Angular, or Vue.
-   - The application does not run as an independent Single-Page Application (SPA).
-
-2. **Logical Organization & Planning**:
-   - The `frontend/` directory serves as an organizational and architectural workspace for planning component trees, state boundaries, styling hierarchies, and design systems.
-
-3. **Production Asset Location**:
-   - All production OWL components, JavaScript controllers, and SCSS stylesheets must reside within the Odoo module:
-     ```
-     backend/addons/dayflow_core/static/src/
-     ├── components/
-     ├── js/
-     └── scss/
-     ```
-
-## Directory Structure
-
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
 ```
-frontend/
-├── src/
-│   ├── components/          # Planned UI component hierarchy
-│   │   ├── common/          # Common reusable UI elements
-│   │   ├── dashboard/       # Dashboard widgets
-│   │   ├── leave/           # Leave management UI elements
-│   │   ├── payroll/         # Payroll UI elements
-│   │   └── analytics/       # Analytics & anomaly visualization
-│   ├── pages/               # Page-level view structures
-│   │   ├── employee/        # Employee self-service views
-│   │   ├── admin/           # Admin / HR management views
-│   │   ├── leave/           # Leave workflow views
-│   │   ├── payroll/         # Payroll visibility views
-│   │   └── analytics/       # Anomaly & insights views
-│   ├── services/            # Client-side API abstraction planning
-│   ├── hooks/               # Component lifecycle helper planning
-│   ├── store/               # Reactive client state planning
-│   ├── utils/               # Formatting, date, and math utilities
-│   └── styles/              # SCSS architecture planning
-│       └── components/      # Component-level styling tokens
-└── tests/                   # Frontend unit/component test planning
-```
+
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+
+## Learn More
+
+To learn more about Next.js, take a look at the following resources:
+
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+
+## Deploy on Vercel
+
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
