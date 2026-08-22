@@ -66,7 +66,7 @@ export default function LoginPage() {
       width: '100%',
       display: 'flex',
       alignItems: 'center',
-      justify: 'center',
+      justifyContent: 'center',
       background: '#F8FAFC',
       backgroundImage: 'radial-gradient(#CBD5E1 1px, transparent 1px)',
       backgroundSize: '24px 24px',
