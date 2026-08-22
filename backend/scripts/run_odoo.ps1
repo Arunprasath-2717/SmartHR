@@ -8,7 +8,7 @@
 
 param (
     [switch]$UpdateModule,
-    [string]$ConfigPath = "D:\SmartHR\backend\config\odoo.local.conf",
+    [string]$ConfigPath = "D:\SmartHR\backend\config\odoo.conf",
     [string]$Database = ""
 )
 
