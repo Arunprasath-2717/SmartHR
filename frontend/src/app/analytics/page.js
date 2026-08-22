@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { analyticsOverview, attendanceTrend, leaveAnalytics } from '@/lib/mockData';
 import { useCounter } from '@/hooks/useCounter';
 import { LineChart, DualLineChart, GroupedBarChart, DonutChart } from '@/components/charts/Charts';
+import ScrollExpand from '@/components/ui/ScrollExpand';
 import { Users, Clock, CheckCircle2, ClipboardList, Check, TrendingUp } from 'lucide-react';
 
 const TABS = ['Overview','Attendance','Leave'];
@@ -31,6 +32,27 @@ export default function AnalyticsPage() {
           <h1 className="page-title">Analytics</h1>
           <p className="caption mt-4">Workforce intelligence and trends</p>
         </div>
+      </div>
+
+      {/* ScrollExpand Hero Feature Banner */}
+      <div style={{ height: '340px', marginBottom: '24px', borderRadius: '24px', overflow: 'hidden', border: '1px solid rgba(59,130,246,0.2)', boxShadow: '0 20px 60px rgba(11,30,61,0.2)' }}>
+        <ScrollExpand
+          src="https://images.unsplash.com/photo-1551836022-d5d88e9218df?q=80&w=1200&auto=format&fit=crop"
+          title="Workforce Intelligence"
+          scrollHint="Scroll frame to expand stage"
+          startWidth={52}
+          startHeight={65}
+          startRadius={20}
+          mediaZoom={1.25}
+          overlayScrim={0.5}
+        >
+          <div style={{ color: '#fff', textAlign: 'center' }}>
+            <h2 style={{ fontSize: '26px', fontWeight: 800, marginBottom: '8px' }}>Real-Time Workforce Analytics</h2>
+            <p style={{ fontSize: '13px', opacity: 0.9, maxWidth: '460px' }}>
+              Deep-dive metrics across attendance trends, leave allocations, and productivity indicators.
+            </p>
+          </div>
+        </ScrollExpand>
       </div>
 
       {/* Glass Filter Bar */}
