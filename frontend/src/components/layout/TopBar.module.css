@@ -6,9 +6,9 @@
   background: linear-gradient(135deg, #0B1E3D 0%, #1A3A6B 55%, #2563EB 100%);
   position: sticky;
   top: 0;
-  z-index: 40;
+  z-index: 1000;
   box-shadow: 0 4px 24px rgba(11,30,61,0.4);
-  overflow: hidden;
+  overflow: visible;
 }
 
 /* Mesh shimmer */
@@ -76,7 +76,7 @@
   align-items:center;
   gap:12px;
   position:relative;
-  z-index:1;
+  z-index:1000;
 }
 
 /* ── Search Bar ── */
@@ -155,9 +155,10 @@
   position:absolute;top:calc(100% + 12px);right:0;
   width:320px;
   background:#fff;border-radius:16px;
-  box-shadow:0 20px 60px rgba(0,0,0,0.15),0 4px 16px rgba(59,130,246,0.1);
-  border:1px solid rgba(59,130,246,0.08);
+  box-shadow:0 20px 60px rgba(0,0,0,0.25),0 4px 16px rgba(59,130,246,0.2);
+  border:1px solid rgba(59,130,246,0.12);
   overflow:hidden;
+  z-index:1000;
   animation:dropdown-3d 200ms cubic-bezier(0.34,1.56,0.64,1) both;
 }
 

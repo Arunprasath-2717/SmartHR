@@ -178,7 +178,7 @@ export default function TopBar() {
             <div style={{
               position: 'absolute', top: 'calc(100% + 10px)', right: 0, width: 220,
               background: '#fff', borderRadius: 16, border: '1px solid rgba(59,130,246,0.12)',
-              boxShadow: '0 20px 60px rgba(0,0,0,0.15)', overflow: 'hidden', zIndex: 100,
+              boxShadow: '0 20px 60px rgba(0,0,0,0.25), 0 4px 16px rgba(59,130,246,0.15)', overflow: 'hidden', zIndex: 1000,
               animation: 'dropdown-in 150ms ease-out'
             }}>
               <div style={{ padding: '14px 16px', borderBottom: '1px solid rgba(0,0,0,0.06)', background: 'rgba(59,130,246,0.04)' }}>

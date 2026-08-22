@@ -19,7 +19,7 @@ export default function AppWrapper({ children }) {
       <Sidebar role={role} />
       <main className="main-content">
         <TopBar />
-        <div style={{ padding: '28px 32px' }}>
+        <div style={{ padding: '28px 32px', position: 'relative', zIndex: 1 }}>
           {children}
         </div>
       </main>
