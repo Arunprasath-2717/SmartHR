@@ -2,13 +2,14 @@
 {
     'name': 'Dayflow Core',
     'version': '1.0.0',
-    'summary': 'Dayflow Core Module, Security Roles, and Authentication API',
+    'summary': 'Dayflow Core Module, Security Roles, and HR API',
     'category': 'Human Resources',
     'author': 'Dayflow Team',
     'website': 'https://github.com/Arunprasath-2717/SmartHR',
     'license': 'LGPL-3',
     'depends': [
         'base',
+        'hr',
     ],
     'data': [
         'security/security_groups.xml',
