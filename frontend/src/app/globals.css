@@ -557,13 +557,14 @@ ul,ol { list-style:none; }
 .data-table tr:last-child td { border-bottom:none; }
 .data-table tbody tr { transition:background 150ms;position:relative; }
 .data-table tbody tr:hover { background:rgba(59,130,246,0.03); }
-.data-table tbody tr::before {
+.data-table tbody tr td:first-child { position:relative; }
+.data-table tbody tr td:first-child::before {
   content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
   background:linear-gradient(to bottom,var(--accent),var(--purple));
   transform:scaleX(0);transform-origin:left;transition:transform 150ms var(--ease);
   border-radius:0 2px 2px 0;
 }
-.data-table tbody tr:hover::before { transform:scaleX(1); }
+.data-table tbody tr:hover td:first-child::before { transform:scaleX(1); }
 
 /* ══ Timeline ══ */
 .timeline { display:flex;flex-direction:column;gap:0;position:relative; }

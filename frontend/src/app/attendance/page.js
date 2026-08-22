@@ -95,7 +95,10 @@ export default function AttendancePage() {
                     <div className="avatar avatar-sm" style={{ background:`linear-gradient(135deg, ${['#3B82F6','#10B981','#8B5CF6','#F59E0B'][i%4]}, #1D4ED8)` }}>
                       {rec.initials}
                     </div>
-                    <span style={{ fontWeight:600, color:'#0F172A' }}>{rec.employee}</span>
+                    <div>
+                      <div style={{ fontWeight:600, color:'#0F172A' }}>{rec.employee}</div>
+                      <div className="monospace text-xs text-muted">{rec.employee_id}</div>
+                    </div>
                   </div>
                 </td>
                 <td style={{ fontWeight:500 }}>{rec.date}</td>
