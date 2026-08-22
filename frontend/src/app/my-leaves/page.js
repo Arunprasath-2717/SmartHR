@@ -14,7 +14,17 @@ export default function MyLeavesPage() {
   const [filter, setFilter]       = useState('All');
   const [selectedLeave, setSelectedLeave] = useState(null);
   const [cancelModal, setCancelModal]     = useState(false);
+  const [applyModal, setApplyModal]       = useState(false);
   const [drawerOpen, setDrawerOpen]       = useState(false);
+  const [loading, setLoading]             = useState(false);
+
+  const [form, setForm] = useState({
+    leave_type: 'Paid',
+    from: '2026-09-10',
+    to: '2026-09-12',
+    reason: '',
+  });
+
   const toast = useToast();
 
   const filtered = myLeaveRequests.filter(l => filter === 'All' || l.status === filter);
@@ -25,6 +35,16 @@ export default function MyLeavesPage() {
     setCancelModal(false);
     setDrawerOpen(false);
     toast({ message:'Leave request cancelled successfully.', type:'success' });
+  };
+
+  const handleApplySubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    await new Promise(r => setTimeout(r, 800));
+    setLoading(false);
+    setApplyModal(false);
+    toast({ message: `Leave request for ${form.leave_type} Leave submitted!`, type: 'success' });
+    setForm({ leave_type: 'Paid', from: '2026-09-10', to: '2026-09-12', reason: '' });
   };
 
   const getStep = (status) => {
@@ -41,7 +61,7 @@ export default function MyLeavesPage() {
           <h1 className="page-title">My Leaves</h1>
           <p className="caption mt-4">Track and manage your leave requests</p>
         </div>
-        <button className="btn btn-primary" onClick={() => toast({ message:'Leave application form coming soon!', type:'info' })}>
+        <button className="btn btn-primary" onClick={() => setApplyModal(true)}>
           <Plus size={15} /> Apply for Leave
         </button>
       </div>
@@ -86,7 +106,7 @@ export default function MyLeavesPage() {
           </div>
           <h3>No leave requests</h3>
           <p>Apply for your first leave to get started.</p>
-          <button className="btn btn-primary mt-16">
+          <button className="btn btn-primary mt-16" onClick={() => setApplyModal(true)}>
             <Plus size={15} /> Apply for Leave
           </button>
         </div>
@@ -134,6 +154,66 @@ export default function MyLeavesPage() {
           </table>
         </div>
       )}
+
+      {/* Apply for Leave Modal (Section 3.5.1) */}
+      <Modal isOpen={applyModal} onClose={() => setApplyModal(false)} title="Apply for Leave" width={460}>
+        <form onSubmit={handleApplySubmit}>
+          <div className="form-group mb-16">
+            <label className="text-muted text-xs text-bold uppercase mb-6 block">Select Leave Type *</label>
+            <select
+              className="input"
+              value={form.leave_type}
+              onChange={e => setForm(f => ({ ...f, leave_type: e.target.value }))}
+            >
+              <option value="Paid">Paid Leave</option>
+              <option value="Sick">Sick Leave</option>
+              <option value="Unpaid">Unpaid Leave</option>
+            </select>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 16 }}>
+            <div>
+              <label className="text-muted text-xs text-bold uppercase mb-6 block">From Date *</label>
+              <input
+                type="date"
+                className="input"
+                required
+                value={form.from}
+                onChange={e => setForm(f => ({ ...f, from: e.target.value }))}
+              />
+            </div>
+            <div>
+              <label className="text-muted text-xs text-bold uppercase mb-6 block">To Date *</label>
+              <input
+                type="date"
+                className="input"
+                required
+                value={form.to}
+                onChange={e => setForm(f => ({ ...f, to: e.target.value }))}
+              />
+            </div>
+          </div>
+
+          <div className="form-group mb-20">
+            <label className="text-muted text-xs text-bold uppercase mb-6 block">Remarks / Reason *</label>
+            <textarea
+              className="input"
+              rows={3}
+              required
+              placeholder="Provide context for your leave request..."
+              value={form.reason}
+              onChange={e => setForm(f => ({ ...f, reason: e.target.value }))}
+            />
+          </div>
+
+          <div className="flex gap-10 justify-between">
+            <button type="button" className="btn btn-ghost" onClick={() => setApplyModal(false)}>Cancel</button>
+            <button type="submit" className={`btn btn-primary ${loading ? 'btn-disabled' : ''}`} disabled={loading}>
+              {loading ? 'Submitting...' : 'Submit Request'}
+            </button>
+          </div>
+        </form>
+      </Modal>
 
       {/* Leave Detail Drawer */}
       <Drawer isOpen={drawerOpen} onClose={() => setDrawerOpen(false)} title={`Leave Request #${selectedLeave?.id}`} width={420}>

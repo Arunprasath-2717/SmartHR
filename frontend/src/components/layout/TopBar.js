@@ -1,6 +1,8 @@
 'use client';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useState, useRef, useEffect } from 'react';
+import { useAuth } from '@/context/AuthContext';
+import { useToast } from '@/components/ui/Toast';
 import {
   Search,
   Bell,
@@ -10,7 +12,12 @@ import {
   ChevronDown,
   ClipboardList,
   Bot,
-  CreditCard
+  CreditCard,
+  User,
+  LogOut,
+  Shield,
+  ClockCheck,
+  Clock
 } from 'lucide-react';
 import styles from './TopBar.module.css';
 
@@ -26,16 +33,25 @@ const PAGE_TITLES = {
   '/analytics':    { title:'Analytics',      subtitle:'Workforce intelligence and trend reports.' },
   '/ai-insights':  { title:'AI Insights',    subtitle:'Machine learning anomaly detection reports.' },
   '/settings':     { title:'Settings',       subtitle:'Manage your account preferences.' },
+  '/profile':      { title:'My Profile',     subtitle:'View and edit your personal & job details.' },
 };
 
 export default function TopBar() {
   const pathname  = usePathname();
+  const router    = useRouter();
+  const { user, role, logout, switchRole } = useAuth();
+  const toast     = useToast();
+
   const [searchQ, setSearchQ] = useState('');
   const [notifOpen, setNotifOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [checkedIn, setCheckedIn] = useState(true);
   const [notifCount] = useState(3);
-  const notifRef = useRef(null);
 
-  const page = PAGE_TITLES[pathname] || PAGE_TITLES[Object.keys(PAGE_TITLES).find(k => pathname.startsWith(k)) || ''] || { title:'DayFlow', subtitle:'HR Management System' };
+  const notifRef = useRef(null);
+  const userMenuRef = useRef(null);
+
+  const page = PAGE_TITLES[pathname] || PAGE_TITLES[Object.keys(PAGE_TITLES).find(k => pathname.startsWith(k)) || ''] || { title:'Dayflow', subtitle:'HR Management System' };
 
   const hour = new Date().getHours();
   const greeting = hour < 12 ? 'Good Morning' : hour < 17 ? 'Good Afternoon' : 'Good Evening';
@@ -48,10 +64,23 @@ export default function TopBar() {
   ];
 
   useEffect(() => {
-    const handler = (e) => { if (notifRef.current && !notifRef.current.contains(e.target)) setNotifOpen(false); };
+    const handler = (e) => {
+      if (notifRef.current && !notifRef.current.contains(e.target)) setNotifOpen(false);
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target)) setUserMenuOpen(false);
+    };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, []);
+
+  const handleToggleAttendance = () => {
+    if (!checkedIn) {
+      setCheckedIn(true);
+      toast({ message: 'Checked In successfully at ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), type: 'success' });
+    } else {
+      setCheckedIn(false);
+      toast({ message: 'Checked Out successfully at ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), type: 'info' });
+    }
+  };
 
   return (
     <div className={styles.topBar}>
@@ -62,14 +91,29 @@ export default function TopBar() {
             <GreetIcon size={24} />
           </span>
           <div>
-            <div className={styles.greetTitle}>{greeting}! <span style={{ fontWeight:800 }}>Welcome Back</span></div>
+            <div className={styles.greetTitle}>{greeting}! <span style={{ fontWeight:800 }}>{user?.name || 'Welcome Back'}</span></div>
             <div className={styles.greetSub}>{page.subtitle}</div>
           </div>
         </div>
       </div>
 
-      {/* Right: Search + Actions */}
+      {/* Right: Actions & User context */}
       <div className={styles.topRight}>
+        {/* Attendance Check-in / Check-out Button */}
+        <button
+          onClick={handleToggleAttendance}
+          style={{
+            padding: '7px 16px', borderRadius: 20, fontSize: 12, fontWeight: 700,
+            background: checkedIn ? 'rgba(16,185,129,0.2)' : 'rgba(245,158,11,0.2)',
+            color: checkedIn ? '#6EE7B7' : '#FCD34D',
+            border: `1px solid ${checkedIn ? 'rgba(16,185,129,0.4)' : 'rgba(245,158,11,0.4)'}`,
+            display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', transition: 'all 200ms'
+          }}
+        >
+          {checkedIn ? <ClockCheck size={15} /> : <Clock size={15} />}
+          {checkedIn ? 'Checked In' : 'Check In Now'}
+        </button>
+
         {/* Search Bar */}
         <div className={styles.searchBar}>
           <span className={styles.searchIcon} style={{ color: 'rgba(255,255,255,0.6)', display:'flex', alignItems:'center' }}>
@@ -122,12 +166,71 @@ export default function TopBar() {
           )}
         </div>
 
-        {/* User Quick Access */}
-        <button className={styles.userChip}>
-          <div className={styles.userChipAvatar}>CS</div>
-          <span className={styles.userChipName}>Carla</span>
-          <ChevronDown size={14} style={{ color:'rgba(255,255,255,0.7)', marginLeft:2 }} />
-        </button>
+        {/* User Profile Menu & Role Switcher */}
+        <div style={{ position: 'relative' }} ref={userMenuRef}>
+          <button className={styles.userChip} onClick={() => setUserMenuOpen(!userMenuOpen)}>
+            <div className={styles.userChipAvatar}>{user?.initials || 'CS'}</div>
+            <span className={styles.userChipName}>{user?.name?.split(' ')[0] || 'User'}</span>
+            <ChevronDown size={14} style={{ color:'rgba(255,255,255,0.7)', marginLeft:2 }} />
+          </button>
+
+          {userMenuOpen && (
+            <div style={{
+              position: 'absolute', top: 'calc(100% + 10px)', right: 0, width: 220,
+              background: '#fff', borderRadius: 16, border: '1px solid rgba(59,130,246,0.12)',
+              boxShadow: '0 20px 60px rgba(0,0,0,0.15)', overflow: 'hidden', zIndex: 100,
+              animation: 'dropdown-in 150ms ease-out'
+            }}>
+              <div style={{ padding: '14px 16px', borderBottom: '1px solid rgba(0,0,0,0.06)', background: 'rgba(59,130,246,0.04)' }}>
+                <div style={{ fontWeight: 700, fontSize: 13, color: '#0F172A' }}>{user?.name}</div>
+                <div style={{ fontSize: 11, color: '#64748B', marginTop: 2 }}>{user?.email}</div>
+                <span className="pill pill-info" style={{ marginTop: 6, fontSize: 10 }}>
+                  Role: {role.toUpperCase()}
+                </span>
+              </div>
+
+              <div style={{ padding: '6px' }}>
+                <button
+                  className="dropdown-item"
+                  onClick={() => { setUserMenuOpen(false); router.push('/profile'); }}
+                  style={{ width: '100%', borderRadius: 8 }}
+                >
+                  <User size={15} /> My Profile
+                </button>
+
+                <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', margin: '4px 0' }} />
+
+                <div style={{ padding: '6px 12px', fontSize: 10, fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase' }}>
+                  Switch Role (RBAC)
+                </div>
+                <button
+                  className="dropdown-item"
+                  onClick={() => { setUserMenuOpen(false); switchRole('hr'); }}
+                  style={{ width: '100%', borderRadius: 8, color: role === 'hr' ? '#3B82F6' : '#0F172A', fontWeight: role === 'hr' ? 700 : 400 }}
+                >
+                  <Shield size={14} /> HR Officer View
+                </button>
+                <button
+                  className="dropdown-item"
+                  onClick={() => { setUserMenuOpen(false); switchRole('employee'); }}
+                  style={{ width: '100%', borderRadius: 8, color: role === 'employee' ? '#3B82F6' : '#0F172A', fontWeight: role === 'employee' ? 700 : 400 }}
+                >
+                  <User size={14} /> Employee View
+                </button>
+
+                <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', margin: '4px 0' }} />
+
+                <button
+                  className="dropdown-item danger"
+                  onClick={() => { setUserMenuOpen(false); logout(); }}
+                  style={{ width: '100%', borderRadius: 8, color: '#EF4444' }}
+                >
+                  <LogOut size={15} /> Sign Out
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
