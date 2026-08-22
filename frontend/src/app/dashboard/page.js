@@ -2,233 +2,384 @@
 import { useState } from 'react';
 import { useCounter } from '@/hooks/useCounter';
 import { useInView } from '@/hooks/useInView';
-import { DonutChart, MiniBarChart } from '@/components/charts/Charts';
+import { LineChart, MiniBarChart } from '@/components/charts/Charts';
 import { hrDashboardData } from '@/lib/mockData';
-import { formatCurrency, getStatusClass } from '@/lib/utils';
-import styles from './page.module.css';
+import { getStatusClass } from '@/lib/utils';
 
-export default function HRDashboard() {
-  const d = hrDashboardData;
+/* ─── MINI SPARKLINE used in hero cards ─── */
+function Sparkline({ data, color = '#6EE7B7', height = 60 }) {
   const [ref, inView] = useInView();
-  const empCount    = useCounter(d.total_employees, 1200, 0, true);
-  const present     = useCounter(d.present_today, 1200, 0, true);
-  const absent      = useCounter(d.absent_today, 1200, 0, true);
-  const pending     = useCounter(d.pending_leaves, 1200, 0, true);
-  const anomalies   = useCounter(d.ai_anomalies_total, 1200, 0, true);
-  const rate        = useCounter(d.attendance_rate, 1200, 1, true);
+  const max = Math.max(...data, 1);
+  const w = 280, h = height;
+  const pts = data.map((v, i) => ({ x:(i/(data.length-1))*w, y:h-(v/max)*h*0.85-4 }));
+  const line = pts.map((p,i)=>`${i===0?'M':'L'} ${p.x} ${p.y}`).join(' ');
+  const area = `${line} L${pts[pts.length-1].x} ${h} L0 ${h} Z`;
 
   return (
-    <div className={`page-wrapper page-in`}>
-      {/* Header */}
-      <div className="page-header">
-        <div>
-          <h1 className="page-title">Dashboard</h1>
-          <p className="caption mt-4">Welcome back, Carla · {new Date().toLocaleDateString('en-IN', { weekday:'long', day:'numeric', month:'long', year:'numeric' })}</p>
+    <div ref={ref} style={{width:'100%',height}}>
+      <svg width="100%" viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none">
+        <defs>
+          <linearGradient id={`sg-${color.replace('#','')}`} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor={color} stopOpacity="0.3"/>
+            <stop offset="100%" stopColor={color} stopOpacity="0.02"/>
+          </linearGradient>
+        </defs>
+        <path d={area} fill={`url(#sg-${color.replace('#','')})`}
+          style={{ opacity: inView ? 1 : 0, transition:'opacity 800ms 400ms' }}/>
+        <path d={line} fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+          style={{ strokeDasharray: 1000, strokeDashoffset: inView ? 0 : 1000, transition:'stroke-dashoffset 1000ms ease-out 200ms' }}/>
+        {/* Dots on data points */}
+        {pts.map((p,i) => (
+          <circle key={i} cx={p.x} cy={p.y} r={i === pts.length-1 ? 5 : 3}
+            fill={color} opacity={0.8}
+            style={{ opacity: inView ? 0.8 : 0, transition:`opacity 300ms ease-out ${i*80 + 800}ms`, filter: i === pts.length-1 ? `drop-shadow(0 0 4px ${color})` : 'none' }}/>
+        ))}
+        {/* Active point hover marker */}
+        <circle cx={pts[Math.floor(pts.length/2)].x} cy={pts[Math.floor(pts.length/2)].y} r="8"
+          fill="none" stroke={color} strokeWidth="2" opacity="0.3"
+          style={{ animation: inView ? 'ping 2s ease-out 1200ms infinite' : 'none' }}/>
+      </svg>
+    </div>
+  );
+}
+
+/* ─── HERO STAT CARD (glass on dark) ─── */
+function HeroCard({ title, value, suffix='', prefix='', sub=[], sparkColor, sparkData, colorAccent='#6EE7B7', style={}, delay=0 }) {
+  const count = useCounter(value, 1400, 0, true);
+  return (
+    <div style={{
+      background:'rgba(255,255,255,0.10)',
+      backdropFilter:'blur(20px) saturate(180%)',
+      WebkitBackdropFilter:'blur(20px) saturate(180%)',
+      border:'1px solid rgba(255,255,255,0.20)',
+      borderRadius:20,
+      padding:'24px 24px 0',
+      color:'#fff',
+      position:'relative',
+      overflow:'hidden',
+      animation:`hero-card-3d 600ms cubic-bezier(0.34,1.56,0.64,1) ${delay}ms both`,
+      transition:'transform 300ms cubic-bezier(0.34,1.56,0.64,1), box-shadow 300ms',
+      cursor:'default',
+      ...style,
+    }}
+    onMouseEnter={e => { e.currentTarget.style.transform='perspective(600px) rotateX(-3deg) translateY(-8px)'; e.currentTarget.style.boxShadow='0 24px 48px rgba(0,0,0,0.3)'; }}
+    onMouseLeave={e => { e.currentTarget.style.transform=''; e.currentTarget.style.boxShadow=''; }}
+    >
+      {/* Shimmer overlay */}
+      <div style={{ position:'absolute',inset:0,background:'linear-gradient(120deg,transparent 30%,rgba(255,255,255,0.05) 50%,transparent 70%)',backgroundSize:'200%',animation:'shimmer-move 3s infinite',pointerEvents:'none' }}/>
+
+      {/* Colored accent top line */}
+      <div style={{ position:'absolute',top:0,left:0,right:0,height:3,background:`linear-gradient(90deg,${colorAccent},${colorAccent}88)`,borderRadius:'20px 20px 0 0' }}/>
+
+      <div style={{ fontSize:36, fontWeight:800, letterSpacing:'-0.03em', lineHeight:1, marginBottom:4 }}>
+        {prefix}{count}{suffix}
+      </div>
+      <div style={{ fontSize:12, fontWeight:600, color:colorAccent, letterSpacing:'0.05em', textTransform:'uppercase', marginBottom:16 }}>{title}</div>
+
+      {sparkData && (
+        <div style={{ margin:'0 -24px', marginBottom:-1 }}>
+          <Sparkline data={sparkData} color={colorAccent} height={70} />
         </div>
-        <div className="flex items-center gap-12">
-          <div className="avatar avatar-md">CS</div>
-          <div>
-            <div style={{ fontWeight:600, fontSize:14 }}>Carla Sanford</div>
-            <div className="pill pill-info text-xs" style={{ marginTop:2 }}>HR Officer</div>
-          </div>
+      )}
+
+      {sub.length > 0 && (
+        <div style={{ display:'flex', background:'rgba(255,255,255,0.1)', backdropFilter:'blur(8px)', margin:'0 -24px', padding:'10px 24px', gap:0, borderTop:'1px solid rgba(255,255,255,0.1)' }}>
+          {sub.map((s, i) => (
+            <div key={i} style={{ flex:1, textAlign:'center', borderRight: i < sub.length-1 ? '1px solid rgba(255,255,255,0.15)' : 'none', padding:'4px 0' }}>
+              <div style={{ fontSize:20, fontWeight:800 }}>{s.val}</div>
+              <div style={{ fontSize:10, color:colorAccent, fontWeight:600, textTransform:'uppercase', letterSpacing:'0.06em', marginTop:2 }}>{s.label}</div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ─── MINI KPI CARD (white, compact) ─── */
+function MiniKPICard({ label, value, prefix='', color, icon, change, changeUp, delay=0 }) {
+  const count = useCounter(value, 1200, 0, true);
+  return (
+    <div className="card card-no-hover" style={{ padding:'20px', animation:`card-in-3d 500ms ease-out ${delay}ms both` }}>
+      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:12 }}>
+        <span style={{ fontSize:20 }}>{icon}</span>
+        <div style={{ display:'flex', alignItems:'center', gap:4, padding:'4px 8px', borderRadius:20, background: changeUp ? '#D1FAE5':'#FEE2E2', fontSize:10, fontWeight:600, color: changeUp ? '#065F46':'#991B1B' }}>
+          {changeUp ? '▲':'▼'} {change}
         </div>
       </div>
+      <div style={{ fontSize:32, fontWeight:800, color, letterSpacing:'-0.03em', lineHeight:1, marginBottom:4 }}>
+        {prefix}{typeof count === 'number' ? count.toLocaleString('en-IN') : count}
+      </div>
+      <div style={{ fontSize:11, fontWeight:600, color:'#64748B', textTransform:'uppercase', letterSpacing:'0.05em' }}>{label}</div>
+    </div>
+  );
+}
 
-      {/* KPI Row */}
-      <div className="grid-4 mb-20">
-        {/* Card 1: Total Employees */}
-        <div className="card p-24" style={{ animation:'card-in 400ms ease-out 0ms both' }}>
-          <div className="flex items-center gap-10 mb-16">
-            <div style={{ width:40, height:40, borderRadius:10, background:'var(--accent-10)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:20 }}>👥</div>
-            <span className="label">Total Employees</span>
-          </div>
-          <div className="display-stat" style={{ fontSize:42 }}>{empCount}</div>
-          <div className="caption mt-4">{d.active_employees} active</div>
-          <div className="delta-badge delta-up mt-8">▲ +{d.new_this_month} this month</div>
+/* ─── ACTIVITY ITEM (matches reference) ─── */
+function ActivityItem({ time, icon, text, sub, iconBg, delay=0 }) {
+  return (
+    <div style={{ display:'flex', alignItems:'flex-start', gap:12, padding:'12px 0', borderBottom:'1px solid rgba(59,130,246,0.06)', animation:`card-in 300ms ease-out ${delay}ms both` }}>
+      <div style={{ fontSize:12, color:'#94A3B8', minWidth:52, flexShrink:0, paddingTop:3, textAlign:'right' }}>{time}</div>
+      <div style={{
+        width:36,height:36,borderRadius:'50%',flexShrink:0,
+        background:iconBg, display:'flex',alignItems:'center',justifyContent:'center',fontSize:16,
+        boxShadow:`0 4px 12px ${iconBg}55`, transition:'transform 200ms cubic-bezier(0.34,1.56,0.64,1)',
+      }}
+      onMouseEnter={e => e.currentTarget.style.transform='scale(1.15) rotate(5deg)'}
+      onMouseLeave={e => e.currentTarget.style.transform=''}>{icon}</div>
+      <div style={{ flex:1 }}>
+        <div style={{ fontWeight:600, fontSize:13, color:'#0F172A' }}>{text}</div>
+        {sub && <div style={{ fontSize:12, color:'#64748B', marginTop:2 }}>{sub}</div>}
+      </div>
+    </div>
+  );
+}
+
+/* ─── BOTTOM STAT ROW CARD (matches reference) ─── */
+function BottomStatCard({ label, value, prefix='', suffix='', trend, color, sparkData, delay=0 }) {
+  const count = useCounter(parseFloat(value.toString().replace(/,/g,'')), 1400, typeof value === 'string' && value.includes('.') ? 2 : 0, true);
+  const [ref, inView] = useInView();
+  return (
+    <div className="card" ref={ref} style={{ padding:'20px 24px', animation:`card-in-3d 500ms ease-out ${delay}ms both` }}>
+      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:8 }}>
+        <div style={{ fontSize:28, fontWeight:800, color, letterSpacing:'-0.02em' }}>
+          {prefix}{typeof count === 'number' ? count.toLocaleString('en-IN') : count}{suffix}
         </div>
-
-        {/* Card 2: Attendance Today */}
-        <div className="card p-24" style={{ animation:'card-in 400ms ease-out 80ms both' }}>
-          <div className="flex items-center gap-10 mb-16">
-            <div style={{ width:40, height:40, borderRadius:10, background:'var(--success-10)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:20 }}>✅</div>
-            <span className="label">Attendance Today</span>
-          </div>
-          <div className="flex gap-16 items-end">
-            <div>
-              <div style={{ fontSize:36, fontWeight:700, color:'var(--success)' }}>{present}</div>
-              <div className="caption">Present</div>
-            </div>
-            <div>
-              <div style={{ fontSize:36, fontWeight:700, color:'var(--error)' }}>{absent}</div>
-              <div className="caption">Absent</div>
-            </div>
-          </div>
-          <div className="progress-bar mt-12">
-            <div className="progress-fill progress-fill-success" style={{ '--target': `${(d.present_today / (d.present_today + d.absent_today)) * 100}%` }} ref={ref} />
-          </div>
-        </div>
-
-        {/* Card 3: Pending Leaves */}
-        <div className="card p-24" style={{ animation:'card-in 400ms ease-out 160ms both', position:'relative' }}>
-          <div className="flex items-center gap-10 mb-16">
-            <div style={{ width:40, height:40, borderRadius:10, background:'var(--warning-10)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:20 }}>📋</div>
-            <span className="label">Pending Leaves</span>
-          </div>
-          <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-            <div style={{ fontSize:48, fontWeight:700, color:'var(--warning)' }}>{pending}</div>
-            <span className="pulse-dot" style={{ color:'var(--warning)', width:8, height:8 }} />
-          </div>
-          <div className="caption mt-4">Needs Review</div>
-          <a href="/leaves" className="text-accent text-sm text-semibold mt-8" style={{ display:'block' }}>→ Review All</a>
-        </div>
-
-        {/* Card 4: AI Anomalies (Dark Glass) */}
-        <div className="card-glass-dark p-24" style={{ animation:'card-in 400ms ease-out 240ms both', ...(d.ai_high_risk > 0 ? { boxShadow:'0 0 24px rgba(239,68,68,0.2), var(--dark-glass-shadow)' } : {}) }}>
-          <div className="flex items-center gap-10 mb-16">
-            <div style={{ width:40, height:40, borderRadius:10, background:'rgba(255,255,255,0.1)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:20 }}>🤖</div>
-            <span className="label text-white" style={{ color:'rgba(255,255,255,0.5)' }}>AI Anomalies</span>
-          </div>
-          <div style={{ fontSize:48, fontWeight:700, color:'#fff' }}>{anomalies}</div>
-          <div className="flex gap-8 mt-8">
-            <span className="pill pill-high" style={{ fontSize:10 }}>⚠ {d.ai_high_risk} High Risk</span>
-            <span style={{ fontSize:11, color:'rgba(255,255,255,0.5)', alignSelf:'center' }}>{d.ai_anomalies_total - d.ai_high_risk} Low/Med</span>
-          </div>
+        <div style={{ display:'flex', alignItems:'center', gap:4, fontSize:12, fontWeight:600, color: trend.up ? '#10B981':'#EF4444' }}>
+          {trend.up ? '▲':'▼'} {trend.label}
         </div>
       </div>
+      <div style={{ fontSize:11, color:'#94A3B8', fontWeight:600, textTransform:'uppercase', letterSpacing:'0.05em', marginBottom:12 }}>{label}</div>
+      {sparkData && (
+        <div style={{ height:40 }}>
+          <Sparkline data={sparkData} color={color} height={40} />
+        </div>
+      )}
+    </div>
+  );
+}
 
-      {/* Main Content Row */}
-      <div className="grid-65-35 mb-20">
-        {/* Attendance Rate Card */}
-        <div className="card" style={{ animation:'card-in 400ms ease-out 320ms both' }}>
-          <div className="section-header">
-            <span className="card-title">Attendance Rate</span>
-            <span className="pill pill-info text-xs">Past 30 Days</span>
-          </div>
-          <div className="section-content">
-            <div className="flex items-end gap-12 mb-20">
-              <div style={{ fontSize:52, fontWeight:700, lineHeight:1 }}>{rate.toFixed(1)}%</div>
-              <div className="delta-badge delta-down mb-8">▼ {Math.abs(d.attendance_delta)}% vs last month</div>
-            </div>
-            {/* Monthly bars */}
-            <div style={{ display:'flex', gap:8, alignItems:'flex-end', height:80, marginBottom:16 }}>
-              {d.monthly_attendance.map((m, i) => (
-                <div key={i} style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', gap:6 }}>
-                  <div style={{ width:'100%', borderRadius:4, overflow:'hidden', background:'rgba(0,0,0,0.06)', height:60, display:'flex', alignItems:'flex-end' }}>
-                    <div style={{
-                      width:'100%', borderRadius:4,
-                      background: i === d.monthly_attendance.length - 1 ? 'var(--accent)' : 'rgba(108,99,255,0.3)',
-                      height:`${m.rate}%`,
-                      transition:`height 600ms ease-out ${i*80}ms`,
-                    }} />
-                  </div>
-                  <span style={{ fontSize:10, color:'var(--text-muted)', fontWeight:500 }}>{m.month}</span>
+/* ═══ MAIN PAGE ═══ */
+export default function HRDashboard() {
+  const d = hrDashboardData;
+  const [checkedRows, setCheckedRows] = useState([]);
+
+  const attendanceSpark = d.monthly_attendance.map(m => m.rate);
+  const presentSpark    = [68,72,75,70,80,78,85,82,88,84,90,87];
+  const leaveSpark      = [5,8,6,10,4,7,9,5,11,8,6,9];
+  const earningsSpark   = [30,35,32,40,38,45,42,48,44,50,47,52];
+  const productsSpark   = [120,145,130,155,140,165,158,172,168,180,175,182];
+  const bounceSpk       = [52,48,55,50,46,49,53,47,51,45,49,47];
+
+  const activities = [
+    { time:'2 hrs ago', icon:'👍', iconBg:'rgba(59,130,246,0.15)', text:'+1,652 New Employees Onboarded', sub:'Quarterly onboarding batch completed!' },
+    { time:'4 hrs ago', icon:'🎯', iconBg:'rgba(239,68,68,0.15)',  text:'5 New Leave Requests Submitted', sub:'Needs your review.' },
+    { time:'2 days ago',icon:'🤝', iconBg:'rgba(16,185,129,0.15)', text:'+3 Contracts Renewed', sub:'Great retention this quarter!' },
+    { time:'2 days ago',icon:'🤖', iconBg:'rgba(245,158,11,0.15)', text:'AI detected 2 Attendance Anomalies', sub:'Review AI Insights for details.' },
+  ];
+
+  const projects = d.employees.slice(0,5).map((emp, i) => ({
+    ...emp,
+    project: ['Q3 Performance Review','Leave Policy Update','Payroll Audit','Team Building','Compliance Audit'][i],
+    due: ['Sep, 15','Oct, 01','Aug, 30','Sep, 22','Oct, 10'][i],
+    priority: ['Low','High','Medium','Low','High'][i],
+  }));
+
+  return (
+    <div style={{ animation:'page-in 350ms ease-out both' }}>
+      {/* ── HERO STAT CARDS (Glass on dark bg via ::before pseudo) ── */}
+      <div style={{
+        background:'linear-gradient(135deg, #0B1E3D 0%, #1A3A6B 55%, #2563EB 100%)',
+        borderRadius:24, padding:'28px 28px 32px', marginBottom:28,
+        position:'relative', overflow:'hidden',
+        boxShadow:'0 20px 60px rgba(11,30,61,0.4)',
+      }}>
+        {/* Animated bg radials */}
+        <div style={{ position:'absolute',inset:0,background:'radial-gradient(ellipse 50% 80% at 80% 30%, rgba(139,92,246,0.2) 0%,transparent 70%), radial-gradient(ellipse 40% 60% at 10% 70%, rgba(16,185,129,0.15) 0%,transparent 70%)',pointerEvents:'none',animation:'mesh-shift 8s ease-in-out infinite alternate' }}/>
+
+        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 0.5fr 0.5fr', gap:16, position:'relative' }}>
+          <HeroCard
+            title="Total Employees"
+            value={d.total_employees}
+            suffix="+"
+            colorAccent="#6EE7B7"
+            sparkData={presentSpark}
+            sub={[{val:d.present_today,label:'Present'},{val:d.absent_today,label:'Absent'},{val:d.pending_leaves,label:'Pending'}]}
+            delay={0}
+          />
+          <HeroCard
+            title="Attendance Rate"
+            value={d.attendance_rate}
+            suffix="%"
+            colorAccent="#93C5FD"
+            sparkData={attendanceSpark}
+            sub={[{val:d.active_employees,label:'Active'},{val:d.new_this_month,label:'New'},{val:d.ai_anomalies_total,label:'Flagged'}]}
+            delay={100}
+          />
+          {/* Compact right cards */}
+          <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
+            <div style={{ background:'rgba(255,255,255,0.1)', backdropFilter:'blur(16px)', border:'1px solid rgba(255,255,255,0.18)', borderRadius:16, padding:'18px 20px', color:'#fff', animation:'hero-card-3d 600ms ease-out 200ms both', transition:'transform 250ms ease, box-shadow 250ms' }}
+              onMouseEnter={e=>{ e.currentTarget.style.transform='translateY(-6px)'; e.currentTarget.style.boxShadow='0 16px 40px rgba(0,0,0,0.3)'; }}
+              onMouseLeave={e=>{ e.currentTarget.style.transform=''; e.currentTarget.style.boxShadow=''; }}>
+              <div style={{ fontSize:22, fontWeight:800, color:'#FCD34D', letterSpacing:'-0.02em' }}>₹{(d.total_employees * 45000).toLocaleString('en-IN')}</div>
+              <div style={{ fontSize:11, color:'rgba(255,255,255,0.6)', fontWeight:600, textTransform:'uppercase', letterSpacing:'0.05em', marginTop:2, marginBottom:10 }}>Monthly Payroll</div>
+              <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+                <div style={{ flex:1, height:4, borderRadius:2, background:'rgba(255,255,255,0.15)' }}>
+                  <div style={{ width:'73%', height:'100%', borderRadius:2, background:'linear-gradient(90deg,#FCD34D,#F59E0B)' }}/>
                 </div>
-              ))}
-            </div>
-            <div className="divider" />
-            <div className="card-title mb-12">Top Attendance</div>
-            {d.top_attendance.map((emp, i) => (
-              <div key={i} style={{ display:'flex', alignItems:'center', gap:12, padding:'10px 0', borderBottom: i < d.top_attendance.length-1 ? '1px solid var(--border)' : 'none' }}>
-                <div className="avatar avatar-sm">{emp.initials}</div>
-                <div style={{ flex:1 }}>
-                  <div style={{ fontWeight:600, fontSize:13 }}>{emp.name}</div>
-                  <div className="caption">{emp.days} days present</div>
-                </div>
-                <div style={{ fontSize:22 }}>🏆</div>
+                <span style={{ fontSize:10, color:'#FCD34D', fontWeight:600 }}>▲ 4.2%</span>
               </div>
+            </div>
+            <div style={{ background:'rgba(255,255,255,0.1)', backdropFilter:'blur(16px)', border:'1px solid rgba(255,255,255,0.18)', borderRadius:16, padding:'18px 20px', color:'#fff', animation:'hero-card-3d 600ms ease-out 300ms both', transition:'transform 250ms ease' }}
+              onMouseEnter={e=>{ e.currentTarget.style.transform='translateY(-6px)'; e.currentTarget.style.boxShadow='0 16px 40px rgba(0,0,0,0.3)'; }}
+              onMouseLeave={e=>{ e.currentTarget.style.transform=''; e.currentTarget.style.boxShadow=''; }}>
+              <div style={{ fontSize:22, fontWeight:800, color:'#6EE7B7' }}>{d.total_employees}+</div>
+              <div style={{ fontSize:11, color:'rgba(255,255,255,0.6)', fontWeight:600, textTransform:'uppercase', letterSpacing:'0.05em', marginTop:2, marginBottom:10 }}>Page Views</div>
+              <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+                <div style={{ flex:1, height:4, borderRadius:2, background:'rgba(255,255,255,0.15)' }}>
+                  <div style={{ width:'58%', height:'100%', borderRadius:2, background:'linear-gradient(90deg,#6EE7B7,#10B981)' }}/>
+                </div>
+                <span style={{ fontSize:10, color:'#6EE7B7', fontWeight:600 }}>▲ 8.1%</span>
+              </div>
+            </div>
+          </div>
+          <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
+            <div style={{ background:'rgba(239,68,68,0.25)', backdropFilter:'blur(16px)', border:'1px solid rgba(239,68,68,0.3)', borderRadius:16, padding:'18px 20px', color:'#fff', animation:'hero-card-3d 600ms ease-out 380ms both', transition:'transform 250ms ease' }}
+              onMouseEnter={e=>{ e.currentTarget.style.transform='translateY(-6px)'; e.currentTarget.style.boxShadow='0 16px 40px rgba(239,68,68,0.2)'; }}
+              onMouseLeave={e=>{ e.currentTarget.style.transform=''; e.currentTarget.style.boxShadow=''; }}>
+              <div style={{ fontSize:22, fontWeight:800, color:'#FCA5A5' }}>{d.ai_anomalies_total}</div>
+              <div style={{ fontSize:11, color:'rgba(255,255,255,0.6)', fontWeight:600, textTransform:'uppercase', letterSpacing:'0.05em', marginTop:2, marginBottom:10 }}>AI Anomalies</div>
+              <div style={{ display:'flex', alignItems:'center', gap:6 }}>
+                <span style={{ fontSize:16 }}>⚠️</span>
+                <span style={{ fontSize:10, color:'#FCA5A5', fontWeight:600 }}>{d.ai_high_risk} High Risk</span>
+              </div>
+            </div>
+            <div style={{ background:'rgba(59,130,246,0.25)', backdropFilter:'blur(16px)', border:'1px solid rgba(59,130,246,0.3)', borderRadius:16, padding:'18px 20px', color:'#fff', animation:'hero-card-3d 600ms ease-out 460ms both', transition:'transform 250ms ease' }}
+              onMouseEnter={e=>{ e.currentTarget.style.transform='translateY(-6px)'; e.currentTarget.style.boxShadow='0 16px 40px rgba(59,130,246,0.2)'; }}
+              onMouseLeave={e=>{ e.currentTarget.style.transform=''; e.currentTarget.style.boxShadow=''; }}>
+              <div style={{ fontSize:22, fontWeight:800, color:'#93C5FD' }}>{d.pending_leaves}</div>
+              <div style={{ fontSize:11, color:'rgba(255,255,255,0.6)', fontWeight:600, textTransform:'uppercase', letterSpacing:'0.05em', marginTop:2, marginBottom:10 }}>Pending Leaves</div>
+              <div style={{ display:'flex', alignItems:'center', gap:6 }}>
+                <span style={{ fontSize:10, color:'#93C5FD', fontWeight:600 }}>↓ Needs Review</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ── MIDDLE ROW: Projects Table + Latest Updates ── */}
+      <div style={{ display:'grid', gridTemplateColumns:'1.1fr 0.9fr', gap:20, marginBottom:20 }}>
+        {/* Projects / Employees Table */}
+        <div className="card card-no-hover">
+          <div style={{ padding:'20px 24px 16px', borderBottom:'1px solid rgba(59,130,246,0.07)', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+            <span style={{ fontSize:15, fontWeight:700, color:'#0F172A' }}>Team Assignments</span>
+            <div style={{ display:'flex', gap:8, alignItems:'center' }}>
+              <a href="/employees" style={{ fontSize:12, color:'#3B82F6', fontWeight:600 }}>View All</a>
+              <span style={{ color:'#94A3B8', cursor:'pointer', fontSize:18 }}>···</span>
+            </div>
+          </div>
+          {/* Table Header */}
+          <div style={{ display:'grid', gridTemplateColumns:'32px 1fr 1fr 90px 80px', gap:12, padding:'10px 24px', borderBottom:'1px solid rgba(59,130,246,0.06)', background:'rgba(248,250,255,0.8)' }}>
+            {['☑','ASSIGNED','PROJECT','DUE DATE','PRIORITY'].map((h,i) => (
+              <div key={i} style={{ fontSize:10, fontWeight:700, letterSpacing:'0.08em', textTransform:'uppercase', color:'#94A3B8' }}>{h}</div>
             ))}
           </div>
+          {projects.map((emp, i) => (
+            <div key={emp.id}
+              style={{ display:'grid', gridTemplateColumns:'32px 1fr 1fr 90px 80px', gap:12, padding:'13px 24px', borderBottom:'1px solid rgba(59,130,246,0.05)', alignItems:'center', cursor:'pointer', transition:'background 150ms', animation:`table-row-in 400ms ease-out ${i*60}ms both` }}
+              onMouseEnter={e => e.currentTarget.style.background='rgba(59,130,246,0.03)'}
+              onMouseLeave={e => e.currentTarget.style.background='transparent'}
+            >
+              <input type="checkbox" style={{ accentColor:'#3B82F6', width:14, height:14 }}
+                checked={checkedRows.includes(emp.id)}
+                onChange={e => setCheckedRows(p => e.target.checked ? [...p,emp.id] : p.filter(r=>r!==emp.id))} />
+              <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+                <div style={{ width:32,height:32,borderRadius:'50%',background:`linear-gradient(135deg,${['#3B82F6','#10B981','#8B5CF6','#F59E0B','#EF4444'][i]},${['#1D4ED8','#059669','#6D28D9','#D97706','#DC2626'][i]})`,color:'#fff',fontSize:11,fontWeight:700,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0 }}>{emp.initials}</div>
+                <div>
+                  <div style={{ fontSize:13,fontWeight:600,color:'#0F172A' }}>{emp.name}</div>
+                  <div style={{ fontSize:11,color:'#94A3B8' }}>{emp.title}</div>
+                </div>
+              </div>
+              <div style={{ fontSize:13, fontWeight:500, color:'#334155' }}>{emp.project}</div>
+              <div style={{ fontSize:12, color:'#64748B' }}>{emp.due}</div>
+              <span style={{
+                display:'inline-flex',padding:'3px 10px',borderRadius:20,fontSize:11,fontWeight:600,
+                background: emp.priority==='High' ? '#FEE2E2':emp.priority==='Medium' ? '#FEF3C7':'#D1FAE5',
+                color: emp.priority==='High' ? '#991B1B':emp.priority==='Medium' ? '#92400E':'#065F46',
+                border: `1px solid ${emp.priority==='High' ? 'rgba(239,68,68,0.2)':emp.priority==='Medium' ? 'rgba(245,158,11,0.2)':'rgba(16,185,129,0.2)'}`,
+              }}>{emp.priority}</span>
+            </div>
+          ))}
         </div>
 
-        {/* Pending Approvals (Dark Glass) */}
-        <div className="card-glass-dark" style={{ animation:'card-in 400ms ease-out 400ms both' }}>
-          <div className="section-header" style={{ borderBottomColor:'rgba(255,255,255,0.08)' }}>
-            <span className="card-title text-white">Pending Actions</span>
-            <span style={{ fontSize:12, color:'rgba(255,255,255,0.4)' }}>{d.pending_approvals.length} items</span>
+        {/* Latest Updates (Activity Feed) */}
+        <div className="card card-no-hover">
+          <div style={{ padding:'20px 24px 16px', borderBottom:'1px solid rgba(59,130,246,0.07)', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+            <span style={{ fontSize:15, fontWeight:700, color:'#0F172A' }}>Latest Updates</span>
+            <span style={{ color:'#94A3B8', cursor:'pointer', fontSize:18 }}>···</span>
           </div>
-          <div style={{ padding:'12px 0' }}>
-            {d.pending_approvals.map((item, i) => (
-              <div key={item.id} style={{
-                display:'flex', alignItems:'center', gap:12, padding:'14px 20px',
-                borderBottom: i < d.pending_approvals.length-1 ? '1px solid rgba(255,255,255,0.06)' : 'none',
-                animation:`card-in 400ms ease-out ${400 + i*60}ms both`,
-              }}>
-                <div className="avatar avatar-sm">{item.initials}</div>
-                <div style={{ flex:1, minWidth:0 }}>
-                  <div style={{ fontWeight:600, fontSize:13, color:'#fff' }}>{item.name}</div>
-                  <div style={{ fontSize:11, color:'rgba(255,255,255,0.45)', marginTop:2 }}>{item.leave_type} · {item.dates}</div>
-                </div>
-                <a href="/leaves" className="btn btn-ghost-white btn-sm">Review →</a>
-              </div>
+          <div style={{ padding:'8px 24px' }}>
+            {activities.map((a, i) => (
+              <ActivityItem key={i} {...a} delay={i*80} />
             ))}
+          </div>
+          <div style={{ padding:'12px 24px', textAlign:'right', borderTop:'1px solid rgba(59,130,246,0.06)' }}>
+            <a href="/analytics" style={{ fontSize:12, fontWeight:600, color:'#3B82F6' }}>View all updates →</a>
           </div>
         </div>
       </div>
 
-      {/* Bottom Row */}
+      {/* ── BOTTOM ROW: 3 Stat Sparkline Cards ── */}
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:20, marginBottom:20 }}>
+        <BottomStatCard label="Total Employees" value={d.total_employees} color="#3B82F6" sparkData={presentSpark} trend={{ up:true, label:'▲ 12%' }} delay={0}/>
+        <BottomStatCard label="Attendance Rate" value={d.attendance_rate} suffix="%" color="#10B981" sparkData={attendanceSpark} trend={{ up:true, label:'▲ 2.1%' }} delay={100}/>
+        <BottomStatCard label="AI Anomaly Score" value={d.ai_anomalies_total} color="#EF4444" sparkData={leaveSpark} trend={{ up:false, label:'▼ 1 new' }} delay={200}/>
+      </div>
+
+      {/* ── BOTTOM SECTION: Leave Distribution + Pending Approvals ── */}
       <div className="grid-65-35">
-        {/* Employee Table */}
-        <div className="card" style={{ animation:'card-in 400ms ease-out 480ms both' }}>
-          <div className="section-header">
-            <span className="card-title">Employees</span>
-            <div className="flex gap-10 items-center">
-              <div className="search-wrapper">
-                <span className="search-icon">🔍</span>
-                <input className="input input-glass" placeholder="Search..." style={{ width:160, height:34 }} />
-              </div>
-              <a href="/employees" className="text-accent text-sm text-semibold">View All →</a>
-            </div>
+        {/* Leave Distribution Card */}
+        <div className="card card-no-hover">
+          <div style={{ padding:'20px 24px 16px', borderBottom:'1px solid rgba(59,130,246,0.07)', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+            <span style={{ fontSize:15, fontWeight:700, color:'#0F172A' }}>Leave Overview</span>
+            <span style={{ color:'#94A3B8', cursor:'pointer', fontSize:18 }}>···</span>
           </div>
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>ID</th><th>Name</th><th>Department</th><th>Title</th><th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {d.employees.map((emp, i) => (
-                <tr key={emp.id} style={{ animation:`card-in 300ms ease-out ${i*40}ms both`, cursor:'pointer' }}>
-                  <td className="monospace text-muted text-sm">{emp.id}</td>
-                  <td>
-                    <div className="flex items-center gap-8">
-                      <div className="avatar avatar-sm">{emp.initials}</div>
-                      <span style={{ fontWeight:500 }}>{emp.name}</span>
-                    </div>
-                  </td>
-                  <td><span className="pill pill-info">{emp.dept}</span></td>
-                  <td className="text-muted">{emp.title}</td>
-                  <td>
-                    <span className={`pill ${emp.active ? 'pill-active' : 'pill-inactive'}`}>
-                      ● {emp.active ? 'Active' : 'Inactive'}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Leave Distribution */}
-        <div className="card" style={{ animation:'card-in 400ms ease-out 560ms both' }}>
-          <div className="section-header">
-            <span className="card-title">Leave Distribution</span>
-          </div>
-          <div style={{ padding:'8px 0' }}>
+          <div>
             {d.leave_distribution.map((row, i) => (
-              <div key={i} style={{ display:'flex', alignItems:'center', padding:'16px 24px', borderBottom: i < d.leave_distribution.length-1 ? '1px solid var(--border)' : 'none' }}>
-                <div style={{ fontSize:28, fontWeight:700, width:50 }}>{row.count}</div>
+              <div key={i} style={{ display:'flex', alignItems:'center', padding:'16px 24px', borderBottom: i < d.leave_distribution.length-1 ? '1px solid rgba(59,130,246,0.05)' : 'none', gap:16, animation:`card-in 350ms ease-out ${i*70}ms both` }}>
+                <div style={{ width:52, textAlign:'center' }}>
+                  <div style={{ fontSize:28, fontWeight:800, color:['#3B82F6','#10B981','#EF4444'][i] }}>{row.count}</div>
+                </div>
                 <div style={{ flex:1 }}>
-                  <div style={{ fontWeight:600, fontSize:13, marginBottom:4 }}>{row.label}</div>
-                  <div className={`progress-bar`} style={{ height:4 }}>
-                    <div className={`progress-fill progress-fill-${row.color}`} style={{ width:`${row.pct}%` }} />
+                  <div style={{ fontWeight:600, fontSize:13, marginBottom:6 }}>{row.label}</div>
+                  <div style={{ height:6, borderRadius:3, background:'rgba(0,0,0,0.06)', overflow:'hidden' }}>
+                    <div style={{ width:`${row.pct}%`, height:'100%', borderRadius:3, background:['linear-gradient(90deg,#3B82F6,#1D4ED8)','linear-gradient(90deg,#10B981,#059669)','linear-gradient(90deg,#EF4444,#DC2626)'][i], transition:`width 800ms ease-out ${i*100}ms` }}/>
                   </div>
                 </div>
-                <div style={{ marginLeft:16 }}>
-                  <span className={`pill pill-${row.color === 'success' ? 'approved' : row.color === 'error' ? 'rejected' : 'pending'}`}>{row.pct}%</span>
-                </div>
+                <span style={{ fontWeight:700, fontSize:16, minWidth:40, color:['#3B82F6','#10B981','#EF4444'][i] }}>{row.pct}%</span>
               </div>
             ))}
           </div>
+        </div>
+
+        {/* Pending Approvals */}
+        <div className="card card-no-hover" style={{ background:'linear-gradient(180deg,#0F172A,#1E293B)', borderRadius:20 }}>
+          <div style={{ padding:'20px 24px 16px', borderBottom:'1px solid rgba(255,255,255,0.07)', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+            <span style={{ fontSize:15, fontWeight:700, color:'#fff' }}>Pending Approvals</span>
+            <span style={{ padding:'4px 10px', borderRadius:20, background:'rgba(239,68,68,0.25)', color:'#FCA5A5', fontSize:11, fontWeight:700 }}>
+              {d.pending_approvals.length} waiting
+            </span>
+          </div>
+          {d.pending_approvals.map((item, i) => (
+            <div key={item.id} style={{ display:'flex', alignItems:'center', gap:12, padding:'14px 24px', borderBottom:'1px solid rgba(255,255,255,0.05)', animation:`card-in 350ms ease-out ${i*80}ms both` }}>
+              <div style={{ width:36,height:36,borderRadius:'50%',background:`linear-gradient(135deg,${['#3B82F6','#10B981','#F59E0B','#EF4444'][i]},${['#1D4ED8','#059669','#D97706','#DC2626'][i]})`,color:'#fff',fontSize:12,fontWeight:700,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0 }}>{item.initials}</div>
+              <div style={{ flex:1 }}>
+                <div style={{ fontWeight:600, fontSize:13, color:'#fff' }}>{item.name}</div>
+                <div style={{ fontSize:11, color:'rgba(255,255,255,0.45)', marginTop:2 }}>{item.leave_type} · {item.dates}</div>
+              </div>
+              <a href="/leaves" style={{ fontSize:12, color:'#93C5FD', fontWeight:600, whiteSpace:'nowrap' }}>Review →</a>
+            </div>
+          ))}
         </div>
       </div>
     </div>

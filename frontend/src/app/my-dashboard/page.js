@@ -1,5 +1,6 @@
 'use client';
 import { useCounter } from '@/hooks/useCounter';
+import { useInView } from '@/hooks/useInView';
 import { DonutChart, MiniBarChart } from '@/components/charts/Charts';
 import { employeeDashboardData } from '@/lib/mockData';
 
@@ -15,100 +16,120 @@ export default function EmployeeDashboard() {
   const greetIcon = hour < 12 ? '☀️' : hour < 17 ? '🌤' : '🌙';
 
   return (
-    <div className="page-wrapper page-in">
-      {/* Greeting */}
-      <div className="page-header">
-        <div>
-          <h1 style={{ fontSize:36, fontWeight:700, letterSpacing:'-0.02em', animation:'card-in 500ms ease-out both' }}>
+    <div className="page-in">
+      {/* Hero Banner with Dark Navy Glass Theme */}
+      <div style={{
+        background: 'linear-gradient(135deg, #0B1E3D 0%, #1A3A6B 55%, #2563EB 100%)',
+        borderRadius: 24, padding: '28px 28px 32px', marginBottom: 28,
+        position: 'relative', overflow: 'hidden',
+        boxShadow: '0 20px 60px rgba(11,30,61,0.35)',
+      }}>
+        <div style={{ position:'absolute', inset:0, background:'radial-gradient(ellipse 50% 80% at 80% 30%, rgba(139,92,246,0.2) 0%,transparent 70%)', pointerEvents:'none' }} />
+        
+        <div style={{ position:'relative', zIndex:1, marginBottom:20 }}>
+          <span style={{ fontSize:12, fontWeight:600, color:'#93C5FD', letterSpacing:'0.05em', textTransform:'uppercase' }}>Personal Workspace</span>
+          <h1 style={{ fontSize:28, fontWeight:800, color:'#fff', marginTop:2 }}>
             {greeting}, John {greetIcon}
           </h1>
-          <p className="caption mt-4">{new Date().toLocaleDateString('en-IN', { weekday:'long', day:'numeric', month:'long', year:'numeric' })}</p>
-        </div>
-      </div>
-
-      {/* Hero Stat Row — 4 Glass Cards */}
-      <div className="grid-4 mb-20">
-        {/* Card 1: Today's Hours */}
-        <div className="card-glass p-24" style={{ animation:'card-in 400ms ease-out 0ms both' }}>
-          <div className="label mb-8">Hours Today</div>
-          <div style={{ fontSize:52, fontWeight:700, letterSpacing:'-0.03em', lineHeight:1 }}>{hoursToday.toFixed(1)}<span style={{ fontSize:22 }}>h</span></div>
-          <div className="progress-bar mt-12 mb-12">
-            <div className="progress-fill" style={{ width:`${(d.today_worked_hours / 8) * 100}%` }} />
-          </div>
-          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-            <span className="caption">Target: 8h</span>
-            <span className={`pill ${d.checked_in ? 'pill-active checked-in-badge' : 'pill-cancelled'}`} style={{ fontSize:11 }}>
-              <span className="pulse-dot" style={{ display: d.checked_in ? 'inline-block' : 'none' }} />
-              {d.checked_in ? 'Live · Checked In' : 'Checked Out'}
-            </span>
-          </div>
         </div>
 
-        {/* Card 2: Monthly Hours */}
-        <div className="card-glass p-24" style={{ animation:'card-in 400ms ease-out 80ms both' }}>
-          <div className="label mb-8">Monthly Hours</div>
-          <div style={{ fontSize:52, fontWeight:700, letterSpacing:'-0.03em', lineHeight:1 }}>{monthlyHours}<span style={{ fontSize:22 }}>h</span></div>
-          <div className="mt-16">
-            <MiniBarChart data={d.weekly_hours} activeIndex={4} height={50} />
-          </div>
-        </div>
-
-        {/* Card 3: Leave Balance */}
-        <div className="card-glass p-24" style={{ animation:'card-in 400ms ease-out 160ms both' }}>
-          <div className="label mb-12">Leave Balance</div>
-          <div style={{ display:'flex', alignItems:'center', gap:16 }}>
-            <DonutChart value={d.leave_balance.annual} max={d.leave_balance.total} size={90} stroke={9}>
-              <div style={{ textAlign:'center' }}>
-                <div style={{ fontSize:22, fontWeight:700 }}>{leaveBalance}</div>
-                <div style={{ fontSize:9, color:'var(--text-muted)', fontWeight:500 }}>days</div>
-              </div>
-            </DonutChart>
-            <div style={{ flex:1 }}>
-              <div className="flex gap-6 flex-wrap">
-                <span className="pill pill-info" style={{ fontSize:10 }}>Annual · {d.leave_balance.annual}</span>
-                <span className="pill pill-pending" style={{ fontSize:10 }}>Sick · {d.leave_balance.sick}</span>
-              </div>
-              <div className="caption mt-8">Used {d.leave_balance.used} / {d.leave_balance.total}</div>
+        {/* 4 Hero Stat Cards */}
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(4, 1fr)', gap:16, position:'relative', zIndex:1 }}>
+          {/* Card 1 */}
+          <div style={{
+            background:'rgba(255,255,255,0.1)', backdropFilter:'blur(16px)',
+            border:'1px solid rgba(255,255,255,0.18)', borderRadius:16, padding:20, color:'#fff',
+            transition:'transform 300ms cubic-bezier(0.34,1.56,0.64,1)', animation:'card-in-3d 500ms ease-out 0ms both',
+          }}
+          onMouseEnter={e => e.currentTarget.style.transform='perspective(600px) rotateX(-3deg) translateY(-6px)'}
+          onMouseLeave={e => e.currentTarget.style.transform=''}
+          >
+            <div style={{ fontSize:11, color:'#93C5FD', fontWeight:700, textTransform:'uppercase', letterSpacing:'0.05em' }}>Hours Today</div>
+            <div style={{ fontSize:36, fontWeight:800, letterSpacing:'-0.03em', margin:'8px 0 4px' }}>{hoursToday.toFixed(1)}<span style={{ fontSize:18 }}>h</span></div>
+            <div className="progress-bar" style={{ background:'rgba(255,255,255,0.15)', height:5, marginBottom:10 }}>
+              <div className="progress-fill" style={{ width:`${(d.today_worked_hours / 8) * 100}%`, background:'linear-gradient(90deg, #6EE7B7, #10B981)' }} />
+            </div>
+            <div style={{ display:'flex', justifyContent:'space-between', fontSize:11 }}>
+              <span style={{ color:'rgba(255,255,255,0.6)' }}>Target: 8h</span>
+              <span style={{ color:'#6EE7B7', fontWeight:600 }}>{d.checked_in ? '● Checked In' : 'Checked Out'}</span>
             </div>
           </div>
-          <a href="/my-leaves" className="btn btn-primary btn-sm mt-16" style={{ display:'inline-flex', width:'100%', justifyContent:'center' }}>Apply Leave</a>
-        </div>
 
-        {/* Card 4: Payslip (Dark Glass) */}
-        <div className="card-glass-dark p-24" style={{ animation:'card-in 400ms ease-out 240ms both' }}>
-          <div style={{ fontSize:11, color:'rgba(255,255,255,0.45)', fontWeight:500, letterSpacing:'0.05em', marginBottom:8 }}>{d.payslip_period}</div>
-          <div style={{ fontSize:48, fontWeight:700, color:'#fff', letterSpacing:'-0.03em', lineHeight:1 }}>
-            ₹{salary.toLocaleString('en-IN')}
+          {/* Card 2 */}
+          <div style={{
+            background:'rgba(255,255,255,0.1)', backdropFilter:'blur(16px)',
+            border:'1px solid rgba(255,255,255,0.18)', borderRadius:16, padding:20, color:'#fff',
+            transition:'transform 300ms cubic-bezier(0.34,1.56,0.64,1)', animation:'card-in-3d 500ms ease-out 100ms both',
+          }}
+          onMouseEnter={e => e.currentTarget.style.transform='perspective(600px) rotateX(-3deg) translateY(-6px)'}
+          onMouseLeave={e => e.currentTarget.style.transform=''}
+          >
+            <div style={{ fontSize:11, color:'#93C5FD', fontWeight:700, textTransform:'uppercase', letterSpacing:'0.05em' }}>Monthly Hours</div>
+            <div style={{ fontSize:36, fontWeight:800, letterSpacing:'-0.03em', margin:'8px 0 4px' }}>{monthlyHours}<span style={{ fontSize:18 }}>h</span></div>
+            <div style={{ marginTop:8 }}>
+              <MiniBarChart data={d.weekly_hours} activeIndex={4} color="#6EE7B7" height={36} />
+            </div>
           </div>
-          <div style={{ fontSize:11, color:'rgba(255,255,255,0.45)', marginTop:4 }}>Net Salary</div>
-          <div className="flex justify-between items-center mt-16">
-            <span className="pill pill-paid">● {d.payslip_status}</span>
-            <a href="/my-payroll" style={{ color:'rgba(255,255,255,0.7)', fontSize:12, fontWeight:600 }} className="text-semibold">View Details →</a>
+
+          {/* Card 3 */}
+          <div style={{
+            background:'rgba(255,255,255,0.1)', backdropFilter:'blur(16px)',
+            border:'1px solid rgba(255,255,255,0.18)', borderRadius:16, padding:20, color:'#fff',
+            transition:'transform 300ms cubic-bezier(0.34,1.56,0.64,1)', animation:'card-in-3d 500ms ease-out 200ms both',
+          }}
+          onMouseEnter={e => e.currentTarget.style.transform='perspective(600px) rotateX(-3deg) translateY(-6px)'}
+          onMouseLeave={e => e.currentTarget.style.transform=''}
+          >
+            <div style={{ fontSize:11, color:'#93C5FD', fontWeight:700, textTransform:'uppercase', letterSpacing:'0.05em' }}>Leave Balance</div>
+            <div style={{ display:'flex', alignItems:'center', gap:12, marginTop:6 }}>
+              <DonutChart value={d.leave_balance.annual} max={d.leave_balance.total} size={64} stroke={7} color="#FCD34D" bg="rgba(255,255,255,0.15)">
+                <span style={{ fontSize:15, fontWeight:800, color:'#fff' }}>{leaveBalance}</span>
+              </DonutChart>
+              <div>
+                <div style={{ fontSize:12, fontWeight:600 }}>{d.leave_balance.annual} Days</div>
+                <div style={{ fontSize:10, color:'rgba(255,255,255,0.6)' }}>Used {d.leave_balance.used}/{d.leave_balance.total}</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Card 4 */}
+          <div style={{
+            background:'rgba(255,255,255,0.12)', backdropFilter:'blur(16px)',
+            border:'1px solid rgba(255,255,255,0.22)', borderRadius:16, padding:20, color:'#fff',
+            transition:'transform 300ms cubic-bezier(0.34,1.56,0.64,1)', animation:'card-in-3d 500ms ease-out 300ms both',
+          }}
+          onMouseEnter={e => e.currentTarget.style.transform='perspective(600px) rotateX(-3deg) translateY(-6px)'}
+          onMouseLeave={e => e.currentTarget.style.transform=''}
+          >
+            <div style={{ fontSize:11, color:'#FCD34D', fontWeight:700, textTransform:'uppercase', letterSpacing:'0.05em' }}>Net Payslip</div>
+            <div style={{ fontSize:32, fontWeight:800, letterSpacing:'-0.03em', margin:'6px 0 2px' }}>₹{salary.toLocaleString('en-IN')}</div>
+            <div style={{ fontSize:11, color:'rgba(255,255,255,0.6)', marginBottom:8 }}>{d.payslip_period}</div>
+            <span style={{ padding:'3px 8px', borderRadius:20, background:'rgba(16,185,129,0.25)', color:'#6EE7B7', fontSize:10, fontWeight:700 }}>● {d.payslip_status}</span>
           </div>
         </div>
       </div>
 
-      {/* Lower Section */}
+      {/* Main Section */}
       <div className="grid-60-40">
-        {/* Recent Activity Feed */}
-        <div className="card">
-          <div className="section-header">
-            <span className="card-title">Recent Activity</span>
-            <a href="#" className="text-accent text-sm text-semibold">View All</a>
+        {/* Activity Feed */}
+        <div className="card card-no-hover">
+          <div style={{ padding:'20px 24px 16px', borderBottom:'1px solid rgba(59,130,246,0.07)', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+            <span style={{ fontSize:15, fontWeight:700, color:'#0F172A' }}>Recent Activity</span>
+            <span style={{ fontSize:12, color:'#3B82F6', fontWeight:600, cursor:'pointer' }}>View All</span>
           </div>
           <div style={{ padding:'16px 24px' }}>
             <div className="timeline">
               {d.recent_activity.map((item, i) => (
                 <div key={item.id} className="timeline-item" style={{ animation:`card-in 400ms ease-out ${i*60}ms both` }}>
-                  <div className="timeline-dot" style={{ background: item.color }} />
+                  <div className="timeline-dot" style={{ background: item.color, boxShadow:`0 0 8px ${item.color}66` }} />
                   <div className="timeline-line" />
                   <div className="timeline-content">
-                    <div className="flex justify-between items-start">
+                    <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
                       <div>
-                        <div style={{ fontWeight:600, fontSize:13 }}>{item.title}</div>
-                        <div className="caption mt-2">{item.desc}</div>
+                        <div style={{ fontWeight:600, fontSize:13, color:'#0F172A' }}>{item.title}</div>
+                        <div style={{ fontSize:12, color:'#64748B', marginTop:2 }}>{item.desc}</div>
                       </div>
-                      <span className="caption flex-shrink-0">{item.time}</span>
+                      <span style={{ fontSize:11, color:'#94A3B8', flexShrink:0 }}>{item.time}</span>
                     </div>
                   </div>
                 </div>
@@ -117,34 +138,39 @@ export default function EmployeeDashboard() {
           </div>
         </div>
 
-        {/* Quick Actions (Dark Glass) */}
-        <div className="card-glass-dark" style={{ animation:'card-in 400ms ease-out 320ms both' }}>
-          <div className="section-header" style={{ borderBottomColor:'rgba(255,255,255,0.08)' }}>
-            <span className="card-title text-white">Quick Actions</span>
+        {/* Quick Actions */}
+        <div className="card card-no-hover">
+          <div style={{ padding:'20px 24px 16px', borderBottom:'1px solid rgba(59,130,246,0.07)' }}>
+            <span style={{ fontSize:15, fontWeight:700, color:'#0F172A' }}>Quick Actions</span>
           </div>
-          {[
-            { icon:'📋', label:'Apply Leave',      href:'/my-leaves' },
-            { icon:'💳', label:'View Payslips',    href:'/my-payroll' },
-            { icon:'⏱',  label:'My Attendance',    href:'/attendance' },
-            { icon:'👤', label:'Update Profile',   href:'/settings' },
-          ].map((action, i) => (
-            <a
-              key={i}
-              href={action.href}
-              style={{
-                display:'flex', alignItems:'center', gap:14, padding:'14px 20px',
-                borderBottom: i < 3 ? '1px solid rgba(255,255,255,0.06)' : 'none',
-                transition:'background 150ms', cursor:'pointer', textDecoration:'none',
-                animation:`card-in 400ms ease-out ${320 + i*60}ms both`,
-              }}
-              onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.06)'}
-              onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-            >
-              <div style={{ width:36, height:36, borderRadius:10, background:'var(--accent-20)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:18 }}>{action.icon}</div>
-              <span style={{ flex:1, color:'#fff', fontSize:13, fontWeight:500 }}>{action.label}</span>
-              <span style={{ color:'rgba(255,255,255,0.35)', fontSize:14, transition:'transform 150ms' }}>›</span>
-            </a>
-          ))}
+          <div style={{ padding:'12px 16px' }}>
+            {[
+              { icon:'📋', label:'Apply for Leave', sub:'Submit a new leave request', href:'/my-leaves', color:'#3B82F6' },
+              { icon:'💳', label:'View Payslips', sub:'Download latest salary statement', href:'/my-payroll', color:'#10B981' },
+              { icon:'⏱', label:'My Attendance', sub:'Check monthly hours & logs', href:'/attendance', color:'#F59E0B' },
+              { icon:'⚙️', label:'Account Settings', sub:'Manage security & profile', href:'/settings', color:'#8B5CF6' },
+            ].map((act, i) => (
+              <a
+                key={i}
+                href={act.href}
+                style={{
+                  display:'flex', alignItems:'center', gap:14, padding:'14px 16px', borderRadius:14,
+                  textDecoration:'none', color:'inherit', transition:'all 200ms', marginBottom:4,
+                }}
+                onMouseEnter={e => { e.currentTarget.style.background='rgba(59,130,246,0.05)'; e.currentTarget.style.transform='translateX(4px)'; }}
+                onMouseLeave={e => { e.currentTarget.style.background='transparent'; e.currentTarget.style.transform=''; }}
+              >
+                <div style={{ width:40, height:40, borderRadius:12, background:`${act.color}15`, color:act.color, display:'flex', alignItems:'center', justifyContent:'center', fontSize:20, flexShrink:0 }}>
+                  {act.icon}
+                </div>
+                <div style={{ flex:1 }}>
+                  <div style={{ fontWeight:600, fontSize:13, color:'#0F172A' }}>{act.label}</div>
+                  <div style={{ fontSize:11, color:'#94A3B8', marginTop:1 }}>{act.sub}</div>
+                </div>
+                <span style={{ color:'#CBD5E1', fontSize:16 }}>›</span>
+              </a>
+            ))}
+          </div>
         </div>
       </div>
     </div>

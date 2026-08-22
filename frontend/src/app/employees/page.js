@@ -21,7 +21,7 @@ export default function EmployeesPage() {
   const handleSubmit = async (ev) => {
     ev.preventDefault();
     setSubmitting(true);
-    await new Promise(r => setTimeout(r, 1200));
+    await new Promise(r => setTimeout(r, 1000));
     setSubmitting(false);
     setShowModal(false);
     toast({ message:`Employee "${form.name}" created successfully!`, type:'success' });
@@ -29,45 +29,45 @@ export default function EmployeesPage() {
   };
 
   return (
-    <div className="page-wrapper page-in">
-      {/* Header */}
+    <div className="page-in">
+      {/* Header Bar */}
       <div className="page-header">
         <div>
-          <h1 className="page-title">Employees</h1>
-          <p className="caption mt-4">{filtered.length} employees</p>
+          <h1 className="page-title">Team Members</h1>
+          <p className="text-muted text-sm mt-4">Managing {filtered.length} active employees across departments</p>
         </div>
         <div className="page-header-right">
           <div className="search-wrapper">
             <span className="search-icon">🔍</span>
             <input
               id="employee-search"
-              className="input input-glass"
-              placeholder="Search employees..."
+              className="input"
+              placeholder="Search team members..."
               value={search}
               onChange={e => setSearch(e.target.value)}
-              style={{ width:220 }}
+              style={{ width:240, borderRadius:20 }}
             />
           </div>
           <select
             className="input"
-            style={{ width:160 }}
+            style={{ width:160, borderRadius:20 }}
             value={dept}
             onChange={e => setDept(e.target.value)}
           >
             {departments.map(d => <option key={d}>{d}</option>)}
           </select>
           <button className="btn btn-primary" onClick={() => setShowModal(true)} id="add-employee-btn">
-            + Add Employee
+            + Add Member
           </button>
         </div>
       </div>
 
-      {/* Employee Grid */}
+      {/* Employee Cards Grid */}
       {filtered.length === 0 ? (
         <div className="empty-state">
           <div className="empty-state-icon">🔍</div>
-          <h3>No employees found</h3>
-          <p>No employees found for &ldquo;{search}&rdquo;. Try a different search.</p>
+          <h3>No team members found</h3>
+          <p>Try adjusting your search query or department filter.</p>
         </div>
       ) : (
         <div className="grid-4">
@@ -75,29 +75,38 @@ export default function EmployeesPage() {
             <a
               key={emp.id}
               href={`/employees/${emp.id.replace('#','')}`}
-              className="card"
+              className="card card-3d"
               style={{
                 padding:24, textDecoration:'none', display:'block',
-                animation:`card-in 400ms ease-out ${i * 40}ms both`,
-                cursor:'pointer',
+                animation:`card-in-3d 500ms ease-out ${i * 45}ms both`,
               }}
             >
               <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:16 }}>
-                <div className="avatar avatar-xl">{emp.initials}</div>
-                <span className={`pill ${emp.active ? 'pill-active' : 'pill-inactive'}`}>● {emp.active ? 'Active' : 'Inactive'}</span>
+                <div className="avatar avatar-xl" style={{ background: `linear-gradient(135deg, ${['#3B82F6','#10B981','#8B5CF6','#F59E0B'][i % 4]}, ${['#1D4ED8','#059669','#6D28D9','#D97706'][i % 4]})` }}>
+                  {emp.initials}
+                </div>
+                <span className={`pill ${emp.active ? 'pill-active' : 'pill-inactive'}`}>
+                  ● {emp.active ? 'Active' : 'Inactive'}
+                </span>
               </div>
-              <div style={{ fontWeight:700, fontSize:15, marginBottom:3 }}>{emp.name}</div>
-              <div className="caption mb-8">{emp.title}</div>
-              <span className="pill pill-info" style={{ fontSize:10 }}>{emp.dept}</span>
-              <div className="caption mt-12 text-truncate" style={{ fontSize:11 }}>{emp.email}</div>
+              <div style={{ fontWeight:700, fontSize:16, color:'#0F172A', marginBottom:3 }}>{emp.name}</div>
+              <div style={{ fontSize:12, color:'#64748B', marginBottom:12 }}>{emp.title}</div>
+              <div style={{ display:'flex', alignItems:'center', gap:6, marginBottom:16 }}>
+                <span className="pill pill-info" style={{ fontSize:10 }}>{emp.dept}</span>
+                <span className="monospace text-xs text-muted">{emp.id}</span>
+              </div>
+              <div style={{ paddingTop:12, borderTop:'1px solid rgba(59,130,246,0.06)', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+                <span className="text-muted text-xs text-truncate" style={{ maxWidth:150 }}>{emp.email}</span>
+                <span style={{ color:'#3B82F6', fontSize:14, fontWeight:700 }}>→</span>
+              </div>
             </a>
           ))}
         </div>
       )}
 
       {/* Pagination */}
-      <div className="pagination mt-20">
-        <span className="pagination-info">Showing 1–{filtered.length} of {filtered.length}</span>
+      <div className="pagination mt-24">
+        <span className="pagination-info">Showing 1–{filtered.length} of {filtered.length} team members</span>
         <div className="pagination-controls">
           <button className="page-btn">‹</button>
           <button className="page-btn active">1</button>
@@ -106,8 +115,8 @@ export default function EmployeesPage() {
         </div>
       </div>
 
-      {/* Create Employee Modal (Screen 05) */}
-      <Modal isOpen={showModal} onClose={() => setShowModal(false)} title="Add New Employee">
+      {/* Create Employee Modal */}
+      <Modal isOpen={showModal} onClose={() => setShowModal(false)} title="Add New Team Member">
         <form onSubmit={handleSubmit}>
           {[
             { label:'Full Name *',  name:'name',  type:'text',  required:true  },
@@ -115,11 +124,7 @@ export default function EmployeesPage() {
             { label:'Work Phone',   name:'phone', type:'tel',   required:false },
             { label:'Job Title',    name:'title', type:'text',  required:false },
           ].map((field, i) => (
-            <div
-              key={field.name}
-              className="form-group"
-              style={{ animation:`card-in 300ms ease-out ${i*50}ms both` }}
-            >
+            <div key={field.name} className="form-group" style={{ animation:`card-in 300ms ease-out ${i*50}ms both` }}>
               <input
                 id={`emp-${field.name}`}
                 className="input"
@@ -156,7 +161,7 @@ export default function EmployeesPage() {
               onChange={e => setForm(f => ({ ...f, active: e.target.checked }))}
               style={{ width:16, height:16, accentColor:'var(--accent)' }}
             />
-            <label htmlFor="emp-active" style={{ fontSize:13, fontWeight:500 }}>Active Employee</label>
+            <label htmlFor="emp-active" style={{ fontSize:13, fontWeight:500 }}>Active Member</label>
           </div>
           <div className="flex gap-10 justify-between">
             <button type="button" className="btn btn-ghost" onClick={() => setShowModal(false)}>Cancel</button>
@@ -166,12 +171,7 @@ export default function EmployeesPage() {
               className={`btn btn-primary ${submitting ? 'btn-disabled' : ''}`}
               disabled={submitting}
             >
-              {submitting ? (
-                <span style={{ display:'flex', alignItems:'center', gap:8 }}>
-                  <span style={{ animation:'spin 0.8s linear infinite', display:'inline-block' }}>⟳</span>
-                  Creating...
-                </span>
-              ) : 'Create Employee'}
+              {submitting ? 'Creating...' : 'Create Member'}
             </button>
           </div>
         </form>

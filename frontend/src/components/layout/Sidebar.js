@@ -3,85 +3,117 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect, useRef } from 'react';
 import styles from './Sidebar.module.css';
 
-const navItems = [
-  { group:'Main Menu', items:[
-    { id:'dashboard',    href:'/dashboard',    icon:'⬡',  label:'Dashboard',     roles:['hr'] },
-    { id:'my-dashboard', href:'/my-dashboard', icon:'⬡',  label:'Dashboard',     roles:['employee'] },
-    { id:'employees',    href:'/employees',    icon:'👥',  label:'Employees',     roles:['hr'] },
-    { id:'attendance',   href:'/attendance',   icon:'⏱',  label:'Attendance',    roles:['hr','employee'] },
-  ]},
-  { group:'Leave', items:[
-    { id:'leaves',       href:'/leaves',       icon:'📋',  label:'Leave Requests', roles:['hr'] },
-    { id:'my-leaves',    href:'/my-leaves',    icon:'🗓',  label:'My Leaves',      roles:['employee'] },
-  ]},
-  { group:'Payroll', items:[
-    { id:'payroll',      href:'/payroll',      icon:'💳',  label:'Payroll',        roles:['hr'] },
-    { id:'my-payroll',   href:'/my-payroll',   icon:'💳',  label:'Payroll',        roles:['employee'] },
-  ]},
-  { group:'Reports', items:[
-    { id:'analytics',   href:'/analytics',    icon:'📊',  label:'Analytics',     roles:['hr'] },
-    { id:'ai-insights', href:'/ai-insights',  icon:'🤖',  label:'AI Insights',   roles:['hr'] },
-  ]},
-  { group:'Account', items:[
-    { id:'settings',    href:'/settings',     icon:'⚙',  label:'Settings',      roles:['hr','employee'] },
-  ]},
+const navGroups = [
+  {
+    label: 'Navigation',
+    color: '#3B82F6',
+    items: [
+      { id:'dashboard',    href:'/dashboard',    icon:'🏠', label:'Dashboard',     roles:['hr'] },
+      { id:'my-dashboard', href:'/my-dashboard', icon:'🏠', label:'Dashboard',     roles:['employee'] },
+      { id:'employees',    href:'/employees',    icon:'👥', label:'Team Members',  roles:['hr'] },
+      { id:'attendance',   href:'/attendance',   icon:'📅', label:'Attendance',    roles:['hr','employee'] },
+    ],
+  },
+  {
+    label: 'Workforce',
+    color: '#F59E0B',
+    items: [
+      { id:'leaves',    href:'/leaves',    icon:'📋', label:'Leave Center', roles:['hr'] },
+      { id:'my-leaves', href:'/my-leaves', icon:'🗓', label:'My Leaves',    roles:['employee'] },
+      { id:'payroll',   href:'/payroll',   icon:'💳', label:'Payroll Hub',  roles:['hr'] },
+      { id:'my-payroll',href:'/my-payroll',icon:'💰', label:'My Payslips',  roles:['employee'] },
+    ],
+  },
+  {
+    label: 'Intelligence',
+    color: '#8B5CF6',
+    items: [
+      { id:'analytics',   href:'/analytics',   icon:'📊', label:'Analytics',   roles:['hr'] },
+      { id:'ai-insights', href:'/ai-insights', icon:'🤖', label:'AI Insights', roles:['hr'] },
+    ],
+  },
+  {
+    label: 'Account',
+    color: '#10B981',
+    items: [
+      { id:'settings', href:'/settings', icon:'⚙️', label:'Settings', roles:['hr','employee'] },
+    ],
+  },
 ];
 
 export default function Sidebar({ role = 'hr' }) {
   const pathname = usePathname();
   const router   = useRouter();
-  const [indicatorStyle, setIndicatorStyle] = useState({});
-  const navRef   = useRef(null);
+  const [indicatorY, setIndicatorY]         = useState(0);
+  const [indicatorH, setIndicatorH]         = useState(0);
+  const [indicatorVisible, setVisible]      = useState(false);
+  const [collapsed, setCollapsed]           = useState({});
+  const navRef = useRef(null);
 
-  const filteredNav = navItems.map(group => ({
-    ...group,
-    items: group.items.filter(item => item.roles.includes(role)),
+  const filteredGroups = navGroups.map(g => ({
+    ...g,
+    items: g.items.filter(i => i.roles.includes(role)),
   })).filter(g => g.items.length > 0);
 
-  const allItems = filteredNav.flatMap(g => g.items);
-  const activeItem = allItems.find(i => i.href === pathname || pathname.startsWith(i.href + '/'));
+  const allItems = filteredGroups.flatMap(g => g.items);
+  const active   = allItems.find(i => i.href === pathname || pathname.startsWith(i.href + '/'));
 
-  // Slide the nav indicator to the active item
   useEffect(() => {
-    if (!navRef.current || !activeItem) return;
-    const el = navRef.current.querySelector(`[data-id="${activeItem.id}"]`);
+    if (!navRef.current || !active) return;
+    const el = navRef.current.querySelector(`[data-nav-id="${active.id}"]`);
     if (!el) return;
-    const { offsetTop, offsetHeight } = el;
-    setIndicatorStyle({ top: offsetTop, height: offsetHeight, opacity: 1 });
-  }, [pathname, activeItem]);
+    const navRect  = navRef.current.getBoundingClientRect();
+    const elRect   = el.getBoundingClientRect();
+    setIndicatorY(elRect.top - navRect.top);
+    setIndicatorH(elRect.height);
+    setVisible(true);
+  }, [pathname, active]);
 
   const user = role === 'hr'
-    ? { name:'Carla Sanford', role:'HR Officer', initials:'CS' }
-    : { name:'John Doe',      role:'Employee',   initials:'JD' };
+    ? { name:'Carla Sanford', title:'HR Officer', initials:'CS', dept:'Human Resources' }
+    : { name:'John Doe',      title:'Software Engineer', initials:'JD', dept:'Engineering' };
 
   return (
     <aside className={styles.sidebar}>
-      {/* Logo */}
-      <div className={styles.logo}>
-        <span className={styles.logoMark}>⬡</span>
-        <span className={styles.logoText}>Dayflow</span>
+      {/* User Profile Header */}
+      <div className={styles.profileSection}>
+        <div className={styles.avatarRing}>
+          <div className={styles.avatarInner}>{user.initials}</div>
+          <div className={styles.onlineDot} />
+        </div>
+        <div className={styles.profileInfo}>
+          <span className={styles.profileName}>{user.name}</span>
+          <span className={styles.profileTitle}>{user.title}</span>
+        </div>
       </div>
 
-      {/* Nav */}
+      {/* Navigation */}
       <nav className={styles.nav} ref={navRef}>
-        {/* Animated indicator */}
-        <div className={styles.indicator} style={indicatorStyle} />
+        {/* Sliding Indicator */}
+        <div
+          className={styles.indicator}
+          style={{ top:indicatorY, height:indicatorH, opacity: indicatorVisible ? 1 : 0 }}
+        />
 
-        {filteredNav.map(group => (
-          <div key={group.group} className={styles.group}>
-            <span className={styles.groupLabel}>{group.group}</span>
-            {group.items.map(item => {
+        {filteredGroups.map((group) => (
+          <div key={group.label} className={styles.group}>
+            <span className={styles.groupLabel} style={{ color: group.color }}>
+              {group.label}
+            </span>
+            {group.items.map((item, idx) => {
               const isActive = item.href === pathname || pathname.startsWith(item.href + '/');
               return (
                 <button
                   key={item.id}
-                  data-id={item.id}
+                  data-nav-id={item.id}
                   className={`${styles.navItem} ${isActive ? styles.active : ''}`}
                   onClick={() => router.push(item.href)}
+                  style={{ animationDelay:`${idx * 50}ms` }}
                   aria-current={isActive ? 'page' : undefined}
                 >
                   <span className={styles.navIcon}>{item.icon}</span>
                   <span className={styles.navLabel}>{item.label}</span>
+                  {isActive && <span className={styles.activeDot} />}
                 </button>
               );
             })}
@@ -89,14 +121,17 @@ export default function Sidebar({ role = 'hr' }) {
         ))}
       </nav>
 
-      {/* User Footer */}
-      <div className={styles.userCard}>
-        <div className={`${styles.userAvatar} avatar avatar-sm`}>{user.initials}</div>
-        <div className={styles.userInfo}>
-          <span className={styles.userName}>{user.name}</span>
-          <span className={styles.userRole}>{user.role}</span>
+      {/* AI Promo Card at Bottom */}
+      <div className={styles.promoCard}>
+        <button className={styles.promoClose}>×</button>
+        <div className={styles.promoRobot}>🤖</div>
+        <div className={styles.promoText}>
+          <strong>Try AI Insights</strong>
+          <span>Detect anomalies automatically</span>
         </div>
-        <div className={styles.onlineDot} />
+        <button className={styles.promoBtn} onClick={() => router.push('/ai-insights')}>
+          Explore →
+        </button>
       </div>
     </aside>
   );

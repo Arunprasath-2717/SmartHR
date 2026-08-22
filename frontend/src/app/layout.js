@@ -1,14 +1,14 @@
 import './globals.css';
 import { ToastProvider } from '@/components/ui/Toast';
 import Sidebar from '@/components/layout/Sidebar';
+import TopBar from '@/components/layout/TopBar';
 
 export const metadata = {
   title: 'DayFlow HRMS — Smart HR Management',
-  description: 'Modern Human Resource Management System with attendance, leave, payroll, and AI-powered anomaly insights.',
+  description: 'Human Resource Management System with AI-powered insights, attendance tracking, leave management and payroll.',
 };
 
-// Role can be switched here — in real app comes from auth
-const CURRENT_ROLE = 'hr'; // toggle to 'employee' to see employee views
+const CURRENT_ROLE = 'hr'; // Switch to 'employee' for employee view
 
 export default function RootLayout({ children }) {
   return (
@@ -18,7 +18,10 @@ export default function RootLayout({ children }) {
           <div className="app-shell">
             <Sidebar role={CURRENT_ROLE} />
             <main className="main-content">
-              {children}
+              <TopBar />
+              <div style={{ padding:'28px 32px' }}>
+                {children}
+              </div>
             </main>
           </div>
         </ToastProvider>
