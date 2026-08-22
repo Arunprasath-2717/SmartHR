@@ -4,6 +4,7 @@ import { anomalies } from '@/lib/mockData';
 import { ScoreGauge } from '@/components/charts/Charts';
 import { useCounter } from '@/hooks/useCounter';
 import Drawer from '@/components/ui/Drawer';
+import CustomToggle from '@/components/ui/CustomToggle';
 import { ShieldAlert, Search, AlertTriangle, AlertCircle, ArrowRight } from 'lucide-react';
 
 const RISK_FILTERS = ['All','HIGH','MEDIUM','LOW'];
@@ -87,6 +88,7 @@ export default function AIInsightsPage() {
   const [search, setSearch]         = useState('');
   const [selected, setSelected]     = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [aiScannerActive, setAiScannerActive] = useState(true);
 
   const total    = useCounter(anomalies.length, 1200, 0, true);
   const high     = useCounter(anomalies.filter(a => a.risk_level === 'HIGH').length, 1200, 0, true);
@@ -102,10 +104,19 @@ export default function AIInsightsPage() {
 
   return (
     <div className="page-in">
-      <div className="page-header">
+      {/* Header */}
+      <div className="page-header flex items-center justify-between">
         <div>
           <h1 className="page-title">AI Anomaly Insights</h1>
           <p className="text-muted text-sm mt-4">Automated pattern recognition & fraud protection engine</p>
+        </div>
+        <div className="card p-12 flex items-center gap-12" style={{ background: '#fff', borderRadius: 20 }}>
+          <span style={{ fontSize: 12, fontWeight: 700, color: '#0F172A' }}>AI Live Engine</span>
+          <CustomToggle
+            checked={aiScannerActive}
+            onChange={(e) => setAiScannerActive(e.target.checked)}
+            size="44px"
+          />
         </div>
       </div>
 

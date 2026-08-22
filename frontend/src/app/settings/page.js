@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useToast } from '@/components/ui/Toast';
+import CustomToggle from '@/components/ui/CustomToggle';
 import { Lock, Check, Heart, Hexagon } from 'lucide-react';
 
 const NAV_ITEMS = ['Profile', 'Notifications', 'Security', 'About'];
@@ -11,6 +12,8 @@ export default function SettingsPage() {
   const [dirty, setDirty]         = useState(false);
   const [form, setForm] = useState({ name:'John Doe', email:'john@dayflow.io', phone:'+91 98765 43210', dept:'Engineering', title:'Software Engineer' });
   const [saved, setSaved] = useState('');
+  const [notifState, setNotifState] = useState({ 0: true, 1: true, 2: true, 3: false });
+  const [twoFactor, setTwoFactor] = useState(true);
   const toast = useToast();
 
   const editableFields = { phone: true };
@@ -84,7 +87,7 @@ export default function SettingsPage() {
                     { label:'Work Phone',  key:'phone', editable:true  },
                     { label:'Department',  key:'dept',  editable:false },
                     { label:'Job Title',   key:'title', editable:false },
-                  ].map((field, i) => (
+                  ].map((field) => (
                     <div key={field.key}>
                       <label style={{ display:'block', fontSize:11, fontWeight:600, textTransform:'uppercase', letterSpacing:'0.05em', color:'var(--text-muted)', marginBottom:6 }}>
                         {field.label}
@@ -138,11 +141,11 @@ export default function SettingsPage() {
                     <div style={{ fontWeight:600, fontSize:13 }}>{pref}</div>
                     <div className="caption mt-2">Receive email and in-app notifications</div>
                   </div>
-                  <label style={{ position:'relative', width:44, height:24, cursor:'pointer' }}>
-                    <input type="checkbox" defaultChecked={i < 3} style={{ opacity:0, width:0, height:0 }} />
-                    <span style={{ position:'absolute', inset:0, borderRadius:12, background:`var(--${i < 3 ? 'accent' : 'border-med'})`, transition:'background 200ms' }} />
-                    <span style={{ position:'absolute', top:3, left: i < 3 ? 22 : 3, width:18, height:18, background:'#fff', borderRadius:50, transition:'left 200ms', boxShadow:'0 1px 3px rgba(0,0,0,0.2)' }} />
-                  </label>
+                  <CustomToggle
+                    checked={!!notifState[i]}
+                    onChange={(e) => setNotifState(prev => ({ ...prev, [i]: e.target.checked }))}
+                    size="48px"
+                  />
                 </div>
               ))}
             </div>
@@ -163,6 +166,19 @@ export default function SettingsPage() {
                 <label className="label mb-8">Confirm New Password</label>
                 <input className="input" type="password" placeholder="••••••••" />
               </div>
+
+              <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'18px 0', borderTop:'1px solid var(--border)', borderBottom:'1px solid var(--border)', marginBottom:24 }}>
+                <div>
+                  <div style={{ fontWeight:600, fontSize:13 }}>Two-Factor Authentication (2FA)</div>
+                  <div className="caption mt-2">Secure your account with authenticator apps</div>
+                </div>
+                <CustomToggle
+                  checked={twoFactor}
+                  onChange={(e) => setTwoFactor(e.target.checked)}
+                  size="48px"
+                />
+              </div>
+
               <button className="btn btn-primary" onClick={() => toast({ message:'Password updated!', type:'success' })}>Update Password</button>
             </div>
           )}
@@ -170,7 +186,7 @@ export default function SettingsPage() {
           {activeNav === 'About' && (
             <div className="card p-32 text-center" style={{ display:'flex', flexDirection:'column', alignItems:'center' }}>
               <Hexagon size={48} color="var(--accent)" style={{ marginBottom:16 }} />
-              <div style={{ fontSize:24, fontWeight:800, letterSpacing:'-0.02em', marginBottom:8 }}>DayFlow HRMS</div>
+              <div style={{ fontSize:24, fontWeight:800, letterSpacing:'-0.02em', marginBottom:8 }}>Dayflow HRMS</div>
               <div className="caption mb-4">Version 1.0.0</div>
               <div className="caption">Human Resource Management System</div>
               <div className="caption mt-4 flex items-center gap-4 justify-center">

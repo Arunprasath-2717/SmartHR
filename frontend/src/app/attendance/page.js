@@ -1,10 +1,13 @@
 'use client';
+import { useState } from 'react';
 import { attendanceRecords, attendanceSummary } from '@/lib/mockData';
 import { useCounter } from '@/hooks/useCounter';
 import { getStatusClass } from '@/lib/utils';
+import CustomToggle from '@/components/ui/CustomToggle';
 import { Download, Search, CheckCircle2, XCircle, Clock } from 'lucide-react';
 
 export default function AttendancePage() {
+  const [autoRefresh, setAutoRefresh] = useState(true);
   const present  = useCounter(attendanceSummary.present, 1200, 0, true);
   const absent   = useCounter(attendanceSummary.absent, 1200, 0, true);
   const avgHours = useCounter(attendanceSummary.avg_hours, 1200, 1, true);
@@ -16,9 +19,19 @@ export default function AttendancePage() {
           <h1 className="page-title">Attendance Records</h1>
           <p className="text-muted text-sm mt-4">Real-time presence monitoring and shift logs</p>
         </div>
-        <button className="btn btn-ghost">
-          <Download size={14} /> Export CSV
-        </button>
+        <div className="flex items-center gap-12">
+          <div className="card p-10 flex items-center gap-10" style={{ background: '#fff', borderRadius: 20 }}>
+            <span style={{ fontSize: 11, fontWeight: 700, color: '#0F172A' }}>Live Sync</span>
+            <CustomToggle
+              checked={autoRefresh}
+              onChange={(e) => setAutoRefresh(e.target.checked)}
+              size="40px"
+            />
+          </div>
+          <button className="btn btn-ghost">
+            <Download size={14} /> Export CSV
+          </button>
+        </div>
       </div>
 
       {/* Filter Bar */}

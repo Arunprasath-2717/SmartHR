@@ -600,6 +600,54 @@ ul,ol { list-style:none; }
 .icon-red    { background:var(--error-light);color:var(--error); }
 .icon-teal   { background:var(--teal-light);color:var(--teal); }
 
+/* ══ UIVERSE.IO CUSTOM ANIMATED TOGGLE SWITCH ══ */
+.checkbox-wrapper-41 {
+  --size: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.checkbox-wrapper-41 input[type="checkbox"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: var(--size);
+  height: calc(var(--size) / 2);
+  background-color: #fff;
+  border: 2px solid #1E293B;
+  border-radius: 30px 100px 100px 100px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  outline: none;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.checkbox-wrapper-41 input[type="checkbox"]::before {
+  content: "";
+  position: absolute;
+  width: calc(var(--size) / 2);
+  height: calc(var(--size) / 2);
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%) scale(0.7);
+  border: 2px solid #1E293B;
+  border-radius: 30px 100px 100px 100px;
+  background-color: #fde881;
+  box-sizing: border-box;
+  transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.checkbox-wrapper-41 input[type="checkbox"]:checked {
+  background-color: #fde881;
+  border-radius: 100px 100px 30px 100px;
+}
+
+.checkbox-wrapper-41 input[type="checkbox"]:checked::before {
+  left: 50%;
+  background-color: #fff;
+  border-radius: 100px 100px 30px 100px;
+}
+
 /* ══ Scrollbar ══ */
 ::-webkit-scrollbar { width:5px;height:5px; }
 ::-webkit-scrollbar-track { background:transparent; }
