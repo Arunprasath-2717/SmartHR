@@ -6,6 +6,15 @@ class LoginRequest(BaseModel):
     login: str  # Email or username
     password: str
 
+class RegisterRequest(BaseModel):
+    name: str
+    email: str
+    password: str
+    phone: Optional[str] = None
+    address: Optional[str] = None
+    job_title: Optional[str] = None
+    department_id: Optional[int] = None
+
 class UserOut(BaseModel):
     id: int
     name: str
@@ -26,3 +35,7 @@ class SessionUserOut(BaseModel):
     employee_id: Optional[int] = None
     company_id: int = 1
     partner_id: int = 1
+
+class LogoutResponse(BaseModel):
+    success: bool
+    message: str

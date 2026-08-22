@@ -10,9 +10,11 @@ class AttendanceOut(BaseModel):
     check_in: datetime
     check_out: Optional[datetime] = None
     worked_hours: float
+    status: str = "Present"
 
 class AttendanceStatusOut(BaseModel):
     attendance_state: str  # "checked_in" or "checked_out"
     last_check_in: Optional[datetime] = None
     last_check_out: Optional[datetime] = None
     current_attendance_id: Optional[int] = None
+    status: str = "Present"

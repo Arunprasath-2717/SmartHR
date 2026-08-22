@@ -73,9 +73,15 @@ Dayflow backend REST API provides enterprise Human Resource Management workflows
   - Response: API metadata & documentation paths
 
 ### 4.2 Authentication & Session
+- `POST /api/v1/auth/register`
+  - Body: `{"name": "...", "email": "...", "password": "...", "phone": "...", "address": "..."}`
+  - Response: `{"data": {"access_token": "...", "token_type": "bearer", "user": {...}}}` (Status 201)
 - `POST /api/v1/auth/login`
   - Body: `{"login": "user@company.com", "password": "Password123!"}`
   - Response: `{"data": {"access_token": "...", "token_type": "bearer", "user": {...}}}`
+- `POST /api/v1/auth/logout`
+  - Auth: Bearer Token
+  - Response: `{"data": {"success": true, "message": "Logged out successfully"}}`
 - `GET /api/v1/session`
   - Auth: Bearer Token
   - Response: `{"data": {"authenticated": true, "user_id": 1, "user_name": "...", "user_login": "...", "role": "..."}}`

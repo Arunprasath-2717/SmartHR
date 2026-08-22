@@ -9,6 +9,9 @@ class EmployeeCreateIn(BaseModel):
     work_phone: Optional[str] = None
     job_title: Optional[str] = None
     department_id: Optional[int] = None
+    address: Optional[str] = None
+    profile_picture: Optional[str] = None
+    documents: Optional[str] = None
     role: Optional[str] = "employee"
     password: Optional[str] = "TemporaryPassword123!"
 
@@ -18,6 +21,9 @@ class EmployeeUpdateIn(BaseModel):
     work_phone: Optional[str] = None
     job_title: Optional[str] = None
     department_id: Optional[int] = None
+    address: Optional[str] = None
+    profile_picture: Optional[str] = None
+    documents: Optional[str] = None
     emergency_contact: Optional[str] = None
     emergency_phone: Optional[str] = None
     active: Optional[bool] = None
@@ -31,6 +37,9 @@ class EmployeeOut(BaseModel):
     job_title: Optional[str] = None
     department_id: Optional[int] = None
     department_name: Optional[str] = None
+    address: Optional[str] = None
+    profile_picture: Optional[str] = None
+    documents: Optional[str] = None
     emergency_contact: Optional[str] = None
     emergency_phone: Optional[str] = None
     role: Optional[str] = "employee"

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 from typing import Optional
-from sqlalchemy import Float, Integer, DateTime, ForeignKey
+from sqlalchemy import Float, Integer, String, DateTime, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.models.base import Base, TimestampMixin
 
@@ -14,5 +14,6 @@ class Attendance(Base, TimestampMixin):
     check_in: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, index=True)
     check_out: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
     worked_hours: Mapped[float] = mapped_column(Float, default=0.0, nullable=False)
+    status: Mapped[str] = mapped_column(String(50), default="Present", nullable=False, index=True)
 
     employee = relationship("Employee", back_populates="attendances")

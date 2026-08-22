@@ -91,17 +91,22 @@ def get_current_user(
 
 
 def require_roles(*allowed_roles: str) -> Callable:
+    """Enforces role-based access control normalized to 'employee' and 'hr_officer'."""
     def role_checker(current_user: User = Depends(get_current_user)) -> User:
         user_role = (current_user.role or "employee").lower()
         allowed = [r.lower() for r in allowed_roles]
         
-        # Admin always inherits all permissions
-        if user_role == "admin" or "admin" in allowed and user_role == "admin":
+        # Normalize HR / Admin roles
+        is_hr_admin = user_role in {"hr_officer", "admin"}
+        hr_allowed = "hr_officer" in allowed or "admin" in allowed
+        
+        if is_hr_admin and hr_allowed:
             return current_user
         
-        if user_role not in allowed:
-            raise_forbidden(f"Role '{user_role}' is not authorized to access this resource")
-        return current_user
+        if user_role in allowed:
+            return current_user
+
+        raise_forbidden(f"Role '{user_role}' is not authorized to access this resource")
     return role_checker
 
 

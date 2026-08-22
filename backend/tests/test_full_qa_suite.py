@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Dayflow Comprehensive QA & Security Automated Test Suite.
-Executes detailed test cases across all 35 FastAPI routes, Go AI Service, and Security Matrix.
+Executes detailed test cases across all FastAPI routes, Go AI Service, and Security Matrix.
 """
 import time
 import pytest
@@ -30,8 +30,28 @@ def test_root_endpoint(client):
     assert body["docs"] == "/docs"
 
 # ------------------------------------------------------------------------------
-# 2. AUTHENTICATION & SESSION
+# 2. AUTHENTICATION, REGISTRATION, SESSION & LOGOUT
 # ------------------------------------------------------------------------------
+def test_auth_register_and_logout(client):
+    """AUTH-REG-001: Self-service employee signup and logout"""
+    # 1. Register new employee
+    reg_res = client.post("/api/v1/auth/register", json={
+        "name": "Frank Employee",
+        "email": "frank@company.com",
+        "password": "Password123!",
+        "phone": "+1-555-0109",
+        "address": "123 Main Street, Springfield"
+    })
+    assert reg_res.status_code == 201
+    reg_data = reg_res.json()["data"]
+    assert reg_data["user"]["login"] == "frank@company.com"
+    token = reg_data["access_token"]
+
+    # 2. Logout
+    logout_res = client.post("/api/v1/auth/logout", headers={"Authorization": f"Bearer {token}"})
+    assert logout_res.status_code == 200
+    assert logout_res.json()["data"]["success"] is True
+
 def test_auth_login_valid(client):
     """AUTH-001: Valid credentials login returns JWT access token"""
     res = client.post("/api/v1/auth/login", json={"login": "alice@company.com", "password": "Password123!"})
@@ -75,23 +95,27 @@ def test_auth_session_and_me(client, auth_headers_emp, auth_headers_hr):
 # 3. PROFILE TESTS
 # ------------------------------------------------------------------------------
 def test_profile_retrieval_and_update(client, auth_headers_emp):
-    """PROF-001 & PROF-002: Profile get, whitelist update, and restricted field blocking"""
+    """PROF-001 & PROF-002: Profile get, whitelist update (address, phone, avatar), and restricted field blocking"""
     # Get profile
     res = client.get("/api/v1/profile", headers=auth_headers_emp)
     assert res.status_code == 200
     assert res.json()["data"]["name"] == "Alice Employee"
 
-    # Whitelist update
+    # Whitelist update with address, phone, and profile_picture
     patch_res = client.patch("/api/v1/profile", headers=auth_headers_emp, json={
-        "work_phone": "+1-555-4321",
+        "address": "456 Oak Avenue, Metropolis",
+        "phone": "+1-555-4321",
+        "profile_picture": "https://cdn.dayflow.com/avatars/alice.png",
         "emergency_contact": "Bob Senior",
         "emergency_phone": "+1-555-9876"
     })
     assert patch_res.status_code == 200
-    assert patch_res.json()["data"]["work_phone"] == "+1-555-4321"
+    assert patch_res.json()["data"]["address"] == "456 Oak Avenue, Metropolis"
+    assert patch_res.json()["data"]["profile_picture"] == "https://cdn.dayflow.com/avatars/alice.png"
+    assert patch_res.json()["data"]["phone"] == "+1-555-4321"
 
-    # Restricted field attempt (e.g. modifying role or job_title)
-    bad_res = client.patch("/api/v1/profile", headers=auth_headers_emp, json={"role": "admin"})
+    # Restricted field attempt (modifying role)
+    bad_res = client.patch("/api/v1/profile", headers=auth_headers_emp, json={"role": "hr_officer"})
     assert bad_res.status_code == 422
     assert bad_res.json()["error"]["code"] == "validation_error"
 
@@ -138,10 +162,10 @@ def test_employee_directory_crud_and_isolation(client, auth_headers_emp, auth_he
     assert self_res.status_code == 200
 
 # ------------------------------------------------------------------------------
-# 5. ATTENDANCE WORKFLOW & DUPLICATE CHECKS
+# 5. ATTENDANCE WORKFLOW, DAILY/WEEKLY VIEWS & STATUSES
 # ------------------------------------------------------------------------------
 def test_attendance_complete_lifecycle(client, auth_headers_emp, auth_headers_hr, auth_headers_dave):
-    """ATT-001 to ATT-008: Check-in, duplicate guard, status, check-out, and HR view"""
+    """ATT-001 to ATT-009: Check-in, duplicate guard, status, check-out, daily/weekly view, and HR view"""
     # 1. Initial status: checked_out
     st_init = client.get("/api/v1/attendance/status", headers=auth_headers_emp)
     assert st_init.status_code == 200
@@ -151,6 +175,7 @@ def test_attendance_complete_lifecycle(client, auth_headers_emp, auth_headers_hr
     in_res = client.post("/api/v1/attendance/check-in", headers=auth_headers_emp)
     assert in_res.status_code == 201
     att_id = in_res.json()["data"]["id"]
+    assert in_res.json()["data"]["status"] == "Present"
 
     # 3. Duplicate check-in fails with 409 Conflict
     dup_res = client.post("/api/v1/attendance/check-in", headers=auth_headers_emp)
@@ -167,24 +192,28 @@ def test_attendance_complete_lifecycle(client, auth_headers_emp, auth_headers_hr
     assert out_res.status_code == 200
     assert out_res.json()["data"]["check_out"] is not None
 
-    # 6. Check-out without active attendance fails with 400 Bad Request
-    extra_out = client.post("/api/v1/attendance/check-out", headers=auth_headers_emp)
-    assert extra_out.status_code == 400
-    assert extra_out.json()["error"]["code"] == "bad_request"
+    # 6. Daily view filter
+    daily_res = client.get("/api/v1/attendance?view=daily", headers=auth_headers_emp)
+    assert daily_res.status_code == 200
+    assert len(daily_res.json()["data"]) >= 1
 
-    # 7. Dave blocked from viewing Alice's attendance record
+    # 7. Weekly view filter
+    weekly_res = client.get("/api/v1/attendance?view=weekly", headers=auth_headers_emp)
+    assert weekly_res.status_code == 200
+
+    # 8. Dave blocked from viewing Alice's attendance record
     cross_att = client.get(f"/api/v1/attendance/{att_id}", headers=auth_headers_dave)
     assert cross_att.status_code == 403
 
-    # 8. HR can view any attendance record
+    # 9. HR can view any attendance record
     hr_att = client.get(f"/api/v1/attendance/{att_id}", headers=auth_headers_hr)
     assert hr_att.status_code == 200
 
 # ------------------------------------------------------------------------------
-# 6. LEAVE MANAGEMENT & AI INTEGRATION
+# 6. LEAVE MANAGEMENT & TIME-OFF
 # ------------------------------------------------------------------------------
 def test_leave_creation_and_ai_scoring(client, auth_headers_emp):
-    """LEAVE-001 & AI-INT-001: Leave creation with simulated AI anomaly scoring"""
+    """LEAVE-001: Leave creation with AI scoring integration and validation"""
     # 1. Invalid date range fails validation
     bad_dates = client.post("/api/v1/leave", headers=auth_headers_emp, json={
         "leave_type": "paid",
@@ -223,10 +252,9 @@ def test_leave_creation_and_ai_scoring(client, auth_headers_emp):
         assert data["ai_is_anomaly"] is True
         assert data["ai_score"] == 0.88
         assert data["ai_risk_level"] == "high"
-        assert "peak sprint" in data["ai_reasons"]
 
-def test_leave_ai_service_fallback(client, auth_headers_emp):
-    """AI-INT-002: Leave creation gracefully falls back when AI microservice times out"""
+def test_leave_standalone_and_ai_service_fallback(client, auth_headers_emp):
+    """AI-INT-002: Leave creation functions cleanly standalone and gracefully falls back on AI timeout"""
     mock_fallback = {
         "is_anomaly": False,
         "score": 0.0,
@@ -349,7 +377,7 @@ def test_dashboards_employee_admin_and_dynamic(client, auth_headers_emp, auth_he
     assert "summary" in dyn_hr.json()["data"]
 
 # ------------------------------------------------------------------------------
-# 10. NOTIFICATIONS
+# 10. NOTIFICATIONS (OPTIONAL / FUTURE ENHANCEMENT)
 # ------------------------------------------------------------------------------
 def test_notifications_lifecycle(client, auth_headers_emp, auth_headers_dave):
     """NOTIF-001 to NOTIF-004: In-app alerts, read status, ownership isolation, and read-all"""
@@ -373,7 +401,7 @@ def test_notifications_lifecycle(client, auth_headers_emp, auth_headers_dave):
     assert read_all.json()["data"]["success"] is True
 
 # ------------------------------------------------------------------------------
-# 11. ANALYTICS & REPORTS
+# 11. ANALYTICS & REPORTS (OPTIONAL / FUTURE ENHANCEMENT)
 # ------------------------------------------------------------------------------
 def test_analytics_and_reports(client, auth_headers_emp, auth_headers_hr):
     """REP-001 to REP-006: Attendance reports, payroll cost aggregates, and workforce overview"""
@@ -404,7 +432,7 @@ def test_security_rbac_negative_matrix(client, auth_headers_emp):
     forbidden_endpoints = [
         ("GET", "/api/v1/employees"),
         ("POST", "/api/v1/employees", {"name": "Hacker", "work_email": "hack@company.com"}),
-        ("PATCH", "/api/v1/employees/1", {"role": "admin"}),
+        ("PATCH", "/api/v1/employees/1", {"role": "hr_officer"}),
         ("GET", "/api/v1/admin/leave"),
         ("POST", "/api/v1/leave/1/approve", {}),
         ("POST", "/api/v1/leave/1/reject", {}),

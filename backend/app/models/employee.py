@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from datetime import date
 from typing import Optional
-from sqlalchemy import String, Boolean, Integer, Date, ForeignKey
+from sqlalchemy import String, Boolean, Integer, Date, ForeignKey, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.models.base import Base, TimestampMixin
 
@@ -16,6 +16,9 @@ class Employee(Base, TimestampMixin):
     work_email: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     work_phone: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
     job_title: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    address: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
+    profile_picture: Mapped[Optional[str]] = mapped_column(String(1000), nullable=True)
+    documents: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     emergency_contact: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     emergency_phone: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
     gender: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)

@@ -28,7 +28,11 @@ def submit_leave_request(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """Submit a leave request. Integrates with Go AI anomaly service for scoring and fallback."""
+    """
+    Submit a leave request.
+    Core HRMS leave workflow is fully standalone and resilient.
+    Optional AI scoring evaluation is non-blocking with automatic fallback.
+    """
     if payload.start_date > payload.end_date:
         raise_validation_error("start_date cannot be after end_date")
 
@@ -38,7 +42,7 @@ def submit_leave_request(
 
     duration_days = (payload.end_date - payload.start_date).days + 1
 
-    # 1. Create preliminary Leave record
+    # 1. Create Core Leave Record
     new_leave = Leave(
         employee_id=emp.id,
         leave_type=payload.leave_type,
@@ -49,42 +53,47 @@ def submit_leave_request(
         ai_is_anomaly=False,
         ai_score=0.0,
         ai_risk_level="low",
-        ai_reasons="AI evaluation pending",
+        ai_reasons="AI evaluation optional",
         ai_evaluation_status="fallback"
     )
     db.add(new_leave)
     db.flush()
 
-    # 2. Call Go AI Microservice with non-blocking timeout fallback
-    ai_result = ai_client.score_leave_anomaly(
-        leave_id=new_leave.id,
-        employee_id=emp.id,
-        leave_type=payload.leave_type,
-        start_date=str(payload.start_date),
-        end_date=str(payload.end_date),
-        duration_days=duration_days,
-        remarks=payload.remarks or ""
-    )
-
-    # 3. Attach AI scoring advisory
-    new_leave.ai_is_anomaly = ai_result.get("is_anomaly", False)
-    new_leave.ai_score = ai_result.get("score", 0.0)
-    new_leave.ai_risk_level = ai_result.get("risk_level", "low")
-    new_leave.ai_reasons = ai_result.get("reasons", "")
-    new_leave.ai_evaluation_status = ai_result.get("evaluation_status", "fallback")
-
-    # 4. Notify HR Officers
-    hr_users = db.query(User).filter(User.role.in_(["hr_officer", "admin"]), User.is_active == True).all()
-    for hr_user in hr_users:
-        notif = Notification(
-            user_id=hr_user.id,
-            title="New Leave Request Submitted",
-            message=f"Employee {emp.name} submitted a {payload.leave_type} leave request ({payload.start_date} to {payload.end_date}).",
-            notification_type="info",
-            res_model="dayflow.leave",
-            res_id=new_leave.id
+    # 2. Non-blocking AI evaluation call (Optional integration boundary)
+    try:
+        ai_result = ai_client.score_leave_anomaly(
+            leave_id=new_leave.id,
+            employee_id=emp.id,
+            leave_type=payload.leave_type,
+            start_date=str(payload.start_date),
+            end_date=str(payload.end_date),
+            duration_days=duration_days,
+            remarks=payload.remarks or ""
         )
-        db.add(notif)
+        new_leave.ai_is_anomaly = ai_result.get("is_anomaly", False)
+        new_leave.ai_score = ai_result.get("score", 0.0)
+        new_leave.ai_risk_level = ai_result.get("risk_level", "low")
+        new_leave.ai_reasons = ai_result.get("reasons", "")
+        new_leave.ai_evaluation_status = ai_result.get("evaluation_status", "fallback")
+    except Exception:
+        # Guarantee core transaction success even if AI client raises an unexpected error
+        pass
+
+    # 3. Optional Notification generation (Protected so notification errors never fail leave)
+    try:
+        hr_users = db.query(User).filter(User.role.in_(["hr_officer", "admin"]), User.is_active == True).all()
+        for hr_user in hr_users:
+            notif = Notification(
+                user_id=hr_user.id,
+                title="New Leave Request Submitted",
+                message=f"Employee {emp.name} submitted a {payload.leave_type} leave request ({payload.start_date} to {payload.end_date}).",
+                notification_type="info",
+                res_model="dayflow.leave",
+                res_id=new_leave.id
+            )
+            db.add(notif)
+    except Exception:
+        pass
 
     db.commit()
     db.refresh(new_leave)
@@ -255,17 +264,20 @@ def approve_leave_request(
     if payload and payload.comments:
         leave.approver_comments = payload.comments
 
-    # Send in-app notification to employee
-    if leave.employee and leave.employee.user_id:
-        notif = Notification(
-            user_id=leave.employee.user_id,
-            title="Leave Request Approved",
-            message=f"Your {leave.leave_type} leave request ({leave.start_date} to {leave.end_date}) was approved.",
-            notification_type="success",
-            res_model="dayflow.leave",
-            res_id=leave.id
-        )
-        db.add(notif)
+    # Optional in-app notification to employee
+    try:
+        if leave.employee and leave.employee.user_id:
+            notif = Notification(
+                user_id=leave.employee.user_id,
+                title="Leave Request Approved",
+                message=f"Your {leave.leave_type} leave request ({leave.start_date} to {leave.end_date}) was approved.",
+                notification_type="success",
+                res_model="dayflow.leave",
+                res_id=leave.id
+            )
+            db.add(notif)
+    except Exception:
+        pass
 
     db.commit()
     db.refresh(leave)
@@ -308,17 +320,20 @@ def reject_leave_request(
     if payload and payload.comments:
         leave.approver_comments = payload.comments
 
-    # Send in-app notification to employee
-    if leave.employee and leave.employee.user_id:
-        notif = Notification(
-            user_id=leave.employee.user_id,
-            title="Leave Request Rejected",
-            message=f"Your {leave.leave_type} leave request ({leave.start_date} to {leave.end_date}) was rejected.",
-            notification_type="danger",
-            res_model="dayflow.leave",
-            res_id=leave.id
-        )
-        db.add(notif)
+    # Optional in-app notification to employee
+    try:
+        if leave.employee and leave.employee.user_id:
+            notif = Notification(
+                user_id=leave.employee.user_id,
+                title="Leave Request Rejected",
+                message=f"Your {leave.leave_type} leave request ({leave.start_date} to {leave.end_date}) was rejected.",
+                notification_type="danger",
+                res_model="dayflow.leave",
+                res_id=leave.id
+            )
+            db.add(notif)
+    except Exception:
+        pass
 
     db.commit()
     db.refresh(leave)
