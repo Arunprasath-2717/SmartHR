@@ -1,0 +1,37 @@
+{
+  "project": "Dayflow",
+  "frontend": {
+    "framework": "Next.js 16.3.2 (App Router)",
+    "react_version": "19.2.8",
+    "architecture": "Next.js Route Handlers & UI Store",
+    "endpoints_discovered": 14
+  },
+  "backend": {
+    "framework": "FastAPI",
+    "version": "0.115.8",
+    "python_version": "3.11",
+    "database": "Supabase PostgreSQL",
+    "endpoints_discovered": 37
+  },
+  "counts": {
+    "frontend_endpoints_discovered": 14,
+    "direct_frontend_to_fastapi": 14,
+    "nextjs_to_fastapi_mappings": 14,
+    "server_actions_to_fastapi": 0,
+    "backend_endpoints": 37,
+    "matched_endpoints": 14,
+    "mismatched_endpoints": 0,
+    "missing_endpoints": 0,
+    "blocked_endpoints": 0
+  },
+  "verifications": {
+    "authentication": "PASS",
+    "request_contracts": "PASS",
+    "response_contracts": "PASS",
+    "rbac": "PASS",
+    "ownership_isolation": "PASS",
+    "cors": "PASS",
+    "browser_e2e": "PASS"
+  },
+  "final_verdict": "READY FOR INTEGRATION"
+}

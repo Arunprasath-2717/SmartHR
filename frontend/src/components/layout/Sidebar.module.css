@@ -1,0 +1,369 @@
+/* ══ Sidebar — White, Premium, Matching Reference ══ */
+
+@property --sidebar-gradient-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes sidebar-gradient-angle {
+  to { --sidebar-gradient-angle: 360deg; }
+}
+
+.sidebar {
+  width: 88px;
+  height: 100vh;
+  background: var(--sidebar-bg);
+  position: fixed;
+  left: 0; top: 0; bottom: 0;
+  z-index: 1010;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  /* Subtle left border */
+  border-right: 1px solid rgba(255,255,255,0.05);
+
+  /* Soft shadow separating sidebar from content */
+  box-shadow: 4px 0 24px rgba(59,130,246,0.06), 2px 0 8px rgba(0,0,0,0.04);
+  transition: width 400ms cubic-bezier(0.34,1.56,0.64,1), box-shadow 400ms ease;
+}
+
+.sidebar:hover {
+  width: 248px;
+  box-shadow: 8px 0 32px rgba(37,99,235,0.12), 4px 0 16px rgba(0,0,0,0.08);
+}
+
+/* ── User Profile Section ── */
+.profileSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 28px 20px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  background: transparent;
+  flex-shrink: 0;
+}
+
+.avatarRing {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  margin-bottom: 12px;
+}
+
+.avatarRing::before {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3B82F6, #8B5CF6, #10B981);
+  z-index: 0;
+  animation: ring-spin 4s linear infinite;
+}
+
+@keyframes ring-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.avatarInner {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3B82F6, #8B5CF6);
+  color: #fff;
+  font-size: 22px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid #fff;
+  box-shadow: 0 4px 16px rgba(59,130,246,0.3);
+  transition: transform 300ms cubic-bezier(0.34,1.56,0.64,1);
+}
+
+.avatarInner:hover {
+  transform: scale(1.08);
+}
+
+.onlineDot {
+  position: absolute;
+  bottom: 4px; right: 4px;
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: #10B981;
+  border: 2.5px solid #fff;
+  z-index: 2;
+  box-shadow: 0 0 8px rgba(16,185,129,0.6);
+  animation: online-pulse 2s ease-in-out infinite;
+}
+
+@keyframes online-pulse {
+  0%,100% { box-shadow: 0 0 4px rgba(16,185,129,0.4); }
+  50%      { box-shadow: 0 0 12px rgba(16,185,129,0.8), 0 0 20px rgba(16,185,129,0.3); }
+}
+
+.profileInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+.profileName {
+  font-size: 14px;
+  font-weight: 700;
+  color: #FFFFFF;
+  letter-spacing: -0.01em;
+}
+
+.profileTitle {
+  font-size: 11px;
+  font-weight: 500;
+  color: #94A3B8;
+  background: rgba(255,255,255,0.08);
+  padding: 2px 10px;
+  border-radius: 20px;
+  margin-top: 2px;
+}
+
+/* ── Navigation ── */
+.nav {
+  flex: 1;
+  padding: 12px 12px 8px;
+  position: relative;
+  overflow: visible;
+}
+
+/* Sliding background indicator */
+.indicator {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  background: linear-gradient(135deg, #3B82F6, #2563EB);
+  border-radius: 10px;
+  opacity: 0;
+  transition: top 250ms cubic-bezier(0.4,0,0.2,1),
+              height 250ms cubic-bezier(0.4,0,0.2,1),
+              opacity 200ms;
+  z-index: 0;
+  box-shadow: 0 4px 16px rgba(59,130,246,0.35), 0 0 0 1px rgba(59,130,246,0.2);
+}
+
+/* ── Group Label ── */
+.group {
+  margin-bottom: 4px;
+}
+
+.groupLabel {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 10px 8px 6px;
+  opacity: 0.5;
+  color: #F8FAFC;
+  transition: color 200ms;
+}
+
+/* ── Nav Item ── */
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #94A3B8;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+  background: transparent;
+  border: none;
+  text-align: left;
+  outline: 2px solid transparent;
+  transition: all 600ms cubic-bezier(0.4, 0, 0.2, 1);
+  animation: navItemIn 400ms ease-out both;
+}
+
+@keyframes navItemIn {
+  from { opacity:0; transform:translateX(-12px); }
+  to   { opacity:1; transform:translateX(0); }
+}
+
+/* Hover subtle fill animation (no skew) */
+.navItem:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #FFFFFF;
+  transform: scale(1.02) translateX(2px);
+}
+
+.navItem.active {
+  color: #FFFFFF;
+  font-weight: 700;
+  background: linear-gradient(#1E293B, #1E293B) padding-box,
+              conic-gradient(from var(--sidebar-gradient-angle), transparent, #3B82F6, #8B5CF6, transparent 40%) border-box;
+  animation: sidebar-gradient-angle 3s linear infinite;
+  box-shadow: 0 4px 16px rgba(59,130,246,0.3);
+}
+
+.navIcon {
+  font-size: 16px;
+  width: 22px;
+  text-align: center;
+  flex-shrink: 0;
+  transition: transform 200ms cubic-bezier(0.34,1.56,0.64,1), color 200ms ease;
+}
+.navItem:hover .navIcon { transform: scale(1.15); color: #FFFFFF; }
+.navItem.active .navIcon { transform: scale(1.1); color: #FFFFFF; }
+
+.navLabel { flex: 1; }
+
+.activeDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.8);
+  animation: dot-pulse 2s ease-in-out infinite;
+}
+
+@keyframes dot-pulse {
+  0%,100% { opacity:1; transform:scale(1); }
+  50%      { opacity:0.6; transform:scale(0.7); }
+}
+
+/* ── AI Promo Card ── */
+.promoCard {
+  margin: 8px 12px 16px;
+  padding: 16px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #1D4ED8 0%, #3B82F6 50%, #8B5CF6 100%);
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+  box-shadow: 0 8px 24px rgba(59,130,246,0.4);
+  animation: promoIn 600ms cubic-bezier(0.34,1.56,0.64,1) 400ms both;
+}
+
+@keyframes promoIn {
+  from { opacity:0; transform:translateY(20px) scale(0.95); }
+  to   { opacity:1; transform:translateY(0) scale(1); }
+}
+
+/* Decorative circle */
+.promoCard::before {
+  content:'';
+  position:absolute;
+  right:-20px;top:-20px;
+  width:100px;height:100px;
+  border-radius:50%;
+  background:rgba(255,255,255,0.1);
+}
+.promoCard::after {
+  content:'';
+  position:absolute;
+  right:10px;bottom:-30px;
+  width:70px;height:70px;
+  border-radius:50%;
+  background:rgba(255,255,255,0.08);
+}
+
+.promoClose {
+  position:absolute;top:8px;right:10px;
+  font-size:16px;color:rgba(255,255,255,0.6);cursor:pointer;
+  background:none;border:none;z-index:1;
+  transition:color 200ms;
+}
+.promoClose:hover { color:#fff; }
+
+.promoRobot {
+  font-size:32px;margin-bottom:8px;
+  animation:float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%,100% { transform:translateY(0); }
+  50%      { transform:translateY(-6px); }
+}
+
+.promoText {
+  display:flex;flex-direction:column;gap:2px;margin-bottom:12px;
+}
+.promoText strong { font-size:13px;font-weight:700; }
+.promoText span   { font-size:11px;opacity:0.75; }
+
+.promoBtn {
+  display:inline-flex;align-items:center;gap:4px;
+  background:rgba(255,255,255,0.2);
+  border:1px solid rgba(255,255,255,0.3);
+  color:#fff;font-size:12px;font-weight:600;
+  padding:6px 14px;border-radius:20px;cursor:pointer;
+  transition:all 200ms;
+  backdrop-filter:blur(4px);
+}
+.promoBtn:hover {
+  background:rgba(255,255,255,0.3);
+  transform:translateY(-2px);
+}
+
+/* ── Collapsible Sidebar Overrides ── */
+.sidebar:not(:hover) .profileName,
+.sidebar:not(:hover) .profileTitle,
+.sidebar:not(:hover) .groupLabel,
+.sidebar:not(:hover) .navLabel,
+.sidebar:not(:hover) .activeDot,
+.sidebar:not(:hover) .promoCard {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.profileName,
+.profileTitle,
+.groupLabel,
+.navLabel,
+.activeDot,
+.promoCard {
+  transition: opacity 300ms ease, visibility 300ms ease, margin 300ms ease, padding 300ms ease, height 300ms ease;
+  white-space: nowrap;
+}
+
+.sidebar:not(:hover) .promoCard {
+  margin: 0;
+  padding: 0;
+  height: 0;
+  border: none;
+}
+
+.sidebar:not(:hover) .avatarRing {
+  width: 44px;
+  height: 44px;
+  margin-bottom: 0;
+}
+
+.sidebar:not(:hover) .avatarInner {
+  font-size: 16px;
+}
+
+.sidebar:not(:hover) .onlineDot {
+  width: 10px;
+  height: 10px;
+  bottom: 0px;
+  right: -2px;
+}
+
+.avatarRing, .avatarInner, .onlineDot, .profileSection {
+  transition: all 400ms cubic-bezier(0.34,1.56,0.64,1);
+}
+
+.sidebar:not(:hover) .profileSection {
+  padding: 28px 12px 12px;
+}
