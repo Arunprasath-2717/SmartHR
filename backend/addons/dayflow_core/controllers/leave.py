@@ -5,6 +5,11 @@ from odoo import http
 from odoo.http import request
 from .auth import get_authenticated_user, resolve_user_role
 from .profile import get_user_employee
+try:
+    from .notification import create_user_notification
+except ImportError:
+    def create_user_notification(*args, **kwargs):
+        pass
 from .common import (
     api_response,
     paginated_response,
@@ -241,7 +246,7 @@ class DayflowLeaveController(http.Controller):
     @handle_api_exceptions
     def approve_leave(self, leave_id, **kwargs):
         """
-        Approves a pending leave request (pending -> approved).
+        Approves a pending leave request (pending -> approved) and sends in-app alert.
         Restricted to HR Officers and Administrators.
         """
         user = get_authenticated_user()
@@ -275,13 +280,26 @@ class DayflowLeaveController(http.Controller):
             update_vals['approver_comments'] = str(comment).strip()
 
         leave_rec.sudo().write(update_vals)
+
+        # Trigger in-app notification for employee
+        if leave_rec.employee_id and leave_rec.employee_id.user_id:
+            create_user_notification(
+                env=request.env,
+                user_id=leave_rec.employee_id.user_id.id,
+                title="Leave Request Approved",
+                message=f"Your leave request for {leave_rec.start_date} to {leave_rec.end_date} ({leave_rec.leave_type}) has been approved.",
+                notification_type='success',
+                res_model='dayflow.leave',
+                res_id=leave_rec.id
+            )
+
         return api_response(format_leave_data(leave_rec), status=200)
 
     @http.route('/api/v1/leave/<int:leave_id>/reject', type='http', auth='public', methods=['POST'], csrf=False)
     @handle_api_exceptions
     def reject_leave(self, leave_id, **kwargs):
         """
-        Rejects a pending leave request (pending -> rejected).
+        Rejects a pending leave request (pending -> rejected) and sends in-app alert.
         Restricted to HR Officers and Administrators.
         """
         user = get_authenticated_user()
@@ -315,4 +333,17 @@ class DayflowLeaveController(http.Controller):
             update_vals['approver_comments'] = str(comment).strip()
 
         leave_rec.sudo().write(update_vals)
+
+        # Trigger in-app notification for employee
+        if leave_rec.employee_id and leave_rec.employee_id.user_id:
+            create_user_notification(
+                env=request.env,
+                user_id=leave_rec.employee_id.user_id.id,
+                title="Leave Request Rejected",
+                message=f"Your leave request for {leave_rec.start_date} to {leave_rec.end_date} ({leave_rec.leave_type}) has been rejected.",
+                notification_type='warning',
+                res_model='dayflow.leave',
+                res_id=leave_rec.id
+            )
+
         return api_response(format_leave_data(leave_rec), status=200)

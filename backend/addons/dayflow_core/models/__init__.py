@@ -2,3 +2,4 @@
 
 from . import leave
 from . import payroll
+from . import notification
