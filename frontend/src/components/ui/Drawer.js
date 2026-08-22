@@ -1,5 +1,6 @@
 'use client';
 import { useEffect } from 'react';
+import { X } from 'lucide-react';
 import styles from './Drawer.module.css';
 
 export default function Drawer({ isOpen, onClose, title, children, width = 460 }) {
@@ -33,7 +34,7 @@ export default function Drawer({ isOpen, onClose, title, children, width = 460 }
         <div className={styles.header}>
           <h3 className={styles.title}>{title}</h3>
           <button className={styles.closeBtn} onClick={onClose} aria-label="Close drawer">
-            <span className={styles.closeIcon}>✕</span>
+            <X size={16} />
           </button>
         </div>
         <div className={styles.body}>{children}</div>

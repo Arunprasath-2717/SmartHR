@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { analyticsOverview, attendanceTrend, leaveAnalytics } from '@/lib/mockData';
 import { useCounter } from '@/hooks/useCounter';
 import { LineChart, DualLineChart, GroupedBarChart, DonutChart } from '@/components/charts/Charts';
+import { Users, Clock, CheckCircle2, ClipboardList, Check, TrendingUp } from 'lucide-react';
 
 const TABS = ['Overview','Attendance','Leave'];
 
@@ -28,7 +29,7 @@ export default function AnalyticsPage() {
       <div className="page-header">
         <div>
           <h1 className="page-title">Analytics</h1>
-          <p className="caption mt-4">Workforce insights and trends</p>
+          <p className="caption mt-4">Workforce intelligence and trends</p>
         </div>
       </div>
 
@@ -58,22 +59,26 @@ export default function AnalyticsPage() {
         <div style={{ animation:'page-in 200ms ease-out both' }}>
           <div className="grid-4 mb-24" style={{ gridTemplateColumns:'repeat(auto-fit, minmax(180px, 1fr))' }}>
             {[
-              { label:'Total Employees', val:totalEmp,  color:'var(--accent)', icon:'👥' },
-              { label:'Avg Worked Hours', val:`${avgHours.toFixed(1)}h`, color:'var(--info)', icon:'⏱' },
-              { label:'Attendance Rate',  val:`${rate.toFixed(1)}%`, color:'var(--success)', icon:'✅' },
-              { label:'Pending Leaves',   val:pending,  color:'var(--warning)', icon:'📋' },
-              { label:'Approved This Month', val:approved, color:'var(--success)', icon:'✓' },
-            ].map((kpi, i) => (
-              <div key={i} className="card p-24" style={{ animation:`card-in 400ms ease-out ${i*60}ms both` }}>
-                <div style={{ fontSize:22, marginBottom:10 }}>{kpi.icon}</div>
-                <div style={{ fontSize:36, fontWeight:700, color:kpi.color }}>{kpi.val}</div>
-                <div className="label mt-6">{kpi.label}</div>
-                {/* Sparkline */}
-                <div style={{ marginTop:12 }}>
-                  <LineChart data={analyticsOverview.attendance_trend} height={30} color={kpi.color} showArea={false} />
+              { label:'Total Employees', val:totalEmp,  color:'var(--accent)', icon: Users },
+              { label:'Avg Worked Hours', val:`${avgHours.toFixed(1)}h`, color:'var(--info)', icon: Clock },
+              { label:'Attendance Rate',  val:`${rate.toFixed(1)}%`, color:'var(--success)', icon: CheckCircle2 },
+              { label:'Pending Leaves',   val:pending,  color:'var(--warning)', icon: ClipboardList },
+              { label:'Approved This Month', val:approved, color:'var(--success)', icon: Check },
+            ].map((kpi, i) => {
+              const KpiIcon = kpi.icon;
+              return (
+                <div key={i} className="card p-24" style={{ animation:`card-in 400ms ease-out ${i*60}ms both` }}>
+                  <div style={{ marginBottom:10, color: kpi.color, display:'flex', alignItems:'center' }}>
+                    <KpiIcon size={24} />
+                  </div>
+                  <div style={{ fontSize:36, fontWeight:700, color:kpi.color }}>{kpi.val}</div>
+                  <div className="label mt-6">{kpi.label}</div>
+                  <div style={{ marginTop:12 }}>
+                    <LineChart data={analyticsOverview.attendance_trend} height={30} color={kpi.color} showArea={false} />
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           <div className="grid-55-45">
@@ -120,7 +125,9 @@ export default function AnalyticsPage() {
             <div className="card-glass p-24" style={{ animation:'card-in 400ms ease-out 80ms both' }}>
               <div className="label mb-6">Attendance Rate</div>
               <div style={{ fontSize:42, fontWeight:700 }}>{attRate.toFixed(1)}%</div>
-              <div className="delta-badge delta-up mt-8">▲ +1.2% vs last period</div>
+              <div className="delta-badge delta-up mt-8">
+                <TrendingUp size={12} /> +1.2% vs last period
+              </div>
             </div>
           </div>
           <div className="card mb-20" style={{ animation:'card-in 400ms ease-out 160ms both' }}>

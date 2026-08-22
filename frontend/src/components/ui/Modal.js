@@ -1,5 +1,6 @@
 'use client';
 import { useEffect } from 'react';
+import { X } from 'lucide-react';
 import styles from './Modal.module.css';
 
 export default function Modal({ isOpen, onClose, title, children, width = 480 }) {
@@ -21,7 +22,7 @@ export default function Modal({ isOpen, onClose, title, children, width = 480 })
         <div className={styles.header}>
           <h3 className={styles.title}>{title}</h3>
           <button className={styles.closeBtn} onClick={onClose} aria-label="Close">
-            <span className={styles.closeIcon}>✕</span>
+            <X size={16} />
           </button>
         </div>
         <div className={styles.body}>{children}</div>

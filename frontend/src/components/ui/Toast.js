@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect, createContext, useContext, useCallback } from 'react';
+import { Check, X, Info } from 'lucide-react';
 import styles from './Toast.module.css';
 
 const ToastContext = createContext(null);
@@ -27,7 +28,7 @@ export function ToastProvider({ children }) {
             role="alert"
           >
             <span className={styles.icon}>
-              {toast.type === 'success' ? '✓' : toast.type === 'error' ? '✕' : 'ℹ'}
+              {toast.type === 'success' ? <Check size={14} /> : toast.type === 'error' ? <X size={14} /> : <Info size={14} />}
             </span>
             <span className={styles.message}>{toast.message}</span>
           </div>

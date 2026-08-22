@@ -2,6 +2,7 @@
 import { attendanceRecords, attendanceSummary } from '@/lib/mockData';
 import { useCounter } from '@/hooks/useCounter';
 import { getStatusClass } from '@/lib/utils';
+import { Download, Search, CheckCircle2, XCircle, Clock } from 'lucide-react';
 
 export default function AttendancePage() {
   const present  = useCounter(attendanceSummary.present, 1200, 0, true);
@@ -15,14 +16,18 @@ export default function AttendancePage() {
           <h1 className="page-title">Attendance Records</h1>
           <p className="text-muted text-sm mt-4">Real-time presence monitoring and shift logs</p>
         </div>
-        <button className="btn btn-ghost">⬇ Export CSV</button>
+        <button className="btn btn-ghost">
+          <Download size={14} /> Export CSV
+        </button>
       </div>
 
       {/* Filter Bar */}
       <div className="card mb-20" style={{ padding:'16px 20px', borderRadius:20 }}>
         <div style={{ display:'flex', flexWrap:'wrap', gap:12, alignItems:'center' }}>
           <div className="search-wrapper flex-1" style={{ minWidth:200 }}>
-            <span className="search-icon">🔍</span>
+            <span className="search-icon" style={{ display:'flex', alignItems:'center' }}>
+              <Search size={15} />
+            </span>
             <input className="input" placeholder="Search employee..." style={{ borderRadius:20 }} />
           </div>
           <input type="date" className="input" style={{ width:160, borderRadius:20 }} defaultValue="2026-08-22" />
@@ -36,7 +41,7 @@ export default function AttendancePage() {
         <div className="card card-3d p-24" style={{ animation:'card-in-3d 500ms ease-out 0ms both' }}>
           <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:8 }}>
             <span className="text-muted text-xs text-bold uppercase">Present Today</span>
-            <span style={{ fontSize:20 }}>✅</span>
+            <CheckCircle2 size={22} color="#10B981" />
           </div>
           <div style={{ fontSize:42, fontWeight:800, color:'var(--success)', letterSpacing:'-0.03em' }}>{present}</div>
           <div style={{ fontSize:11, color:'var(--text-muted)', marginTop:4 }}>94% of active workforce</div>
@@ -45,7 +50,7 @@ export default function AttendancePage() {
         <div className="card card-3d p-24" style={{ animation:'card-in-3d 500ms ease-out 100ms both' }}>
           <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:8 }}>
             <span className="text-muted text-xs text-bold uppercase">Absent Today</span>
-            <span style={{ fontSize:20 }}>❌</span>
+            <XCircle size={22} color="#EF4444" />
           </div>
           <div style={{ fontSize:42, fontWeight:800, color:'var(--error)', letterSpacing:'-0.03em' }}>{absent}</div>
           <div style={{ fontSize:11, color:'var(--text-muted)', marginTop:4 }}>Includes planned leaves</div>
@@ -54,7 +59,7 @@ export default function AttendancePage() {
         <div className="card card-3d p-24" style={{ animation:'card-in-3d 500ms ease-out 200ms both' }}>
           <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:8 }}>
             <span className="text-muted text-xs text-bold uppercase">Avg Worked Hours</span>
-            <span style={{ fontSize:20 }}>⏱</span>
+            <Clock size={22} color="#3B82F6" />
           </div>
           <div style={{ fontSize:42, fontWeight:800, color:'var(--accent)', letterSpacing:'-0.03em' }}>{avgHours.toFixed(1)}<span style={{ fontSize:22 }}>h</span></div>
           <div style={{ fontSize:11, color:'var(--text-muted)', marginTop:4 }}>Target: 8.0h / day</div>

@@ -2,20 +2,19 @@
 import { employeeDetail } from '@/lib/mockData';
 import { useCounter } from '@/hooks/useCounter';
 import { LineChart } from '@/components/charts/Charts';
+import { Pencil, Download, MoreHorizontal, ChevronRight, TrendingUp } from 'lucide-react';
 
 export default function EmployeeDetailPage({ params }) {
   const d = employeeDetail;
   const attendanceRate = useCounter(d.attendance_rate, 1200, 1, true);
   const salary = useCounter(d.net_salary, 1200, 0, true);
 
-  const getStatusColor = (s) => ({ Present:'var(--success)', Absent:'var(--error)' }[s] || 'var(--text-muted)');
-
   return (
     <div className="page-wrapper page-in">
       {/* Breadcrumb */}
       <div className="breadcrumb">
         <a href="/employees">Employees</a>
-        <span className="breadcrumb-sep">›</span>
+        <span className="breadcrumb-sep"><ChevronRight size={14} /></span>
         <span>{d.name}</span>
       </div>
 
@@ -26,7 +25,9 @@ export default function EmployeeDetailPage({ params }) {
           <div className="card p-24" style={{ animation:'card-in 400ms ease-out 0ms both' }}>
             <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:20 }}>
               <div className="avatar avatar-2xl">{d.initials}</div>
-              <button className="btn btn-ghost btn-sm btn-icon" title="Edit">✏️</button>
+              <button className="btn btn-ghost btn-sm btn-icon" title="Edit">
+                <Pencil size={15} />
+              </button>
             </div>
             <div style={{ fontWeight:700, fontSize:18, marginBottom:2 }}>{d.name}</div>
             <div className="caption mb-4">{d.title}</div>
@@ -57,7 +58,9 @@ export default function EmployeeDetailPage({ params }) {
           <div className="card" style={{ animation:'card-in 400ms ease-out 100ms both' }}>
             <div className="section-header">
               <span className="card-title">Recent Activities</span>
-              <button style={{ fontSize:18, cursor:'pointer', background:'none', border:'none' }}>···</button>
+              <button style={{ cursor:'pointer', background:'none', border:'none', color:'#94A3B8' }}>
+                <MoreHorizontal size={18} />
+              </button>
             </div>
             <div style={{ padding:'12px 24px 16px' }}>
               <div className="timeline">
@@ -93,7 +96,9 @@ export default function EmployeeDetailPage({ params }) {
             <div className="card-glass p-24" style={{ animation:'card-in 400ms ease-out 160ms both' }}>
               <div className="label mb-8">Attendance Rate</div>
               <div style={{ fontSize:42, fontWeight:700 }}>{attendanceRate.toFixed(1)}%</div>
-              <div className="delta-badge delta-up mt-8">▲ +2.1% vs last month</div>
+              <div className="delta-badge delta-up mt-8">
+                <TrendingUp size={12} /> +2.1% vs last month
+              </div>
             </div>
             <div className="card-glass-dark p-24" style={{ animation:'card-in 400ms ease-out 240ms both' }}>
               <div className="label mb-8" style={{ color:'rgba(255,255,255,0.5)' }}>Latest Payslip</div>
@@ -118,7 +123,9 @@ export default function EmployeeDetailPage({ params }) {
           <div className="card" style={{ animation:'card-in 400ms ease-out 380ms both' }}>
             <div className="section-header">
               <span className="card-title">Attendance Records</span>
-              <button className="btn btn-ghost btn-sm">⬇ Export CSV</button>
+              <button className="btn btn-ghost btn-sm">
+                <Download size={14} /> Export CSV
+              </button>
             </div>
             <table className="data-table">
               <thead>

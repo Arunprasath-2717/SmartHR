@@ -3,6 +3,7 @@ import { hrPayrollList, hrPayrollKPIs } from '@/lib/mockData';
 import { useCounter } from '@/hooks/useCounter';
 import { getStatusClass } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
+import { Download } from 'lucide-react';
 
 export default function HRPayrollPage() {
   const router = useRouter();
@@ -49,7 +50,9 @@ export default function HRPayrollPage() {
       <div className="card" style={{ animation:'card-in 400ms ease-out 240ms both' }}>
         <div className="section-header">
           <span className="card-title">All Payslips — August 2026</span>
-          <button className="btn btn-ghost btn-sm">⬇ Export</button>
+          <button className="btn btn-ghost btn-sm">
+            <Download size={14} /> Export
+          </button>
         </div>
         <table className="data-table">
           <thead>

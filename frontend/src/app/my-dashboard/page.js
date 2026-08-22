@@ -1,8 +1,17 @@
 'use client';
 import { useCounter } from '@/hooks/useCounter';
-import { useInView } from '@/hooks/useInView';
 import { DonutChart, MiniBarChart } from '@/components/charts/Charts';
 import { employeeDashboardData } from '@/lib/mockData';
+import {
+  Sun,
+  SunMedium,
+  Moon,
+  ClipboardList,
+  CreditCard,
+  Clock,
+  Settings,
+  ChevronRight
+} from 'lucide-react';
 
 export default function EmployeeDashboard() {
   const d = employeeDashboardData;
@@ -13,7 +22,7 @@ export default function EmployeeDashboard() {
 
   const hour = new Date().getHours();
   const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
-  const greetIcon = hour < 12 ? '☀️' : hour < 17 ? '🌤' : '🌙';
+  const GreetIcon = hour < 12 ? Sun : hour < 17 ? SunMedium : Moon;
 
   return (
     <div className="page-in">
@@ -28,8 +37,8 @@ export default function EmployeeDashboard() {
         
         <div style={{ position:'relative', zIndex:1, marginBottom:20 }}>
           <span style={{ fontSize:12, fontWeight:600, color:'#93C5FD', letterSpacing:'0.05em', textTransform:'uppercase' }}>Personal Workspace</span>
-          <h1 style={{ fontSize:28, fontWeight:800, color:'#fff', marginTop:2 }}>
-            {greeting}, John {greetIcon}
+          <h1 style={{ fontSize:28, fontWeight:800, color:'#fff', marginTop:2, display:'flex', alignItems:'center', gap:8 }}>
+            {greeting}, John <GreetIcon size={26} color="#FCD34D" />
           </h1>
         </div>
 
@@ -40,10 +49,7 @@ export default function EmployeeDashboard() {
             background:'rgba(255,255,255,0.1)', backdropFilter:'blur(16px)',
             border:'1px solid rgba(255,255,255,0.18)', borderRadius:16, padding:20, color:'#fff',
             transition:'transform 300ms cubic-bezier(0.34,1.56,0.64,1)', animation:'card-in-3d 500ms ease-out 0ms both',
-          }}
-          onMouseEnter={e => e.currentTarget.style.transform='perspective(600px) rotateX(-3deg) translateY(-6px)'}
-          onMouseLeave={e => e.currentTarget.style.transform=''}
-          >
+          }}>
             <div style={{ fontSize:11, color:'#93C5FD', fontWeight:700, textTransform:'uppercase', letterSpacing:'0.05em' }}>Hours Today</div>
             <div style={{ fontSize:36, fontWeight:800, letterSpacing:'-0.03em', margin:'8px 0 4px' }}>{hoursToday.toFixed(1)}<span style={{ fontSize:18 }}>h</span></div>
             <div className="progress-bar" style={{ background:'rgba(255,255,255,0.15)', height:5, marginBottom:10 }}>
@@ -60,10 +66,7 @@ export default function EmployeeDashboard() {
             background:'rgba(255,255,255,0.1)', backdropFilter:'blur(16px)',
             border:'1px solid rgba(255,255,255,0.18)', borderRadius:16, padding:20, color:'#fff',
             transition:'transform 300ms cubic-bezier(0.34,1.56,0.64,1)', animation:'card-in-3d 500ms ease-out 100ms both',
-          }}
-          onMouseEnter={e => e.currentTarget.style.transform='perspective(600px) rotateX(-3deg) translateY(-6px)'}
-          onMouseLeave={e => e.currentTarget.style.transform=''}
-          >
+          }}>
             <div style={{ fontSize:11, color:'#93C5FD', fontWeight:700, textTransform:'uppercase', letterSpacing:'0.05em' }}>Monthly Hours</div>
             <div style={{ fontSize:36, fontWeight:800, letterSpacing:'-0.03em', margin:'8px 0 4px' }}>{monthlyHours}<span style={{ fontSize:18 }}>h</span></div>
             <div style={{ marginTop:8 }}>
@@ -76,10 +79,7 @@ export default function EmployeeDashboard() {
             background:'rgba(255,255,255,0.1)', backdropFilter:'blur(16px)',
             border:'1px solid rgba(255,255,255,0.18)', borderRadius:16, padding:20, color:'#fff',
             transition:'transform 300ms cubic-bezier(0.34,1.56,0.64,1)', animation:'card-in-3d 500ms ease-out 200ms both',
-          }}
-          onMouseEnter={e => e.currentTarget.style.transform='perspective(600px) rotateX(-3deg) translateY(-6px)'}
-          onMouseLeave={e => e.currentTarget.style.transform=''}
-          >
+          }}>
             <div style={{ fontSize:11, color:'#93C5FD', fontWeight:700, textTransform:'uppercase', letterSpacing:'0.05em' }}>Leave Balance</div>
             <div style={{ display:'flex', alignItems:'center', gap:12, marginTop:6 }}>
               <DonutChart value={d.leave_balance.annual} max={d.leave_balance.total} size={64} stroke={7} color="#FCD34D" bg="rgba(255,255,255,0.15)">
@@ -97,10 +97,7 @@ export default function EmployeeDashboard() {
             background:'rgba(255,255,255,0.12)', backdropFilter:'blur(16px)',
             border:'1px solid rgba(255,255,255,0.22)', borderRadius:16, padding:20, color:'#fff',
             transition:'transform 300ms cubic-bezier(0.34,1.56,0.64,1)', animation:'card-in-3d 500ms ease-out 300ms both',
-          }}
-          onMouseEnter={e => e.currentTarget.style.transform='perspective(600px) rotateX(-3deg) translateY(-6px)'}
-          onMouseLeave={e => e.currentTarget.style.transform=''}
-          >
+          }}>
             <div style={{ fontSize:11, color:'#FCD34D', fontWeight:700, textTransform:'uppercase', letterSpacing:'0.05em' }}>Net Payslip</div>
             <div style={{ fontSize:32, fontWeight:800, letterSpacing:'-0.03em', margin:'6px 0 2px' }}>₹{salary.toLocaleString('en-IN')}</div>
             <div style={{ fontSize:11, color:'rgba(255,255,255,0.6)', marginBottom:8 }}>{d.payslip_period}</div>
@@ -145,31 +142,34 @@ export default function EmployeeDashboard() {
           </div>
           <div style={{ padding:'12px 16px' }}>
             {[
-              { icon:'📋', label:'Apply for Leave', sub:'Submit a new leave request', href:'/my-leaves', color:'#3B82F6' },
-              { icon:'💳', label:'View Payslips', sub:'Download latest salary statement', href:'/my-payroll', color:'#10B981' },
-              { icon:'⏱', label:'My Attendance', sub:'Check monthly hours & logs', href:'/attendance', color:'#F59E0B' },
-              { icon:'⚙️', label:'Account Settings', sub:'Manage security & profile', href:'/settings', color:'#8B5CF6' },
-            ].map((act, i) => (
-              <a
-                key={i}
-                href={act.href}
-                style={{
-                  display:'flex', alignItems:'center', gap:14, padding:'14px 16px', borderRadius:14,
-                  textDecoration:'none', color:'inherit', transition:'all 200ms', marginBottom:4,
-                }}
-                onMouseEnter={e => { e.currentTarget.style.background='rgba(59,130,246,0.05)'; e.currentTarget.style.transform='translateX(4px)'; }}
-                onMouseLeave={e => { e.currentTarget.style.background='transparent'; e.currentTarget.style.transform=''; }}
-              >
-                <div style={{ width:40, height:40, borderRadius:12, background:`${act.color}15`, color:act.color, display:'flex', alignItems:'center', justifyContent:'center', fontSize:20, flexShrink:0 }}>
-                  {act.icon}
-                </div>
-                <div style={{ flex:1 }}>
-                  <div style={{ fontWeight:600, fontSize:13, color:'#0F172A' }}>{act.label}</div>
-                  <div style={{ fontSize:11, color:'#94A3B8', marginTop:1 }}>{act.sub}</div>
-                </div>
-                <span style={{ color:'#CBD5E1', fontSize:16 }}>›</span>
-              </a>
-            ))}
+              { icon: ClipboardList, label:'Apply for Leave', sub:'Submit a new leave request', href:'/my-leaves', color:'#3B82F6' },
+              { icon: CreditCard,    label:'View Payslips', sub:'Download latest salary statement', href:'/my-payroll', color:'#10B981' },
+              { icon: Clock,         label:'My Attendance', sub:'Check monthly hours & logs', href:'/attendance', color:'#F59E0B' },
+              { icon: Settings,      label:'Account Settings', sub:'Manage security & profile', href:'/settings', color:'#8B5CF6' },
+            ].map((act, i) => {
+              const ActionIcon = act.icon;
+              return (
+                <a
+                  key={i}
+                  href={act.href}
+                  style={{
+                    display:'flex', alignItems:'center', gap:14, padding:'14px 16px', borderRadius:14,
+                    textDecoration:'none', color:'inherit', transition:'all 200ms', marginBottom:4,
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.background='rgba(59,130,246,0.05)'; e.currentTarget.style.transform='translateX(4px)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.background='transparent'; e.currentTarget.style.transform=''; }}
+                >
+                  <div style={{ width:40, height:40, borderRadius:12, background:`${act.color}15`, color:act.color, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                    <ActionIcon size={20} />
+                  </div>
+                  <div style={{ flex:1 }}>
+                    <div style={{ fontWeight:600, fontSize:13, color:'#0F172A' }}>{act.label}</div>
+                    <div style={{ fontSize:11, color:'#94A3B8', marginTop:1 }}>{act.sub}</div>
+                  </div>
+                  <ChevronRight size={18} style={{ color:'#CBD5E1' }} />
+                </a>
+              );
+            })}
           </div>
         </div>
       </div>

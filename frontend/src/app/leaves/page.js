@@ -6,6 +6,7 @@ import Drawer from '@/components/ui/Drawer';
 import Modal from '@/components/ui/Modal';
 import { useToast } from '@/components/ui/Toast';
 import { ScoreGauge } from '@/components/charts/Charts';
+import { Search, Check, X, Eye, AlertTriangle, ArrowRight, XCircle, CheckCircle2 } from 'lucide-react';
 
 const TABS = ['All','Pending','Approved','Rejected'];
 
@@ -57,29 +58,37 @@ export default function HRLeavesPage() {
         </div>
       </div>
 
-      {/* Glass Filter Bar */}
-      <div className="glass p-20 mb-20" style={{ borderRadius:'var(--radius-lg)', animation:'slide-down 300ms ease-out both', display:'flex', flexWrap:'wrap', gap:12, alignItems:'center' }}>
-        <div className="search-wrapper flex-1" style={{ minWidth:200 }}>
-          <span className="search-icon">🔍</span>
-          <input className="input input-glass" placeholder="Search employee..." style={{ minWidth:180 }} />
+      {/* Filter Bar */}
+      <div className="card mb-20" style={{ padding:'16px 20px', borderRadius:20 }}>
+        <div style={{ display:'flex', flexWrap:'wrap', gap:12, alignItems:'center' }}>
+          <div className="search-wrapper flex-1" style={{ minWidth:200 }}>
+            <span className="search-icon" style={{ display:'flex', alignItems:'center' }}>
+              <Search size={15} />
+            </span>
+            <input className="input" placeholder="Search employee..." style={{ borderRadius:20 }} />
+          </div>
+          {[
+            { label:'Leave Type', w:140 },
+            { label:'Status', w:120 },
+            { label:'Department', w:140 },
+          ].map((f, i) => (
+            <select key={i} className="input" style={{ width:f.w, borderRadius:20 }}><option>{f.label}</option></select>
+          ))}
+          <input type="date" className="input" style={{ width:150, borderRadius:20 }} />
+          <button className="btn btn-ghost btn-sm">Clear</button>
         </div>
-        {[
-          { label:'Leave Type ▾', w:140 },
-          { label:'Status ▾', w:120 },
-          { label:'Department ▾', w:140 },
-        ].map((f, i) => (
-          <select key={i} className="input" style={{ width:f.w }}><option>{f.label}</option></select>
-        ))}
-        <input type="date" className="input" style={{ width:150 }} />
-        <button className="btn btn-ghost btn-sm">Clear ✕</button>
       </div>
 
       {/* Bulk bar */}
       {checkedRows.length > 0 && (
         <div className="bulk-bar">
           <strong>{checkedRows.length} selected</strong>
-          <button className="btn btn-ghost-success btn-sm" onClick={() => toast({ message:`Approved ${checkedRows.length} requests`, type:'success' })}>✓ Approve All</button>
-          <button className="btn btn-ghost-danger btn-sm" onClick={() => toast({ message:`Rejected ${checkedRows.length} requests`, type:'error' })}>✕ Reject All</button>
+          <button className="btn btn-ghost-success btn-sm" onClick={() => toast({ message:`Approved ${checkedRows.length} requests`, type:'success' })}>
+            <Check size={14} /> Approve All
+          </button>
+          <button className="btn btn-ghost-danger btn-sm" onClick={() => toast({ message:`Rejected ${checkedRows.length} requests`, type:'error' })}>
+            <X size={14} /> Reject All
+          </button>
           <button className="btn btn-ghost btn-sm" onClick={() => setCheckedRows([])}>Clear</button>
         </div>
       )}
@@ -136,18 +145,26 @@ export default function HRLeavesPage() {
                 </td>
                 <td>
                   {leave.ai_flagged && (
-                    <span className="ai-flag-chip" title={`Score: ${leave.ai_score}`}>⚠ AI Flagged</span>
+                    <span className="ai-flag-chip" title={`Score: ${leave.ai_score}`}>
+                      <AlertTriangle size={12} /> AI Flagged
+                    </span>
                   )}
                 </td>
                 <td onClick={e => e.stopPropagation()}>
                   <div className="flex gap-6">
                     {leave.status === 'Pending' && (
                       <>
-                        <button className="btn btn-ghost-success btn-sm" onClick={() => { setSelected(leave); setApproveModal(true); }}>✓</button>
-                        <button className="btn btn-ghost-danger btn-sm" onClick={() => { setSelected(leave); setRejectModal(true); }}>✕</button>
+                        <button className="btn btn-ghost-success btn-sm btn-icon" onClick={() => { setSelected(leave); setApproveModal(true); }}>
+                          <Check size={14} />
+                        </button>
+                        <button className="btn btn-ghost-danger btn-sm btn-icon" onClick={() => { setSelected(leave); setRejectModal(true); }}>
+                          <X size={14} />
+                        </button>
                       </>
                     )}
-                    <button className="btn btn-ghost btn-sm" onClick={() => openDrawer(leave)}>👁</button>
+                    <button className="btn btn-ghost btn-sm btn-icon" onClick={() => openDrawer(leave)}>
+                      <Eye size={14} />
+                    </button>
                   </div>
                 </td>
               </tr>
@@ -156,7 +173,7 @@ export default function HRLeavesPage() {
         </table>
       </div>
 
-      {/* HR Leave Detail Drawer (Screen 09) */}
+      {/* HR Leave Detail Drawer */}
       <Drawer isOpen={drawerOpen} onClose={() => setDrawerOpen(false)} title={`Leave #${selected?.id}`} width={500}>
         {selected && (
           <div>
@@ -197,7 +214,7 @@ export default function HRLeavesPage() {
             {selected.ai_flagged && (
               <div className="mb-20" style={{ background:'rgba(245,158,11,0.06)', border:'1px solid rgba(245,158,11,0.2)', borderRadius:12, padding:16, animation:'card-in 300ms ease-out both' }}>
                 <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:12 }}>
-                  <span style={{ fontSize:20 }}>⚠️</span>
+                  <AlertTriangle size={18} color="#D97706" />
                   <span style={{ fontWeight:700, fontSize:14, color:'#92400E' }}>AI Anomaly Detected</span>
                   <span style={{ marginLeft:'auto' }}><span className="pill pill-high">HIGH RISK</span></span>
                 </div>
@@ -206,11 +223,13 @@ export default function HRLeavesPage() {
                   <ScoreGauge score={selected.ai_score} />
                 </div>
                 {selected.ai_reasons?.map((r, i) => (
-                  <div key={i} style={{ fontSize:12, color:'var(--text-muted)', padding:'4px 0', borderTop: i > 0 ? '1px solid rgba(0,0,0,0.05)' : 'none', animation:`card-in 300ms ease-out ${i*50}ms both` }}>
+                  <div key={i} style={{ fontSize:12, color:'var(--text-muted)', padding:'4px 0', borderTop: i > 0 ? '1px solid rgba(0,0,0,0.05)' : 'none' }}>
                     · {r}
                   </div>
                 ))}
-                <a href="/ai-insights" className="text-accent text-sm text-semibold" style={{ display:'block', marginTop:12 }}>View Full AI Report →</a>
+                <a href="/ai-insights" className="text-accent text-sm text-semibold flex items-center gap-4 mt-12">
+                  View Full AI Report <ArrowRight size={14} />
+                </a>
               </div>
             )}
 
@@ -218,10 +237,10 @@ export default function HRLeavesPage() {
             {selected.status === 'Pending' && (
               <div style={{ paddingTop:20, borderTop:'1px solid var(--border)', display:'flex', flexDirection:'column', gap:10 }}>
                 <button className="btn btn-success" style={{ justifyContent:'center' }} onClick={() => setApproveModal(true)}>
-                  ✓ Approve Leave
+                  <Check size={16} /> Approve Leave
                 </button>
                 <button className="btn btn-ghost-danger" style={{ justifyContent:'center' }} onClick={() => setRejectModal(true)}>
-                  ✕ Reject Leave
+                  <X size={16} /> Reject Leave
                 </button>
               </div>
             )}
@@ -229,7 +248,7 @@ export default function HRLeavesPage() {
         )}
       </Drawer>
 
-      {/* Approve Modal (Screen 19) */}
+      {/* Approve Modal */}
       <Modal isOpen={approveModal} onClose={() => setApproveModal(false)} title="Approve Leave Request" width={400}>
         <p className="text-muted mb-16" style={{ fontSize:14 }}>
           You are approving <strong>{selected?.days} days</strong> of <strong>{selected?.type}</strong> for <strong>{selected?.employee}</strong> ({selected?.from} – {selected?.to}). This cannot be undone.
@@ -246,12 +265,12 @@ export default function HRLeavesPage() {
         <div className="flex gap-10 justify-between">
           <button className="btn btn-ghost" onClick={() => setApproveModal(false)}>Cancel</button>
           <button className={`btn btn-success ${loading ? 'btn-disabled' : ''}`} onClick={handleApprove} id="confirm-approve">
-            {loading ? <span style={{ animation:'spin 0.8s linear infinite', display:'inline-block' }}>⟳</span> : '✓ Confirm Approval'}
+            {loading ? 'Processing...' : 'Confirm Approval'}
           </button>
         </div>
       </Modal>
 
-      {/* Reject Modal (Screen 20) */}
+      {/* Reject Modal */}
       <Modal isOpen={rejectModal} onClose={() => setRejectModal(false)} title="Reject Leave Request" width={420}>
         <p className="text-muted mb-16" style={{ fontSize:14 }}>
           Rejecting leave request for <strong>{selected?.employee}</strong>.
@@ -276,7 +295,7 @@ export default function HRLeavesPage() {
             onClick={handleReject}
             disabled={!rejectReason}
           >
-            {loading ? <span style={{ animation:'spin 0.8s linear infinite', display:'inline-block' }}>⟳</span> : '✕ Confirm Rejection'}
+            {loading ? 'Processing...' : 'Confirm Rejection'}
           </button>
         </div>
       </Modal>

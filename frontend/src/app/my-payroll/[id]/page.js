@@ -2,6 +2,7 @@
 import { payslipDetail } from '@/lib/mockData';
 import { useCounter } from '@/hooks/useCounter';
 import { useToast } from '@/components/ui/Toast';
+import { Download, Share2, CreditCard, ChevronRight } from 'lucide-react';
 
 export default function PayslipDetailPage({ params }) {
   const d = payslipDetail;
@@ -11,7 +12,7 @@ export default function PayslipDetailPage({ params }) {
   const handleDownload = async () => {
     toast({ message:'Preparing PDF download...', type:'info' });
     await new Promise(r => setTimeout(r, 1500));
-    toast({ message:'Payslip downloaded successfully! ✓', type:'success' });
+    toast({ message:'Payslip downloaded successfully!', type:'success' });
   };
 
   return (
@@ -19,14 +20,18 @@ export default function PayslipDetailPage({ params }) {
       {/* Breadcrumb */}
       <div className="breadcrumb">
         <a href="/my-payroll">Payroll</a>
-        <span className="breadcrumb-sep">›</span>
+        <span className="breadcrumb-sep"><ChevronRight size={14} /></span>
         <span>{d.period}</span>
       </div>
       <div className="page-header">
         <h1 className="page-title">Payslip — {d.period}</h1>
         <div className="flex gap-10">
-          <button className="btn btn-ghost" onClick={handleDownload}>⬇ Download PDF</button>
-          <button className="btn btn-ghost">↗ Share</button>
+          <button className="btn btn-ghost" onClick={handleDownload}>
+            <Download size={14} /> Download PDF
+          </button>
+          <button className="btn btn-ghost">
+            <Share2 size={14} /> Share
+          </button>
         </div>
       </div>
 
@@ -34,10 +39,10 @@ export default function PayslipDetailPage({ params }) {
       <div style={{ maxWidth:700, margin:'0 auto' }}>
         <div className="card-glass" style={{ animation:'card-in 400ms ease-out 100ms both' }}>
           {/* Header */}
-          <div style={{ background:'linear-gradient(135deg, #6C63FF, #8B5CF6)', borderRadius:'var(--radius-lg) var(--radius-lg) 0 0', padding:'24px 32px', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+          <div style={{ background:'linear-gradient(135deg, #3B82F6, #8B5CF6)', borderRadius:'var(--radius-lg) var(--radius-lg) 0 0', padding:'24px 32px', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
             <div>
-              <div style={{ fontSize:20, fontWeight:800, color:'#fff', letterSpacing:'-0.02em' }}>⬡ Dayflow</div>
-              <div style={{ fontSize:12, color:'rgba(255,255,255,0.6)', marginTop:2 }}>Payslip</div>
+              <div style={{ fontSize:20, fontWeight:800, color:'#fff', letterSpacing:'-0.02em' }}>Dayflow HRMS</div>
+              <div style={{ fontSize:12, color:'rgba(255,255,255,0.7)', marginTop:2 }}>Official Payslip Statement</div>
             </div>
             <div style={{ textAlign:'right' }}>
               <div style={{ fontSize:14, fontWeight:600, color:'#fff' }}>{d.period}</div>
@@ -99,7 +104,7 @@ export default function PayslipDetailPage({ params }) {
                   ₹{netCount.toLocaleString('en-IN')}
                 </div>
               </div>
-              <div style={{ fontSize:40 }}>💳</div>
+              <CreditCard size={36} color="#fff" />
             </div>
           </div>
         </div>

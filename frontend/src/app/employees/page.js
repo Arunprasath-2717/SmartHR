@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { employeesList, departments } from '@/lib/mockData';
 import Modal from '@/components/ui/Modal';
 import { useToast } from '@/components/ui/Toast';
+import { Search, UserPlus, ArrowRight } from 'lucide-react';
 
 export default function EmployeesPage() {
   const [search, setSearch] = useState('');
@@ -38,7 +39,9 @@ export default function EmployeesPage() {
         </div>
         <div className="page-header-right">
           <div className="search-wrapper">
-            <span className="search-icon">🔍</span>
+            <span className="search-icon" style={{ display:'flex', alignItems:'center' }}>
+              <Search size={15} />
+            </span>
             <input
               id="employee-search"
               className="input"
@@ -57,7 +60,7 @@ export default function EmployeesPage() {
             {departments.map(d => <option key={d}>{d}</option>)}
           </select>
           <button className="btn btn-primary" onClick={() => setShowModal(true)} id="add-employee-btn">
-            + Add Member
+            <UserPlus size={15} /> Add Member
           </button>
         </div>
       </div>
@@ -65,7 +68,9 @@ export default function EmployeesPage() {
       {/* Employee Cards Grid */}
       {filtered.length === 0 ? (
         <div className="empty-state">
-          <div className="empty-state-icon">🔍</div>
+          <div className="empty-state-icon text-muted">
+            <Search size={48} />
+          </div>
           <h3>No team members found</h3>
           <p>Try adjusting your search query or department filter.</p>
         </div>
@@ -97,7 +102,9 @@ export default function EmployeesPage() {
               </div>
               <div style={{ paddingTop:12, borderTop:'1px solid rgba(59,130,246,0.06)', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
                 <span className="text-muted text-xs text-truncate" style={{ maxWidth:150 }}>{emp.email}</span>
-                <span style={{ color:'#3B82F6', fontSize:14, fontWeight:700 }}>→</span>
+                <span style={{ color:'#3B82F6', fontSize:14, fontWeight:700, display:'flex', alignItems:'center' }}>
+                  <ArrowRight size={16} />
+                </span>
               </div>
             </a>
           ))}

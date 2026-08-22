@@ -6,6 +6,7 @@ import { getStatusClass } from '@/lib/utils';
 import Drawer from '@/components/ui/Drawer';
 import Modal from '@/components/ui/Modal';
 import { useToast } from '@/components/ui/Toast';
+import { CalendarDays, Check, X, Plus } from 'lucide-react';
 
 const STATUS_FILTERS = ['All','Pending','Approved','Rejected','Cancelled'];
 
@@ -41,7 +42,7 @@ export default function MyLeavesPage() {
           <p className="caption mt-4">Track and manage your leave requests</p>
         </div>
         <button className="btn btn-primary" onClick={() => toast({ message:'Leave application form coming soon!', type:'info' })}>
-          + Apply for Leave
+          <Plus size={15} /> Apply for Leave
         </button>
       </div>
 
@@ -80,10 +81,14 @@ export default function MyLeavesPage() {
       {/* Leave Requests Table */}
       {filtered.length === 0 ? (
         <div className="empty-state">
-          <div className="empty-state-icon">📅</div>
+          <div className="empty-state-icon text-muted">
+            <CalendarDays size={48} />
+          </div>
           <h3>No leave requests</h3>
           <p>Apply for your first leave to get started.</p>
-          <button className="btn btn-primary mt-16">Apply for Leave</button>
+          <button className="btn btn-primary mt-16">
+            <Plus size={15} /> Apply for Leave
+          </button>
         </div>
       ) : (
         <div className="card">
@@ -130,7 +135,7 @@ export default function MyLeavesPage() {
         </div>
       )}
 
-      {/* Leave Detail Drawer (Screen 07) */}
+      {/* Leave Detail Drawer */}
       <Drawer isOpen={drawerOpen} onClose={() => setDrawerOpen(false)} title={`Leave Request #${selectedLeave?.id}`} width={420}>
         {selectedLeave && (
           <div>
@@ -182,7 +187,7 @@ export default function MyLeavesPage() {
                         display:'flex', alignItems:'center', justifyContent:'center', fontSize:12, fontWeight:700,
                         ...(active ? { animation:'step-pulse 2s ease-in-out infinite' } : {}),
                       }}>
-                        {done ? '✓' : i + 1}
+                        {done ? <Check size={14} /> : i + 1}
                       </div>
                       <span style={{ fontSize:10, color:'var(--text-muted)', marginTop:4, whiteSpace:'nowrap' }}>{step}</span>
                     </div>
@@ -194,8 +199,10 @@ export default function MyLeavesPage() {
 
             {/* Rejection reason */}
             {selectedLeave.status === 'Rejected' && selectedLeave.rejection_reason && (
-              <div style={{ background:'var(--error-10)', border:'1px solid rgba(239,68,68,0.2)', borderRadius:12, padding:16, marginTop:16, animation:'slide-down 200ms ease' }}>
-                <div style={{ fontWeight:700, color:'var(--error)', marginBottom:6 }}>❌ Rejected</div>
+              <div style={{ background:'var(--error-10)', border:'1px solid rgba(239,68,68,0.2)', borderRadius:12, padding:16, marginTop:16 }}>
+                <div style={{ fontWeight:700, color:'var(--error)', marginBottom:6, display:'flex', alignItems:'center', gap:6 }}>
+                  <X size={16} /> Rejected
+                </div>
                 <div style={{ fontSize:13, color:'var(--text-muted)' }}>Reason: {selectedLeave.rejection_reason}</div>
               </div>
             )}
@@ -203,7 +210,9 @@ export default function MyLeavesPage() {
             {/* Approved callout */}
             {selectedLeave.status === 'Approved' && (
               <div style={{ background:'var(--success-10)', border:'1px solid rgba(34,197,94,0.2)', borderRadius:12, padding:16, marginTop:16 }}>
-                <div style={{ fontWeight:700, color:'var(--success)' }}>✓ Approved</div>
+                <div style={{ fontWeight:700, color:'var(--success)', display:'flex', alignItems:'center', gap:6 }}>
+                  <Check size={16} /> Approved
+                </div>
               </div>
             )}
 

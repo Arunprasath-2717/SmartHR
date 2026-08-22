@@ -4,6 +4,7 @@ import { anomalies } from '@/lib/mockData';
 import { ScoreGauge } from '@/components/charts/Charts';
 import { useCounter } from '@/hooks/useCounter';
 import Drawer from '@/components/ui/Drawer';
+import { ShieldAlert, Search, AlertTriangle, AlertCircle, ArrowRight } from 'lucide-react';
 
 const RISK_FILTERS = ['All','HIGH','MEDIUM','LOW'];
 
@@ -51,7 +52,7 @@ function AnomalyCard({ anomaly, onClick, index }) {
 
       {/* Event Type */}
       <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:16, padding:'10px 14px', background:'rgba(59,130,246,0.04)', borderRadius:10, border:'1px solid rgba(59,130,246,0.08)' }}>
-        <span>{anomaly.risk_level === 'HIGH' ? '🔴' : anomaly.risk_level === 'MEDIUM' ? '🟡' : '🟢'}</span>
+        <AlertTriangle size={16} color={borderAccent} />
         <span style={{ fontSize:13, fontWeight:600, color:'#0F172A' }}>{anomaly.event_type}</span>
       </div>
 
@@ -73,7 +74,9 @@ function AnomalyCard({ anomaly, onClick, index }) {
       {/* Footer */}
       <div className="flex justify-between items-center" style={{ borderTop:'1px solid rgba(59,130,246,0.06)', paddingTop:12 }}>
         <span style={{ fontSize:11, color:'#94A3B8' }}>{anomaly.created_at}</span>
-        <span className="text-accent text-xs text-semibold">Analyze Anomaly →</span>
+        <span className="text-accent text-xs text-semibold flex items-center gap-4">
+          Analyze Anomaly <ArrowRight size={13} />
+        </span>
       </div>
     </div>
   );
@@ -116,13 +119,14 @@ export default function AIInsightsPage() {
                 className={`filter-pill ${riskFilter === r ? 'active' : ''}`}
                 onClick={() => setRiskFilter(r)}
               >
-                {r === 'HIGH' ? '🔴' : r === 'MEDIUM' ? '🟡' : r === 'LOW' ? '🟢' : ''}
                 {r === 'All' ? 'All Risks' : ` ${r}`}
               </button>
             ))}
           </div>
           <div className="search-wrapper ml-auto">
-            <span className="search-icon">🔍</span>
+            <span className="search-icon" style={{ display:'flex', alignItems:'center' }}>
+              <Search size={15} />
+            </span>
             <input className="input" placeholder="Search employee..." value={search} onChange={e => setSearch(e.target.value)} style={{ width:220, borderRadius:20 }} />
           </div>
         </div>
@@ -152,7 +156,9 @@ export default function AIInsightsPage() {
       {/* Anomaly Grid */}
       {filtered.length === 0 ? (
         <div className="empty-state">
-          <div className="empty-state-icon">🛡️</div>
+          <div className="empty-state-icon text-muted">
+            <ShieldAlert size={48} />
+          </div>
           <h3>System Normal</h3>
           <p>No workforce anomalies matching your filter selection.</p>
         </div>
@@ -184,7 +190,7 @@ export default function AIInsightsPage() {
                 color: selected.risk_level === 'HIGH' ? '#991B1B' : '#92400E',
                 fontWeight:800, fontSize:14,
               }}>
-                <span>{selected.risk_level === 'HIGH' ? '🔴' : '🟡'}</span>
+                <AlertCircle size={18} />
                 {selected.risk_level} RISK ANOMALY DETECTED
               </div>
             </div>

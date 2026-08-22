@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useToast } from '@/components/ui/Toast';
+import { Lock, Check, Heart, Hexagon } from 'lucide-react';
 
 const NAV_ITEMS = ['Profile', 'Notifications', 'Security', 'About'];
 
@@ -90,7 +91,7 @@ export default function SettingsPage() {
                       </label>
                       <div style={{ position:'relative' }}>
                         <input
-                          className={`input ${!field.editable ? '' : ''}`}
+                          className="input"
                           value={form[field.key]}
                           readOnly={!field.editable}
                           onChange={e => handleChange(field.key, e.target.value)}
@@ -101,10 +102,14 @@ export default function SettingsPage() {
                           }}
                         />
                         {!field.editable && (
-                          <span style={{ position:'absolute', right:12, top:'50%', transform:'translateY(-50%)', fontSize:11, color:'var(--text-light)' }}>🔒</span>
+                          <span style={{ position:'absolute', right:12, top:'50%', transform:'translateY(-50%)', color:'var(--text-light)', display:'flex', alignItems:'center' }}>
+                            <Lock size={14} />
+                          </span>
                         )}
                         {field.editable && saved === field.key && (
-                          <span style={{ position:'absolute', right:12, top:'50%', transform:'translateY(-50%)', fontSize:11, color:'var(--success)', fontWeight:600, animation:'card-in 200ms ease-out both' }}>✓ Saved</span>
+                          <span style={{ position:'absolute', right:12, top:'50%', transform:'translateY(-50%)', fontSize:11, color:'var(--success)', fontWeight:600, display:'flex', alignItems:'center', gap:4 }}>
+                            <Check size={14} /> Saved
+                          </span>
                         )}
                       </div>
                     </div>
@@ -117,11 +122,7 @@ export default function SettingsPage() {
                     disabled={!dirty}
                     onClick={handleSave}
                   >
-                    {saving ? (
-                      <span style={{ display:'flex', alignItems:'center', gap:8 }}>
-                        <span style={{ animation:'spin 0.8s linear infinite', display:'inline-block' }}>⟳</span> Saving...
-                      </span>
-                    ) : 'Save Changes'}
+                    {saving ? 'Saving...' : 'Save Changes'}
                   </button>
                 </div>
               </div>
@@ -167,12 +168,14 @@ export default function SettingsPage() {
           )}
 
           {activeNav === 'About' && (
-            <div className="card p-32 text-center">
-              <div style={{ fontSize:56, marginBottom:16 }}>⬡</div>
+            <div className="card p-32 text-center" style={{ display:'flex', flexDirection:'column', alignItems:'center' }}>
+              <Hexagon size={48} color="var(--accent)" style={{ marginBottom:16 }} />
               <div style={{ fontSize:24, fontWeight:800, letterSpacing:'-0.02em', marginBottom:8 }}>DayFlow HRMS</div>
               <div className="caption mb-4">Version 1.0.0</div>
               <div className="caption">Human Resource Management System</div>
-              <div className="caption mt-4">Built with ❤️ using Next.js</div>
+              <div className="caption mt-4 flex items-center gap-4 justify-center">
+                Built with <Heart size={14} color="#EF4444" fill="#EF4444" /> using Next.js
+              </div>
             </div>
           )}
         </div>
