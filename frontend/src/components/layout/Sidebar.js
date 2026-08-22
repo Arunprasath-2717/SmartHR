@@ -1,6 +1,7 @@
 'use client';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect, useRef } from 'react';
+import { useAuth } from '@/context/AuthContext';
 import {
   LayoutDashboard,
   Users,
@@ -14,7 +15,8 @@ import {
   Settings,
   X,
   ArrowRight,
-  Sparkles
+  Sparkles,
+  User
 } from 'lucide-react';
 import styles from './Sidebar.module.css';
 
@@ -51,7 +53,8 @@ const navGroups = [
     label: 'Account',
     color: '#10B981',
     items: [
-      { id:'settings', href:'/settings', icon: Settings, label:'Settings', roles:['hr','employee'] },
+      { id:'profile',  href:'/profile',  icon: User,     label:'My Profile', roles:['hr','employee'] },
+      { id:'settings', href:'/settings', icon: Settings, label:'Settings',   roles:['hr','employee'] },
     ],
   },
 ];
@@ -59,9 +62,12 @@ const navGroups = [
 export default function Sidebar({ role = 'hr' }) {
   const pathname = usePathname();
   const router   = useRouter();
+  const { user: authUser } = useAuth();
+
   const [indicatorY, setIndicatorY]    = useState(0);
   const [indicatorH, setIndicatorH]    = useState(0);
   const [indicatorVisible, setVisible] = useState(false);
+  const [showPromo, setShowPromo]     = useState(true);
   const navRef = useRef(null);
 
   const filteredGroups = navGroups.map(g => ({
@@ -83,21 +89,21 @@ export default function Sidebar({ role = 'hr' }) {
     setVisible(true);
   }, [pathname, active]);
 
-  const user = role === 'hr'
+  const user = authUser || (role === 'hr'
     ? { name:'Carla Sanford', title:'HR Officer', initials:'CS', dept:'Human Resources' }
-    : { name:'John Doe',      title:'Software Engineer', initials:'JD', dept:'Engineering' };
+    : { name:'John Doe',      title:'Software Engineer', initials:'JD', dept:'Engineering' });
 
   return (
     <aside className={styles.sidebar}>
       {/* User Profile Header */}
-      <div className={styles.profileSection}>
+      <div className={styles.profileSection} onClick={() => router.push('/profile')} style={{ cursor: 'pointer' }}>
         <div className={styles.avatarRing}>
-          <div className={styles.avatarInner}>{user.initials}</div>
+          <div className={styles.avatarInner}>{user.initials || 'CS'}</div>
           <div className={styles.onlineDot} />
         </div>
         <div className={styles.profileInfo}>
-          <span className={styles.profileName}>{user.name}</span>
-          <span className={styles.profileTitle}>{user.title}</span>
+          <span className={styles.profileName}>{user.name || 'User'}</span>
+          <span className={styles.profileTitle}>{user.title || user.role?.toUpperCase()}</span>
         </div>
       </div>
 
@@ -138,22 +144,24 @@ export default function Sidebar({ role = 'hr' }) {
         ))}
       </nav>
 
-      {/* AI Promo Card at Bottom */}
-      <div className={styles.promoCard}>
-        <button className={styles.promoClose} aria-label="Close">
-          <X size={14} />
-        </button>
-        <div className={styles.promoRobot}>
-          <Sparkles size={24} />
+      {/* AI Promo Card at Bottom (HR only) */}
+      {role === 'hr' && showPromo && (
+        <div className={styles.promoCard}>
+          <button className={styles.promoClose} onClick={() => setShowPromo(false)} aria-label="Close">
+            <X size={14} />
+          </button>
+          <div className={styles.promoRobot}>
+            <Sparkles size={24} />
+          </div>
+          <div className={styles.promoText}>
+            <strong>Try AI Insights</strong>
+            <span>Detect anomalies automatically</span>
+          </div>
+          <button className={styles.promoBtn} onClick={() => router.push('/ai-insights')}>
+            Explore <ArrowRight size={13} style={{ marginLeft: 2 }} />
+          </button>
         </div>
-        <div className={styles.promoText}>
-          <strong>Try AI Insights</strong>
-          <span>Detect anomalies automatically</span>
-        </div>
-        <button className={styles.promoBtn} onClick={() => router.push('/ai-insights')}>
-          Explore <ArrowRight size={13} style={{ marginLeft: 2 }} />
-        </button>
-      </div>
+      )}
     </aside>
   );
 }
