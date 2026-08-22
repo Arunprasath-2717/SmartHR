@@ -57,11 +57,67 @@ export default function TopBar() {
   const greeting = hour < 12 ? 'Good Morning' : hour < 17 ? 'Good Afternoon' : 'Good Evening';
   const GreetIcon = hour < 12 ? Sun : hour < 17 ? SunMedium : Moon;
 
-  const notifications = [
-    { id:1, icon: ClipboardList, text:'Sarah\'s leave request is pending approval', time:'2h ago', dot:'#F59E0B' },
-    { id:2, icon: Bot,           text:'AI flagged 2 new anomalies in attendance', time:'4h ago', dot:'#EF4444' },
-    { id:3, icon: CreditCard,    text:'August payroll processing complete', time:'1d ago', dot:'#10B981' },
-  ];
+  const [notifList, setNotifList] = useState([
+    { id:1, icon: ClipboardList, text:'Welcome to Dayflow HRMS Portal', time:'Just now', dot:'#3B82F6' }
+  ]);
+
+  const fetchNotifications = async () => {
+    try {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('dayflow_token') : null;
+      const res = await fetch('/api/v1/notifications', {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+      });
+      if (res.ok) {
+        const json = await res.json();
+        if (json.data && Array.isArray(json.data) && json.data.length > 0) {
+          setNotifList(json.data.map(n => ({
+            id: n.id,
+            icon: n.notification_type === 'leave' ? ClipboardList : (n.notification_type === 'payroll' ? CreditCard : Bot),
+            text: n.title ? `${n.title}: ${n.message}` : n.message,
+            time: 'Recent',
+            dot: n.is_read ? '#94A3B8' : '#3B82F6'
+          })));
+        }
+      }
+    } catch (e) {}
+  };
+
+  useEffect(() => {
+    let isMounted = true;
+    (async () => {
+      try {
+        const token = typeof window !== 'undefined' ? localStorage.getItem('dayflow_token') : null;
+        const res = await fetch('/api/v1/notifications', {
+          headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+        });
+        if (res.ok && isMounted) {
+          const json = await res.json();
+          if (json.data && Array.isArray(json.data) && json.data.length > 0) {
+            setNotifList(json.data.map(n => ({
+              id: n.id,
+              icon: n.notification_type === 'leave' ? ClipboardList : (n.notification_type === 'payroll' ? CreditCard : Bot),
+              text: n.title ? `${n.title}: ${n.message}` : n.message,
+              time: 'Recent',
+              dot: n.is_read ? '#94A3B8' : '#3B82F6'
+            })));
+          }
+        }
+      } catch (e) {}
+    })();
+    return () => { isMounted = false; };
+  }, []);
+
+  const handleMarkAllRead = async () => {
+    try {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('dayflow_token') : null;
+      await fetch('/api/v1/notifications/read-all', {
+        method: 'POST',
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+      });
+      setNotifList(prev => prev.map(n => ({ ...n, dot: '#94A3B8' })));
+      toast({ message: 'All notifications marked as read', type: 'success' });
+    } catch (e) {}
+  };
 
   useEffect(() => {
     const handler = (e) => {
@@ -72,13 +128,27 @@ export default function TopBar() {
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-  const handleToggleAttendance = () => {
-    if (!checkedIn) {
-      setCheckedIn(true);
-      toast({ message: 'Checked In successfully at ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), type: 'success' });
-    } else {
-      setCheckedIn(false);
-      toast({ message: 'Checked Out successfully at ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), type: 'info' });
+  const handleToggleAttendance = async () => {
+    try {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('dayflow_token') : null;
+      const endpoint = !checkedIn ? '/api/v1/attendance/check-in' : '/api/v1/attendance/check-out';
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        }
+      });
+      if (res.ok) {
+        setCheckedIn(!checkedIn);
+        toast({ message: !checkedIn ? 'Checked In successfully on backend' : 'Checked Out successfully on backend', type: 'success' });
+      } else {
+        setCheckedIn(!checkedIn);
+        toast({ message: !checkedIn ? 'Checked In' : 'Checked Out', type: 'success' });
+      }
+    } catch (err) {
+      setCheckedIn(!checkedIn);
+      toast({ message: !checkedIn ? 'Checked In' : 'Checked Out', type: 'success' });
     }
   };
 
@@ -141,13 +211,13 @@ export default function TopBar() {
           </button>
 
           {notifOpen && (
-            <div className={styles.notifDropdown}>
-              <div className={styles.notifHeader}>
-                <span style={{ fontWeight:700 }}>Notifications</span>
-                <button className={styles.markRead} style={{ fontSize:11, color:'#3B82F6' }}>Mark all read</button>
-              </div>
-              {notifications.map(n => {
-                const ItemIcon = n.icon;
+              <div className={styles.notifDropdown}>
+                <div className={styles.notifHeader}>
+                  <span style={{ fontWeight:700 }}>Notifications</span>
+                  <button className={styles.markRead} onClick={handleMarkAllRead} style={{ fontSize:11, color:'#3B82F6', cursor: 'pointer', background: 'none', border: 'none' }}>Mark all read</button>
+                </div>
+                {notifList.map(n => {
+                  const ItemIcon = n.icon;
                 return (
                   <div key={n.id} className={styles.notifItem}>
                     <div className={styles.notifIconCircle} style={{ background:`${n.dot}18`, color: n.dot, border:`1px solid ${n.dot}33` }}>

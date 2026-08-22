@@ -1,4 +1,5 @@
 'use client';
+import { useState, useEffect, use } from 'react';
 import { payslipDetail } from '@/lib/mockData';
 import { useCounter } from '@/hooks/useCounter';
 import { useToast } from '@/components/ui/Toast';
@@ -6,9 +7,41 @@ import Link from 'next/link';
 import { Download, Share2, CreditCard, ChevronRight } from 'lucide-react';
 
 export default function PayslipDetailPage({ params }) {
-  const d = payslipDetail;
-  const netCount = useCounter(d.net, 1400, 0, true);
+  const resolvedParams = use ? use(params) : params;
+  const payrollId = resolvedParams?.id || 1;
+  const [slip, setSlip] = useState(payslipDetail);
   const toast = useToast();
+
+  useEffect(() => {
+    let isMounted = true;
+    (async () => {
+      try {
+        const token = typeof window !== 'undefined' ? localStorage.getItem('dayflow_token') : null;
+        const res = await fetch(`/api/v1/payroll/${payrollId}`, {
+          headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+        });
+        if (res.ok && isMounted) {
+          const json = await res.json();
+          const p = json.data;
+          if (p) {
+            setSlip({
+              ...payslipDetail,
+              employee_name: p.employee_name || 'Alice Employee',
+              basic: p.basic_salary,
+              allowances: p.allowances,
+              total_deductions: p.deductions,
+              gross: p.basic_salary + p.allowances,
+              net: p.net_salary
+            });
+          }
+        }
+      } catch (e) {}
+    })();
+    return () => { isMounted = false; };
+  }, [payrollId]);
+
+  const d = slip;
+  const netCount = useCounter(d.net, 1400, 0, true);
 
   const handleDownload = async () => {
     toast({ message:'Preparing PDF download...', type:'info' });

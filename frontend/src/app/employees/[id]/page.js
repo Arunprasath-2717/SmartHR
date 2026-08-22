@@ -1,4 +1,5 @@
 'use client';
+import { useState, useEffect, use } from 'react';
 import { employeeDetail } from '@/lib/mockData';
 import { useCounter } from '@/hooks/useCounter';
 import { LineChart } from '@/components/charts/Charts';
@@ -6,7 +7,40 @@ import Link from 'next/link';
 import { Pencil, Download, MoreHorizontal, ChevronRight, TrendingUp } from 'lucide-react';
 
 export default function EmployeeDetailPage({ params }) {
-  const d = employeeDetail;
+  const resolvedParams = use ? use(params) : params;
+  const empId = resolvedParams?.id || 1;
+  const [emp, setEmp] = useState(employeeDetail);
+
+  useEffect(() => {
+    let isMounted = true;
+    (async () => {
+      try {
+        const token = typeof window !== 'undefined' ? localStorage.getItem('dayflow_token') : null;
+        const res = await fetch(`/api/v1/employees/${empId}`, {
+          headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+        });
+        if (res.ok && isMounted) {
+          const json = await res.json();
+          const item = json.data;
+          if (item) {
+            setEmp({
+              ...employeeDetail,
+              id: `#EMP-00${item.id}`,
+              name: item.name,
+              email: item.work_email || item.email || `${item.name.toLowerCase().replace(' ', '.')}@company.com`,
+              phone: item.work_phone || item.phone || '+1-555-0100',
+              title: item.job_title || 'Software Engineer',
+              dept: item.department?.name || item.department_name || 'Engineering',
+              initials: (item.name || 'EM').split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()
+            });
+          }
+        }
+      } catch (e) {}
+    })();
+    return () => { isMounted = false; };
+  }, [empId]);
+
+  const d = emp;
   const attendanceRate = useCounter(d.attendance_rate, 1200, 1, true);
   const salary = useCounter(d.net_salary, 1200, 0, true);
 

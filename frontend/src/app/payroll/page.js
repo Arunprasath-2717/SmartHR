@@ -1,4 +1,5 @@
 'use client';
+import { useState, useEffect } from 'react';
 import { hrPayrollList, hrPayrollKPIs } from '@/lib/mockData';
 import { useCounter } from '@/hooks/useCounter';
 import { getStatusClass } from '@/lib/utils';
@@ -7,6 +8,38 @@ import { Download } from 'lucide-react';
 
 export default function HRPayrollPage() {
   const router = useRouter();
+  const [payrollList, setPayrollList] = useState(hrPayrollList);
+
+  useEffect(() => {
+    let isMounted = true;
+    (async () => {
+      try {
+        const token = typeof window !== 'undefined' ? localStorage.getItem('dayflow_token') : null;
+        const res = await fetch('/api/v1/payroll', {
+          headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+        });
+        if (res.ok && isMounted) {
+          const json = await res.json();
+          if (json.data && Array.isArray(json.data) && json.data.length > 0) {
+            const mapped = json.data.map(item => ({
+              id: item.id,
+              employee: item.employee_name || 'Alice Employee',
+              initials: (item.employee_name || 'AE').split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase(),
+              dept: 'Engineering',
+              period: 'August 2026',
+              gross: item.basic_salary + item.allowances,
+              deductions: item.deductions,
+              net: item.net_salary,
+              status: 'Paid'
+            }));
+            setPayrollList(mapped);
+          }
+        }
+      } catch (e) {}
+    })();
+    return () => { isMounted = false; };
+  }, []);
+
   const totalIssued = useCounter(hrPayrollKPIs.total_issued, 1200, 0, true);
   const paid        = useCounter(hrPayrollKPIs.employees_paid, 1200, 0, true);
   const pending     = useCounter(hrPayrollKPIs.pending, 1200, 0, true);

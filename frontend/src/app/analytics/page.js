@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { analyticsOverview, attendanceTrend, leaveAnalytics } from '@/lib/mockData';
 import { useCounter } from '@/hooks/useCounter';
 import { LineChart, DualLineChart, GroupedBarChart, DonutChart } from '@/components/charts/Charts';
@@ -11,12 +11,39 @@ const TABS = ['Overview','Attendance','Leave'];
 export default function AnalyticsPage() {
   const [tab, setTab] = useState('Overview');
   const [dept, setDept] = useState('All');
+  const [overview, setOverview] = useState(analyticsOverview);
 
-  const totalEmp   = useCounter(analyticsOverview.total_employees, 1200, 0, true);
-  const avgHours   = useCounter(analyticsOverview.avg_hours, 1200, 1, true);
-  const rate       = useCounter(analyticsOverview.attendance_rate, 1200, 1, true);
-  const pending    = useCounter(analyticsOverview.pending_leaves, 1200, 0, true);
-  const approved   = useCounter(analyticsOverview.approved_this_month, 1200, 0, true);
+  useEffect(() => {
+    let isMounted = true;
+    (async () => {
+      try {
+        const token = typeof window !== 'undefined' ? localStorage.getItem('dayflow_token') : null;
+        const res = await fetch('/api/v1/analytics/overview', {
+          headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+        });
+        if (res.ok && isMounted) {
+          const json = await res.json();
+          if (json.data) {
+            setOverview(prev => ({
+              ...prev,
+              total_employees: json.data.total_employees || prev.total_employees,
+              avg_hours: json.data.avg_hours || prev.avg_hours,
+              attendance_rate: json.data.attendance_rate || prev.attendance_rate,
+              pending_leaves: json.data.pending_leaves || prev.pending_leaves,
+              approved_this_month: json.data.approved_leaves || prev.approved_this_month
+            }));
+          }
+        }
+      } catch (e) {}
+    })();
+    return () => { isMounted = false; };
+  }, []);
+
+  const totalEmp   = useCounter(overview.total_employees, 1200, 0, true);
+  const avgHours   = useCounter(overview.avg_hours, 1200, 1, true);
+  const rate       = useCounter(overview.attendance_rate, 1200, 1, true);
+  const pending    = useCounter(overview.pending_leaves, 1200, 0, true);
+  const approved   = useCounter(overview.approved_this_month, 1200, 0, true);
 
   const leaveTotal   = useCounter(leaveAnalytics.total, 1200, 0, true);
   const leaveApp     = useCounter(leaveAnalytics.approved, 1200, 0, true);
