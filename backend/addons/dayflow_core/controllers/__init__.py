@@ -5,3 +5,4 @@ from . import health
 from . import auth
 from . import profile
 from . import employee
+from . import attendance
