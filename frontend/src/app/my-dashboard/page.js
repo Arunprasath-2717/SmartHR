@@ -149,21 +149,26 @@ export default function EmployeeDashboard() {
           </div>
           <div style={{ padding:'16px 24px' }}>
             <div className="timeline">
-              {d.recent_activity.map((item, i) => (
-                <div key={item.id} className="timeline-item" style={{ animation:`card-in 400ms ease-out ${i*60}ms both` }}>
-                  <div className="timeline-dot" style={{ background: item.color, boxShadow:`0 0 8px ${item.color}66` }} />
-                  <div className="timeline-line" />
-                  <div className="timeline-content">
-                    <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
-                      <div>
-                        <div style={{ fontWeight:600, fontSize:13, color:'#0F172A' }}>{item.title}</div>
-                        <div style={{ fontSize:12, color:'#64748B', marginTop:2 }}>{item.desc}</div>
+              {d.recent_activity.map((item, i) => {
+                const title = item.title || item.text || 'Activity Log';
+                const desc = item.desc || (item.type === 'checkin' ? 'Attendance logged' : (item.type === 'leave' ? 'Leave request updated' : (item.type === 'payroll' ? 'Payslip available' : 'System update')));
+                const dotColor = item.color || (item.type === 'checkin' ? '#10B981' : (item.type === 'leave' ? '#3B82F6' : (item.type === 'payroll' ? '#8B5CF6' : '#F59E0B')));
+                return (
+                  <div key={item.id || i} className="timeline-item" style={{ animation:`card-in 400ms ease-out ${i*60}ms both` }}>
+                    <div className="timeline-dot" style={{ background: dotColor, boxShadow:`0 0 8px ${dotColor}66` }} />
+                    <div className="timeline-line" />
+                    <div className="timeline-content">
+                      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
+                        <div>
+                          <div style={{ fontWeight:600, fontSize:13, color:'#0F172A' }}>{title}</div>
+                          <div style={{ fontSize:12, color:'#64748B', marginTop:2 }}>{desc}</div>
+                        </div>
+                        <span style={{ fontSize:11, color:'#94A3B8', flexShrink:0 }}>{item.time || 'Recent'}</span>
                       </div>
-                      <span style={{ fontSize:11, color:'#94A3B8', flexShrink:0 }}>{item.time}</span>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>

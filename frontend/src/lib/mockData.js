@@ -17,9 +17,9 @@ export const employeeDashboardData = {
   },
   net_salary: 82500,
   recent_activity: [
-    { id: 1, type: 'checkin', text: 'Checked in at 09:02 AM', time: 'Today', icon: 'Clock' },
-    { id: 2, type: 'leave', text: 'Annual leave approved for Sept 15', time: 'Yesterday', icon: 'CheckCircle2' },
-    { id: 3, type: 'payroll', text: 'August 2026 Payslip issued', time: '3 days ago', icon: 'CreditCard' }
+    { id: 1, type: 'checkin', title: 'Attendance Check-in', desc: 'Checked in at 09:02 AM', text: 'Checked in at 09:02 AM', time: 'Today', color: '#10B981', icon: 'Clock' },
+    { id: 2, type: 'leave', title: 'Leave Request Approved', desc: 'Annual leave approved for Sept 15', text: 'Annual leave approved for Sept 15', time: 'Yesterday', color: '#3B82F6', icon: 'CheckCircle2' },
+    { id: 3, type: 'payroll', title: 'Payslip Available', desc: 'August 2026 Payslip issued', text: 'August 2026 Payslip issued', time: '3 days ago', color: '#8B5CF6', icon: 'CreditCard' }
   ],
   weekly_attendance: [
     { day: 'Mon', hours: 8.5 },
