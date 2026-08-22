@@ -1,8 +1,15 @@
-# ==============================================================================
-# DAYFLOW - Backend Python Requirements (Phase 0)
-# ==============================================================================
-# Official Odoo 17 runtime dependencies are pre-installed in the base Odoo container image.
-#
-# Custom Python package dependencies required by Dayflow backend services
-# will be pinned here when introduced in future phases.
-# ==============================================================================
+fastapi==0.115.8
+uvicorn[standard]==0.34.0
+pydantic==2.10.6
+pydantic-settings==2.7.1
+sqlalchemy==2.0.38
+alembic==1.14.1
+psycopg2-binary==2.9.10
+asyncpg==0.30.0
+httpx==0.28.1
+passlib[bcrypt]==1.7.4
+python-jose[cryptography]==3.3.0
+python-multipart==0.0.20
+email-validator==2.2.0
+pytest==8.3.4
+pytest-asyncio==0.25.3

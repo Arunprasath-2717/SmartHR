@@ -1,14 +1,41 @@
 # ==============================================================================
-# DAYFLOW - Docker Compose Configuration (Phase 0)
+# DAYFLOW - Docker Compose Configuration (FastAPI + Go AI Service)
 # ==============================================================================
-# Services:
-#   - db: PostgreSQL 15 Database with persistent storage and health check
-#   - odoo: Odoo Community 17 with custom addons mount and persistent filestore
-# ==============================================================================
-
-version: '3.8'
-
 services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: dayflow_backend
+    restart: unless-stopped
+    environment:
+      ENVIRONMENT: production
+      DATABASE_URL: ${DATABASE_URL:-postgresql://dayflow_user:dayflow_password@db:5432/dayflow_db}
+      AI_SERVICE_URL: http://ai-service:8080
+      SECRET_KEY: ${SECRET_KEY:-dayflow_super_secret_jwt_key_for_dev_change_in_prod_12345}
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      ai-service:
+        condition: service_started
+    networks:
+      - dayflow_network
+
+  ai-service:
+    build:
+      context: ./ai-service
+      dockerfile: Dockerfile
+    container_name: dayflow_ai_service
+    restart: unless-stopped
+    environment:
+      AI_SERVICE_PORT: 8080
+    ports:
+      - "8080:8080"
+    networks:
+      - dayflow_network
+
   db:
     image: postgres:15-alpine
     container_name: dayflow_postgres
@@ -29,34 +56,10 @@ services:
     networks:
       - dayflow_network
 
-  odoo:
-    image: odoo:17.0
-    container_name: dayflow_odoo
-    restart: unless-stopped
-    depends_on:
-      db:
-        condition: service_healthy
-    environment:
-      HOST: ${ODOO_DB_HOST:-db}
-      PORT: ${ODOO_DB_PORT:-5432}
-      USER: ${ODOO_DB_USER:-dayflow_user}
-      PASSWORD: ${ODOO_DB_PASSWORD:-dayflow_password}
-    ports:
-      - "${ODOO_PORT:-8069}:8069"
-    volumes:
-      - ./backend/addons:/mnt/extra-addons
-      - ./backend/config/odoo.conf:/etc/odoo/odoo.conf
-      - odoo_data:/var/lib/odoo
-    networks:
-      - dayflow_network
-
 volumes:
   postgres_data:
     name: dayflow_postgres_data
-  odoo_data:
-    name: dayflow_odoo_data
 
 networks:
   dayflow_network:
-    name: dayflow_network
     driver: bridge
