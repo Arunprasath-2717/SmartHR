@@ -101,10 +101,11 @@ logs/
 filestore/
 sessions/
 
+# Docker Temporary Files
+.docker/
+
 # Node / Next.js
 node_modules/
-frontend/node_modules/
 .next/
-frontend/.next/
+out/
 scratch/
-
