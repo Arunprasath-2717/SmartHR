@@ -3,11 +3,6 @@ import { createContext, useContext, useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 
 const AuthContext = createContext(null);
-
-export function AuthProvider({ children }) {
-  const router = useRouter();
-  const pathname = usePathname();
-
 const DEFAULT_USER = {
   user_id: 10,
   employee_id: 101,
