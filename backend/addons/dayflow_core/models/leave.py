@@ -28,3 +28,5 @@ class DayflowLeave(models.Model):
         ('approved', 'Approved'),
         ('rejected', 'Rejected'),
     ], string='Status', default='pending', required=True)
+
+    approver_comments = fields.Text(string='Approver Comments')

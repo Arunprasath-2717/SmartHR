@@ -3,7 +3,7 @@ import json
 from datetime import datetime
 from odoo import http
 from odoo.http import request
-from .auth import get_authenticated_user
+from .auth import get_authenticated_user, resolve_user_role
 from .profile import get_user_employee
 from .common import (
     api_response,
@@ -12,6 +12,7 @@ from .common import (
     forbidden_response,
     not_found_response,
     bad_request_response,
+    conflict_response,
     validation_error_response,
     parse_pagination_params,
     handle_api_exceptions,
@@ -19,6 +20,14 @@ from .common import (
 
 VALID_LEAVE_TYPES = {'paid', 'sick', 'unpaid'}
 VALID_LEAVE_STATUSES = {'pending', 'approved', 'rejected'}
+
+
+def is_hr_authorized(user):
+    """
+    Checks whether the user has HR Officer or Administrator role.
+    """
+    role = resolve_user_role(user)
+    return role in ('hr_officer', 'administrator')
 
 
 def format_leave_data(leave):
@@ -34,6 +43,7 @@ def format_leave_data(leave):
 
     start_str = rec.start_date.strftime('%Y-%m-%d') if hasattr(rec.start_date, 'strftime') else str(rec.start_date)
     end_str = rec.end_date.strftime('%Y-%m-%d') if hasattr(rec.end_date, 'strftime') else str(rec.end_date)
+    approver_comments = getattr(rec, 'approver_comments', '') or ''
 
     return {
         "id": rec.id,
@@ -43,7 +53,8 @@ def format_leave_data(leave):
         "start_date": start_str,
         "end_date": end_str,
         "remarks": rec.remarks or "",
-        "status": rec.status
+        "status": rec.status,
+        "approver_comments": approver_comments
     }
 
 
@@ -158,26 +169,150 @@ class DayflowLeaveController(http.Controller):
         data = [format_leave_data(r) for r in records]
         return paginated_response(data, page=page, page_size=page_size, total=total_count, status=200)
 
-    @http.route('/api/v1/leave/<int:leave_id>', type='http', auth='public', methods=['GET'], csrf=False)
+    @http.route('/api/v1/admin/leave', type='http', auth='public', methods=['GET'], csrf=False)
     @handle_api_exceptions
-    def get_leave(self, leave_id, **kwargs):
+    def admin_list_leave(self, **kwargs):
         """
-        Retrieves a single leave request by ID.
-        Restricted to the employee who owns the request.
+        Retrieves paginated leave requests across all employees for HR Officers and Administrators.
         """
         user = get_authenticated_user()
         if not user:
             return unauthorized_response("Authentication required")
 
-        employee = get_user_employee(user)
-        if not employee or not employee.exists():
-            return not_found_response("Leave request not found")
+        if not is_hr_authorized(user):
+            return forbidden_response("HR Officer or Administrator role required")
+
+        page, page_size, offset, error_res = parse_pagination_params()
+        if error_res:
+            return error_res
+
+        domain = []
+        req_args = request.httprequest.args if request and hasattr(request, 'httprequest') else {}
+
+        status_filter = req_args.get('status')
+        if status_filter:
+            status_clean = str(status_filter).strip().lower()
+            if status_clean in VALID_LEAVE_STATUSES:
+                domain.append(('status', '=', status_clean))
+
+        emp_id_raw = req_args.get('employee_id')
+        if emp_id_raw:
+            try:
+                emp_id = int(emp_id_raw)
+                domain.append(('employee_id', '=', emp_id))
+            except (ValueError, TypeError):
+                pass
+
+        total_count = request.env['dayflow.leave'].sudo().search_count(domain)
+        records = request.env['dayflow.leave'].sudo().search(
+            domain,
+            offset=offset,
+            limit=page_size,
+            order='create_date desc, id desc'
+        )
+
+        data = [format_leave_data(r) for r in records]
+        return paginated_response(data, page=page, page_size=page_size, total=total_count, status=200)
+
+    @http.route('/api/v1/leave/<int:leave_id>', type='http', auth='public', methods=['GET'], csrf=False)
+    @handle_api_exceptions
+    def get_leave(self, leave_id, **kwargs):
+        """
+        Retrieves a single leave request by ID.
+        Allowed for HR Officers/Admins or the owning employee.
+        """
+        user = get_authenticated_user()
+        if not user:
+            return unauthorized_response("Authentication required")
 
         leave_rec = request.env['dayflow.leave'].sudo().browse(leave_id)
         if not leave_rec.exists():
             return not_found_response("Leave request not found")
 
-        if leave_rec.employee_id.id != employee.id:
-            return forbidden_response("Permission denied to access this leave request")
+        # Authorization: HR/Admin or Record Owner
+        if not is_hr_authorized(user):
+            employee = get_user_employee(user)
+            if not employee or leave_rec.employee_id.id != employee.id:
+                return forbidden_response("Permission denied to access this leave request")
 
+        return api_response(format_leave_data(leave_rec), status=200)
+
+    @http.route('/api/v1/leave/<int:leave_id>/approve', type='http', auth='public', methods=['POST'], csrf=False)
+    @handle_api_exceptions
+    def approve_leave(self, leave_id, **kwargs):
+        """
+        Approves a pending leave request (pending -> approved).
+        Restricted to HR Officers and Administrators.
+        """
+        user = get_authenticated_user()
+        if not user:
+            return unauthorized_response("Authentication required")
+
+        if not is_hr_authorized(user):
+            return forbidden_response("HR Officer or Administrator role required")
+
+        leave_rec = request.env['dayflow.leave'].sudo().browse(leave_id)
+        if not leave_rec.exists():
+            return not_found_response("Leave request not found")
+
+        if leave_rec.status != 'pending':
+            return conflict_response(
+                f"Leave request cannot be approved because current status is '{leave_rec.status}'",
+                details={"current_status": leave_rec.status, "required_status": "pending"}
+            )
+
+        comment = ""
+        try:
+            if request.httprequest.data:
+                payload = json.loads(request.httprequest.data.decode('utf-8'))
+                if isinstance(payload, dict):
+                    comment = payload.get('comment') or payload.get('approver_comments') or ""
+        except Exception:
+            pass
+
+        update_vals = {'status': 'approved'}
+        if comment:
+            update_vals['approver_comments'] = str(comment).strip()
+
+        leave_rec.sudo().write(update_vals)
+        return api_response(format_leave_data(leave_rec), status=200)
+
+    @http.route('/api/v1/leave/<int:leave_id>/reject', type='http', auth='public', methods=['POST'], csrf=False)
+    @handle_api_exceptions
+    def reject_leave(self, leave_id, **kwargs):
+        """
+        Rejects a pending leave request (pending -> rejected).
+        Restricted to HR Officers and Administrators.
+        """
+        user = get_authenticated_user()
+        if not user:
+            return unauthorized_response("Authentication required")
+
+        if not is_hr_authorized(user):
+            return forbidden_response("HR Officer or Administrator role required")
+
+        leave_rec = request.env['dayflow.leave'].sudo().browse(leave_id)
+        if not leave_rec.exists():
+            return not_found_response("Leave request not found")
+
+        if leave_rec.status != 'pending':
+            return conflict_response(
+                f"Leave request cannot be rejected because current status is '{leave_rec.status}'",
+                details={"current_status": leave_rec.status, "required_status": "pending"}
+            )
+
+        comment = ""
+        try:
+            if request.httprequest.data:
+                payload = json.loads(request.httprequest.data.decode('utf-8'))
+                if isinstance(payload, dict):
+                    comment = payload.get('comment') or payload.get('approver_comments') or ""
+        except Exception:
+            pass
+
+        update_vals = {'status': 'rejected'}
+        if comment:
+            update_vals['approver_comments'] = str(comment).strip()
+
+        leave_rec.sudo().write(update_vals)
         return api_response(format_leave_data(leave_rec), status=200)
