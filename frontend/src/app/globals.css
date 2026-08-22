@@ -8,52 +8,55 @@
 
 :root {
   /* ── New Color Palette (matching reference) ── */
-  --bg:               #EEF2FF;
-  --bg-alt:           #F1F5FF;
-  --sidebar-bg:       #FFFFFF;
+  --bg:               #F8FAFC; /* Off White */
+  --bg-alt:           #E2E8F0; /* Light Gray */
+  --sidebar-bg:       #0F172A; /* Deep Navy */
   --sidebar-w:        88px;
 
   /* Hero gradient (dark navy top zone) */
-  --hero-1:           #0B1E3D;
-  --hero-2:           #1A3A6B;
-  --hero-3:           #2563EB;
+  --hero-1:           #4F46E5;
+  --hero-2:           #2563EB;
+  --hero-3:           #7C3AED;
 
   /* Brand blues */
-  --accent:           #3B82F6;
-  --accent-light:     #DBEAFE;
-  --accent-dark:      #1D4ED8;
-  --accent-glow:      rgba(59,130,246,0.35);
+  --accent:           #4F46E5; /* Indigo */
+  --accent-light:     #E0E7FF; /* Primary Light */
+  --accent-dark:      #2563EB; /* Royal Blue */
+  --accent-glow:      rgba(79, 70, 229, 0.35);
 
   /* Semantic */
-  --success:          #10B981;
-  --success-light:    #D1FAE5;
-  --warning:          #F59E0B;
+  --success:          #22C55E; /* Success */
+  --success-light:    #CCFBF1; /* Teal Light */
+  --warning:          #F59E0B; /* Warning */
   --warning-light:    #FEF3C7;
-  --error:            #EF4444;
+  --error:            #EF4444; /* Error */
   --error-light:      #FEE2E2;
-  --purple:           #8B5CF6;
+  --info:             #0EA5E9; /* Info */
+  --purple:           #7C3AED; /* Violet */
   --purple-light:     #EDE9FE;
-  --teal:             #06B6D4;
-  --teal-light:       #CFFAFE;
+  --teal:             #14B8A6; /* Teal */
+  --teal-light:       #CCFBF1;
+  --pink:             #EC4899; /* Pink */
+  --pink-light:       #FCE7F3; /* Pink Light */
   --orange:           #F97316;
   --orange-light:     #FFEDD5;
 
   /* Cards / Surfaces */
   --card-bg:          #FFFFFF;
-  --card-shadow:      0 2px 8px rgba(59,130,246,0.06), 0 8px 32px rgba(0,0,0,0.06);
-  --card-shadow-hover:0 8px 24px rgba(59,130,246,0.16), 0 24px 56px rgba(0,0,0,0.12);
-  --card-shadow-3d:   0 20px 60px rgba(0,0,0,0.15), 0 4px 16px rgba(59,130,246,0.1);
+  --card-shadow:      0 2px 8px rgba(79, 70, 229, 0.06), 0 8px 32px rgba(0,0,0,0.04);
+  --card-shadow-hover:0 8px 24px rgba(79, 70, 229, 0.12), 0 24px 56px rgba(0,0,0,0.08);
+  --card-shadow-3d:   0 20px 60px rgba(0,0,0,0.12), 0 4px 16px rgba(79, 70, 229, 0.08);
 
   /* Text */
   --text-hero:        #FFFFFF;
-  --text-primary:     #0F172A;
-  --text-secondary:   #334155;
-  --text-muted:       #64748B;
+  --text-primary:     #1E293B; /* Charcoal */
+  --text-secondary:   #334155; /* Slate */
+  --text-muted:       #64748B; /* Cool Gray */
   --text-light:       #94A3B8;
 
   /* Borders */
-  --border:           rgba(59,130,246,0.08);
-  --border-med:       rgba(0,0,0,0.10);
+  --border:           #E2E8F0; /* Light Gray */
+  --border-med:       #CBD5E1;
 
   /* Radius */
   --r-sm:   8px;

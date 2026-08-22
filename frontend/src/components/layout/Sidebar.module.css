@@ -13,7 +13,7 @@
 .sidebar {
   width: 88px;
   height: 100vh;
-  background: #FFFFFF;
+  background: var(--sidebar-bg);
   position: fixed;
   left: 0; top: 0; bottom: 0;
   z-index: 1010;
@@ -23,7 +23,7 @@
   overflow-x: hidden;
 
   /* Subtle left border */
-  border-right: 1px solid rgba(59,130,246,0.08);
+  border-right: 1px solid rgba(255,255,255,0.05);
 
   /* Soft shadow separating sidebar from content */
   box-shadow: 4px 0 24px rgba(59,130,246,0.06), 2px 0 8px rgba(0,0,0,0.04);
@@ -41,8 +41,8 @@
   flex-direction: column;
   align-items: center;
   padding: 28px 20px 20px;
-  border-bottom: 1px solid rgba(59,130,246,0.08);
-  background: linear-gradient(180deg, #F8FAFF 0%, #FFFFFF 100%);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  background: transparent;
   flex-shrink: 0;
 }
 
@@ -117,15 +117,15 @@
 .profileName {
   font-size: 14px;
   font-weight: 700;
-  color: #0F172A;
+  color: #FFFFFF;
   letter-spacing: -0.01em;
 }
 
 .profileTitle {
   font-size: 11px;
   font-weight: 500;
-  color: #64748B;
-  background: rgba(59,130,246,0.08);
+  color: #94A3B8;
+  background: rgba(255,255,255,0.08);
   padding: 2px 10px;
   border-radius: 20px;
   margin-top: 2px;
@@ -166,7 +166,8 @@
   letter-spacing: 0.1em;
   text-transform: uppercase;
   padding: 10px 8px 6px;
-  opacity: 0.85;
+  opacity: 0.5;
+  color: #F8FAFC;
   transition: color 200ms;
 }
 
@@ -180,7 +181,7 @@
   border-radius: 10px;
   font-size: 13px;
   font-weight: 600;
-  color: #475569;
+  color: #94A3B8;
   cursor: pointer;
   position: relative;
   overflow: hidden;
@@ -200,8 +201,8 @@
 
 /* Hover subtle fill animation (no skew) */
 .navItem:hover {
-  background: rgba(37, 99, 235, 0.08);
-  color: #2563EB;
+  background: rgba(255, 255, 255, 0.05);
+  color: #FFFFFF;
   transform: scale(1.02) translateX(2px);
 }
 
@@ -221,8 +222,8 @@
   flex-shrink: 0;
   transition: transform 200ms cubic-bezier(0.34,1.56,0.64,1), color 200ms ease;
 }
-.navItem:hover .navIcon { transform: scale(1.15); color: #2563EB; }
-.navItem.active .navIcon { transform: scale(1.1); color: #60A5FA; }
+.navItem:hover .navIcon { transform: scale(1.15); color: #FFFFFF; }
+.navItem.active .navIcon { transform: scale(1.1); color: #FFFFFF; }
 
 .navLabel { flex: 1; }
 
