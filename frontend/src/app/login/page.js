@@ -18,7 +18,8 @@ import {
   Eye,
   EyeOff,
   UserCheck,
-  PieChart
+  Sparkles,
+  Zap
 } from 'lucide-react';
 
 export default function LoginPage() {
@@ -76,13 +77,32 @@ export default function LoginPage() {
       width: '100%',
       display: 'flex',
       alignItems: 'center',
-      justifyContent: 'center',
+      justify: 'center',
       background: '#F8FAFC',
-      backgroundImage: 'radial-gradient(#E2E8F0 1.2px, transparent 1.2px)',
+      backgroundImage: 'radial-gradient(#CBD5E1 1px, transparent 1px)',
       backgroundSize: '24px 24px',
       position: 'relative',
-      padding: '24px 16px'
+      padding: '32px 16px'
     }}>
+      <style>{`
+        @keyframes floatSlow {
+          0%, 100% { transform: translateY(0px) rotate(0deg); }
+          50% { transform: translateY(-10px) rotate(1deg); }
+        }
+        @keyframes floatFast {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-14px); }
+        }
+        @keyframes pulseGlow {
+          0%, 100% { transform: scale(1); opacity: 0.9; }
+          50% { transform: scale(1.04); opacity: 1; filter: drop-shadow(0 0 12px rgba(255,255,255,0.6)); }
+        }
+        .animate-float-slow { animation: floatSlow 4s ease-in-out infinite; }
+        .animate-float-fast { animation: floatFast 3s ease-in-out infinite; }
+        .animate-pulse-glow { animation: pulseGlow 2.5s ease-in-out infinite; }
+        .subtle-input::placeholder { color: #94A3B8; opacity: 0.65; font-weight: 400; }
+      `}</style>
+
       {/* 2-Column Auth Container (Centered Max 960px) */}
       <div style={{
         width: '100%',
@@ -97,7 +117,7 @@ export default function LoginPage() {
         animation: 'modal-in 400ms cubic-bezier(0.34,1.56,0.64,1) both'
       }}>
         
-        {/* ── LEFT BANNER (Vibrant Amber Illustration Anchor) ── */}
+        {/* ── LEFT BANNER (Animated Golden Amber Motion Canvas) ── */}
         <div style={{
           background: 'linear-gradient(145deg, #FFD000 0%, #FFB703 60%, #FB8500 100%)',
           padding: '36px 32px',
@@ -110,7 +130,7 @@ export default function LoginPage() {
           {/* Subtle curved backdrop pattern */}
           <div style={{
             position: 'absolute', inset: 0,
-            backgroundImage: 'radial-gradient(circle 320px at 0% 0%, rgba(255,255,255,0.25) 0%, transparent 80%)',
+            backgroundImage: 'radial-gradient(circle 320px at 0% 0%, rgba(255,255,255,0.3) 0%, transparent 80%)',
             pointerEvents: 'none'
           }} />
 
@@ -129,95 +149,104 @@ export default function LoginPage() {
             </span>
           </div>
 
-          {/* Central Hero Illustration & Visual Badges (Clean Visual Anchor) */}
+          {/* Animated Hero Graphic & Floating Motion Badges */}
           <div style={{ margin: '32px 0', textAlign: 'center', zIndex: 1, position: 'relative' }}>
             
-            {/* SVG HR Hero Graphic Canvas */}
-            <div style={{
+            {/* Center Animated Hero Card */}
+            <div className="animate-pulse-glow" style={{
               background: 'rgba(255, 255, 255, 0.95)',
+              backdropFilter: 'blur(12px)',
               borderRadius: 24,
-              padding: '28px 24px',
+              padding: '24px 20px',
               boxShadow: '0 16px 40px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.8)',
-              marginBottom: 24,
+              marginBottom: 20,
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              gap: 16
+              gap: 14
             }}>
-              {/* Graphic Icon Composition */}
+              {/* Animated Floating Nodes */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 14, justifyContent: 'center' }}>
-                <div style={{
-                  width: 52, height: 52, borderRadius: 16,
+                <div className="animate-float-slow" style={{
+                  width: 48, height: 48, borderRadius: 16,
                   background: 'linear-gradient(135deg, #2563EB, #1D4ED8)',
                   color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  boxShadow: '0 8px 20px rgba(37,99,235,0.3)'
+                  boxShadow: '0 8px 20px rgba(37,99,235,0.35)'
                 }}>
-                  <UserCheck size={26} />
+                  <UserCheck size={24} />
                 </div>
-                <div style={{
-                  width: 52, height: 52, borderRadius: 16,
+                <div className="animate-float-fast" style={{
+                  width: 48, height: 48, borderRadius: 16,
                   background: 'linear-gradient(135deg, #10B981, #059669)',
                   color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  boxShadow: '0 8px 20px rgba(16,185,129,0.3)'
+                  boxShadow: '0 8px 20px rgba(16,185,129,0.35)'
                 }}>
-                  <ShieldCheck size={26} />
+                  <ShieldCheck size={24} />
                 </div>
-                <div style={{
-                  width: 52, height: 52, borderRadius: 16,
+                <div className="animate-float-slow" style={{
+                  width: 48, height: 48, borderRadius: 16,
                   background: 'linear-gradient(135deg, #F59E0B, #D97706)',
                   color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  boxShadow: '0 8px 20px rgba(245,158,11,0.3)'
+                  boxShadow: '0 8px 20px rgba(245,158,11,0.35)'
                 }}>
-                  <PieChart size={26} />
+                  <Sparkles size={24} />
                 </div>
               </div>
 
-              <div style={{ fontSize: 18, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.01em' }}>
-                Smart Workforce Portal
+              <div style={{ fontSize: 16, fontWeight: 800, color: '#0F172A' }}>
+                AI-Driven Workforce Engine
               </div>
             </div>
 
-            {/* Minimal Icon Badges Grid (Virtual / Full-Time / In-Office / Part-Time) */}
+            {/* Floating Animated Pill Badges */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-              <div style={{ background: 'rgba(255,255,255,0.92)', padding: '10px 12px', borderRadius: 14, display: 'flex', alignItems: 'center', gap: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
+              <div className="animate-float-slow" style={{ background: 'rgba(255,255,255,0.92)', padding: '10px 12px', borderRadius: 14, display: 'flex', alignItems: 'center', gap: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.06)' }}>
                 <Laptop size={16} color="#DB2777" />
                 <span style={{ fontSize: 11, fontWeight: 700, color: '#0F172A' }}>Virtual</span>
               </div>
-              <div style={{ background: 'rgba(255,255,255,0.92)', padding: '10px 12px', borderRadius: 14, display: 'flex', alignItems: 'center', gap: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
+              <div className="animate-float-fast" style={{ background: 'rgba(255,255,255,0.92)', padding: '10px 12px', borderRadius: 14, display: 'flex', alignItems: 'center', gap: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.06)' }}>
                 <Briefcase size={16} color="#2563EB" />
                 <span style={{ fontSize: 11, fontWeight: 700, color: '#0F172A' }}>Full-Time</span>
               </div>
-              <div style={{ background: 'rgba(255,255,255,0.92)', padding: '10px 12px', borderRadius: 14, display: 'flex', alignItems: 'center', gap: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
+              <div className="animate-float-fast" style={{ background: 'rgba(255,255,255,0.92)', padding: '10px 12px', borderRadius: 14, display: 'flex', alignItems: 'center', gap: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.06)' }}>
                 <Building2 size={16} color="#D97706" />
                 <span style={{ fontSize: 11, fontWeight: 700, color: '#0F172A' }}>In-Office</span>
               </div>
-              <div style={{ background: 'rgba(255,255,255,0.92)', padding: '10px 12px', borderRadius: 14, display: 'flex', alignItems: 'center', gap: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
+              <div className="animate-float-slow" style={{ background: 'rgba(255,255,255,0.92)', padding: '10px 12px', borderRadius: 14, display: 'flex', alignItems: 'center', gap: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.06)' }}>
                 <Clock size={16} color="#9333EA" />
                 <span style={{ fontSize: 11, fontWeight: 700, color: '#0F172A' }}>Part-Time</span>
               </div>
             </div>
 
+            {/* Info Highlights Pill */}
+            <div style={{
+              marginTop: 18,
+              background: '#0F172A', color: '#6EE7B7',
+              fontSize: 11, fontWeight: 700, padding: '8px 16px', borderRadius: 20,
+              display: 'inline-flex', alignItems: 'center', gap: 6,
+              boxShadow: '0 6px 18px rgba(0,0,0,0.2)'
+            }}>
+              <Zap size={13} fill="#6EE7B7" /> Real-Time Attendance & Payroll Sync
+            </div>
+
           </div>
 
-          {/* Footer Badge */}
           <div style={{ fontSize: 11, fontWeight: 600, color: '#0F172A', opacity: 0.85, zIndex: 1, textAlign: 'center' }}>
-            Dayflow Enterprise • Secure Auth
+            Enterprise HR Portal • v1.0
           </div>
         </div>
 
-        {/* ── RIGHT COLUMN (Form & Account Selection) ── */}
+        {/* ── RIGHT COLUMN (Minimal Clean Login Form) ── */}
         <div style={{ padding: '40px 44px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
           
-          <div style={{ marginBottom: 24 }}>
+          {/* Clean Title — No Unwanted Text Descriptions */}
+          <div style={{ marginBottom: 20 }}>
             <h1 style={{ fontSize: 26, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.02em' }}>
               Identify your account type
             </h1>
-            <p style={{ fontSize: 13, color: '#64748B', marginTop: 6, lineHeight: 1.4 }}>
-              Join Dayflow to manage your workforce, track attendance, and process payroll
-            </p>
           </div>
 
-          {/* Account Type Selector */}
+          {/* Account Role Selector Cards */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 24 }}>
             
             {/* Employee Card */}
@@ -248,9 +277,6 @@ export default function LoginPage() {
                 <div style={{ fontSize: 14, fontWeight: 700, color: '#0F172A', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <span>I&apos;m an Employee</span>
                   {selectedRole === 'employee' && <CheckCircle2 size={16} color="#F59E0B" />}
-                </div>
-                <div style={{ fontSize: 11, color: '#64748B', marginTop: 2 }}>
-                  Clock attendance, apply for leaves & view payslips
                 </div>
               </div>
             </div>
@@ -284,15 +310,12 @@ export default function LoginPage() {
                   <span>I&apos;m an HR Officer / Employer</span>
                   {selectedRole === 'hr' && <CheckCircle2 size={16} color="#2563EB" />}
                 </div>
-                <div style={{ fontSize: 11, color: '#64748B', marginTop: 2 }}>
-                  Manage employees, approve leaves & process payroll
-                </div>
               </div>
             </div>
 
           </div>
 
-          {/* Top Error Alert (Only shown on form submit failure) */}
+          {/* Top Error Alert */}
           {error && (
             <div style={{
               display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', borderRadius: 12,
@@ -304,10 +327,10 @@ export default function LoginPage() {
             </div>
           )}
 
-          {/* Form Controls */}
+          {/* Login Form Controls */}
           <form onSubmit={handleSubmit}>
             
-            {/* Work Email Field */}
+            {/* Work Email Field (Subtle Less Visible Text) */}
             <div style={{ marginBottom: 18 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
                 <label style={{ fontSize: 12, fontWeight: 600, color: '#475569' }}>
@@ -322,6 +345,7 @@ export default function LoginPage() {
               
               <div style={{ position: 'relative' }}>
                 <input
+                  className="subtle-input"
                   type="email"
                   required
                   placeholder="name@company.com"
@@ -335,7 +359,7 @@ export default function LoginPage() {
                     borderRadius: 12,
                     border: touched.email && !isEmailValid ? '1.5px solid #EF4444' : '1.5px solid #E2E8F0',
                     fontSize: 13,
-                    color: '#0F172A',
+                    color: '#334155',
                     background: '#FFFFFF',
                     outline: 'none',
                     transition: 'all 200ms ease'
@@ -351,7 +375,7 @@ export default function LoginPage() {
               )}
             </div>
 
-            {/* Password Field */}
+            {/* Password Field (Subtle Less Visible Text) */}
             <div style={{ marginBottom: 24 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
                 <label style={{ fontSize: 12, fontWeight: 600, color: '#475569' }}>
@@ -366,6 +390,7 @@ export default function LoginPage() {
               
               <div style={{ position: 'relative' }}>
                 <input
+                  className="subtle-input"
                   type={showPassword ? 'text' : 'password'}
                   required
                   placeholder="••••••••"
@@ -379,7 +404,7 @@ export default function LoginPage() {
                     borderRadius: 12,
                     border: touched.password && !isPasswordValid ? '1.5px solid #EF4444' : '1.5px solid #E2E8F0',
                     fontSize: 13,
-                    color: '#0F172A',
+                    color: '#334155',
                     background: '#FFFFFF',
                     outline: 'none',
                     transition: 'all 200ms ease'
@@ -421,12 +446,8 @@ export default function LoginPage() {
             </ShinyButton>
           </form>
 
-          {/* Legal Footer */}
-          <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 20, textAlign: 'center', lineHeight: 1.5 }}>
-            By signing in, you accept the <a href="#" style={{ color: '#2563EB', fontWeight: 600 }}>Terms of Service</a> and acknowledge our <a href="#" style={{ color: '#2563EB', fontWeight: 600 }}>Privacy Policy</a>.
-          </div>
-
-          <div style={{ textAlign: 'center', marginTop: 14, fontSize: 13, color: '#64748B' }}>
+          {/* Minimal Navigation Link */}
+          <div style={{ textAlign: 'center', marginTop: 20, fontSize: 13, color: '#64748B' }}>
             Don&apos;t have an account?{' '}
             <a href="/signup" style={{ color: '#2563EB', fontWeight: 700 }}>Create an Account</a>
           </div>
