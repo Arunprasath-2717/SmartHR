@@ -34,25 +34,19 @@ export default function AnalyticsPage() {
         </div>
       </div>
 
-      {/* ScrollExpand Hero Feature Banner */}
-      <div style={{ height: '340px', marginBottom: '24px', borderRadius: '24px', overflow: 'hidden', border: '1px solid rgba(59,130,246,0.2)', boxShadow: '0 20px 60px rgba(11,30,61,0.2)' }}>
-        <ScrollExpand
+      {/* Static Hero Feature Banner */}
+      <div style={{ height: '340px', marginBottom: '24px', borderRadius: '24px', overflow: 'hidden', border: '1px solid rgba(59,130,246,0.2)', boxShadow: '0 20px 60px rgba(11,30,61,0.2)', position: 'relative' }}>
+        <img
           src="https://images.unsplash.com/photo-1551836022-d5d88e9218df?q=80&w=1200&auto=format&fit=crop"
-          title="Workforce Intelligence"
-          scrollHint="Scroll frame to expand stage"
-          startWidth={52}
-          startHeight={65}
-          startRadius={20}
-          mediaZoom={1.25}
-          overlayScrim={0.5}
-        >
-          <div style={{ color: '#fff', textAlign: 'center' }}>
-            <h2 style={{ fontSize: '26px', fontWeight: 800, marginBottom: '8px' }}>Real-Time Workforce Analytics</h2>
-            <p style={{ fontSize: '13px', opacity: 0.9, maxWidth: '460px' }}>
-              Deep-dive metrics across attendance trends, leave allocations, and productivity indicators.
-            </p>
-          </div>
-        </ScrollExpand>
+          alt="Workforce Intelligence"
+          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+        />
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#fff', textAlign: 'center', padding: 20 }}>
+          <h2 style={{ fontSize: '26px', fontWeight: 800, marginBottom: '8px' }}>Real-Time Workforce Analytics</h2>
+          <p style={{ fontSize: '13px', opacity: 0.9, maxWidth: '460px' }}>
+            Deep-dive metrics across attendance trends, leave allocations, and productivity indicators.
+          </p>
+        </div>
       </div>
 
       {/* Glass Filter Bar */}

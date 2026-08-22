@@ -98,7 +98,7 @@ export default function SignupPage() {
         
         {/* ── LEFT BANNER (Static Solid Amber Canvas — Motion Removed) ── */}
         <div style={{
-          background: 'linear-gradient(145deg, #FFD000 0%, #FFB703 60%, #FB8500 100%)',
+          background: 'linear-gradient(145deg, #4F46E5 0%, #2563EB 60%, #7C3AED 100%)',
           padding: '36px 32px',
           display: 'flex',
           flexDirection: 'column',
@@ -117,13 +117,13 @@ export default function SignupPage() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, zIndex: 1 }}>
             <div style={{
               width: 42, height: 42, borderRadius: 12,
-              background: '#0F172A', color: '#FFD000',
+              background: '#FFFFFF', color: '#4F46E5',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               boxShadow: '0 4px 14px rgba(0,0,0,0.15)'
             }}>
-              <Hexagon size={24} fill="#FFD000" />
+              <Hexagon size={24} fill="#4F46E5" />
             </div>
-            <span style={{ fontSize: 24, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em' }}>
+            <span style={{ fontSize: 24, fontWeight: 900, color: '#FFFFFF', letterSpacing: '-0.03em' }}>
               dayflow
             </span>
           </div>

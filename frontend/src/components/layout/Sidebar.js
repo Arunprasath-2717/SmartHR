@@ -94,7 +94,7 @@ export default function Sidebar({ role = 'hr' }) {
     : { name:'John Doe',      title:'Software Engineer', initials:'JD', dept:'Engineering' });
 
   return (
-    <aside className={styles.sidebar}>
+    <aside className={styles.sidebar} id="app-sidebar">
       {/* User Profile Header */}
       <div className={styles.profileSection} onClick={() => router.push('/profile')} style={{ cursor: 'pointer' }}>
         <div className={styles.avatarRing}>

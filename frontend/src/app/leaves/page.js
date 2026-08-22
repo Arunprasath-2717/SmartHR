@@ -129,7 +129,10 @@ export default function HRLeavesPage() {
                     <div className="avatar avatar-sm">{leave.initials}</div>
                     <div>
                       <div style={{ fontWeight:600, fontSize:13 }}>{leave.employee}</div>
-                      <div className="caption">{leave.dept}</div>
+                      <div className="caption flex items-center gap-6">
+                        <span>{leave.dept}</span>
+                        <span className="monospace text-muted">{leave.employee_id}</span>
+                      </div>
                     </div>
                   </div>
                 </td>
